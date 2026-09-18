@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الأخطبوط والقلوب التلاتة • عمرك فكرت؟</title>
+<meta name="description" content="عمرك فكرت إن الأخطبوط عنده ٣ قلوب... يعني لما حد يسيبه قلبه بيتكسر ٣ مرات؟ 🐙💔">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/octopus.html">
+<meta property="og:title" content="الأخطبوط والقلوب التلاتة 🐙💔">
+<meta property="og:description" content="عمرك فكرت إن الأخطبوط عنده ٣ قلوب... يعني لما حد يسيبه قلبه بيتكسر ٣ مرات؟">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/octopus.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2A140B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐙%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .sea { background: linear-gradient(#CDEBFF, #9ED3F5); padding: 12px 10px 8px; display: flex; flex-direction: column; gap: 8px; }
+  .hearts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .heart {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: rgba(255,255,255,.75); border: 2px solid var(--ink); border-radius: 12px; padding: 6px 4px 4px;
+  }
+  .h-ico { font-size: 32px; line-height: 1.1; }
+  .heart small { font-size: 12px; font-weight: 800; color: var(--ink-soft); text-align: center; line-height: 1.25; }
+  .heart.broken { background: rgba(255,255,255,.4); }
+  .heart.broken .h-ico { animation: shake .45s; }
+  .notif {
+    align-self: center;
+    background: #fff; border: 2px solid var(--ink); border-radius: 999px;
+    padding: 2px 14px; font-weight: 800; font-size: 15px;
+    animation: pop .3s cubic-bezier(.2, 1.6, .5, 1);
+  }
+  .octo { display: block; width: 100%; max-width: 330px; height: auto; margin: 0 auto; }
+  .octo { --oc: #F07AB8; }
+  .oc-fill { fill: var(--oc); transition: fill .8s; }
+  .t-out { fill: none; stroke: #1A0E08; stroke-width: 24; stroke-linecap: round; }
+  .t-in { fill: none; stroke: var(--oc); stroke-width: 17; stroke-linecap: round; transition: stroke .8s; }
+  #tears, #phones, #notes { opacity: 0; transition: opacity .5s; }
+  #inkCloud { opacity: 0; transform: scale(.3); transform-origin: 150px 230px; transition: opacity .8s, transform .8s; }
+  .s2 #tears, .s3 #tears, .s3 #phones, .s3 #notes { opacity: 1; }
+  .s3 #inkCloud { opacity: .85; transform: scale(1); }
+  #notes text { animation: rise 1.4s ease-in-out infinite; }
+  #notes text:nth-child(2) { animation-delay: .5s; }
+</style>
+</head>
+<body data-story="octopus" style="--accent:#C77DFF">
+<main class="wrap">
+
+  <nav class="topbar">
+    <a class="logo" href="./">عمرك فكرت<span>؟</span></a>
+    <button class="chip" id="randomBtn" type="button">🎲 سؤال تاني</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">الأخطبوط 🐙 • سؤال وجودي رقم ٣</span>
+    <h1 class="meme-text">عمرك فكرت إن <span class="hl">الأخطبوط</span> عنده ٣ قلوب...</h1>
+    <p class="meme-text sub">...يعني لما حد يسيبه قلبه بيتكسر ٣ مرات؟ 💔</p>
+  </header>
+
+  <section class="panel" aria-labelledby="lab-h">
+    <h2 id="lab-h">💔 التجربة العاطفية</h2>
+    <p class="lede">ابعتله الرسايل دي واحدة واحدة، وشوف القلوب بتقع إزاي.</p>
+
+    <div class="stage sea" id="stage">
+      <div class="hearts" id="hearts">
+        <div class="heart"><span class="h-ico">❤️</span><small>قلب الخياشيم اليمين</small></div>
+        <div class="heart"><span class="h-ico">❤️</span><small>قلب الخياشيم الشمال</small></div>
+        <div class="heart"><span class="h-ico">❤️</span><small>القلب الرئيسي</small></div>
+      </div>
+      <div class="notif" id="notif" hidden></div>
+
+      <svg class="octo" id="octo" viewBox="0 0 300 290" role="img" aria-label="أخطبوط كرتون، بيبقى حزين أكتر مع كل قلب بيتكسر">
+        <defs>
+          <path id="t7" d="M100 140C70 140 40 150 28 175C20 192 36 204 46 192"/>
+          <path id="t8" d="M200 140C230 140 260 150 272 175C280 192 264 204 254 192"/>
+          <path id="t1" d="M110 160C80 180 50 190 40 225C34 248 52 258 64 244"/>
+          <path id="t2" d="M125 165C110 200 92 225 96 255C99 272 118 272 120 258"/>
+          <path id="t3" d="M145 168C142 205 138 235 148 262C154 276 170 270 166 256"/>
+          <path id="t4" d="M160 168C166 205 176 232 172 260C170 275 186 278 190 264"/>
+          <path id="t5" d="M178 165C195 198 214 222 210 252C207 270 188 270 187 256"/>
+          <path id="t6" d="M192 160C222 178 252 190 260 225C266 248 248 258 236 244"/>
+        </defs>
+
+        <g id="inkCloud" fill="#1E1230">
+          <circle cx="90" cy="230" r="42"/><circle cx="150" cy="250" r="50"/><circle cx="212" cy="228" r="44"/>
+          <circle cx="60" cy="190" r="26"/><circle cx="244" cy="190" r="28"/><circle cx="150" cy="200" r="40"/>
+        </g>
+
+        <use href="#t7" class="t-out"/><use href="#t8" class="t-out"/>
+        <use href="#t7" class="t-in"/><use href="#t8" class="t-in"/>
+        <use href="#t1" class="t-out"/><use href="#t2" class="t-out"/><use href="#t3" class="t-out"/>
+        <use href="#t4" class="t-out"/><use href="#t5" class="t-out"/><use href="#t6" class="t-out"/>
+        <use href="#t1" class="t-in"/><use href="#t2" class="t-in"/><use href="#t3" class="t-in"/>
+        <use href="#t4" class="t-in"/><use href="#t5" class="t-in"/><use href="#t6" class="t-in"/>
+
+        <ellipse class="oc-fill" cx="150" cy="100" rx="74" ry="72" stroke="#1A0E08" stroke-width="3"/>
+        <ellipse cx="122" cy="62" rx="18" ry="11" transform="rotate(-25 122 62)" fill="#fff" opacity=".35"/>
+        <circle cx="178" cy="56" r="6" fill="#1A0E08" opacity=".12"/>
+        <circle cx="192" cy="72" r="4" fill="#1A0E08" opacity=".12"/>
+        <circle cx="104" cy="84" r="5" fill="#1A0E08" opacity=".12"/>
+
+        <ellipse cx="104" cy="136" rx="11" ry="7" fill="#FF7EB6" opacity=".6"/>
+        <ellipse cx="196" cy="136" rx="11" ry="7" fill="#FF7EB6" opacity=".6"/>
+        <ellipse cx="125" cy="112" rx="15" ry="17" fill="#fff" stroke="#1A0E08" stroke-width="2.5"/>
+        <ellipse cx="175" cy="112" rx="15" ry="17" fill="#fff" stroke="#1A0E08" stroke-width="2.5"/>
+        <circle cx="127" cy="117" r="7.5" fill="#1A0E08"/><circle cx="173" cy="117" r="7.5" fill="#1A0E08"/>
+        <circle cx="130" cy="114" r="2.5" fill="#fff"/><circle cx="176" cy="114" r="2.5" fill="#fff"/>
+        <path id="brows" d="M108 88L138 88M162 88L192 88" stroke="#1A0E08" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path id="mouth" d="M138 140Q150 152 162 140" stroke="#1A0E08" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+        <g id="tears" fill="#1A0E08">
+          <path d="M116 128q-7 13 0 18q7-5 0-18z"/>
+          <path d="M184 128q-7 13 0 18q7-5 0-18z"/>
+          <path d="M110 150q-5 9 0 12q5-3 0-12z" opacity=".7"/>
+        </g>
+        <g id="phones">
+          <path d="M80 104C78 20 222 20 220 104" fill="none" stroke="#1A0E08" stroke-width="9" stroke-linecap="round"/>
+          <path d="M80 104C78 20 222 20 220 104" fill="none" stroke="#5B5F7A" stroke-width="4" stroke-linecap="round"/>
+          <rect x="64" y="88" width="24" height="38" rx="9" fill="#5B5F7A" stroke="#1A0E08" stroke-width="3"/>
+          <rect x="212" y="88" width="24" height="38" rx="9" fill="#5B5F7A" stroke="#1A0E08" stroke-width="3"/>
+        </g>
+        <g id="notes" font-size="22">
+          <text x="30" y="70">🎵</text>
+          <text x="244" y="60">🎶</text>
+        </g>
+      </svg>
+    </div>
+
+    <p class="caption" id="cap" aria-live="polite">الأخطبوط مبسوط وعنده ٣ قلوب سليمة ❤️❤️❤️</p>
+    <button class="btn" id="msgBtn" type="button">💬 ابعتله: «إحنا لازم نتكلم»</button>
+  </section>
+
+  <section class="panel punch tilt-l" id="punch" aria-label="الرد"></section>
+
+  <section class="panel tilt-r" aria-labelledby="cmt-h">
+    <h2 id="cmt-h">التعليقات (٥)</h2>
+    <ul class="comments">
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐙</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الأخطبوط <span class="badge">📌 صاحب الموضوع</span></div>
+          <p class="cmt-text">أنا كويس. أنا كويس. أنا كويس. أنا كويس. أنا كويس. أنا كويس. أنا كويس. أنا كويس. (كتبها بالـ ٨ إيدين)</p>
+        </div>
+        <div class="likes"><b>❤</b>٩١ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦑</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الحبّار</div>
+          <p class="cmt-text">أنا عندي ٣ قلوب برضه ومحدش عمل عليّا فيديو 🙄</p>
+        </div>
+        <div class="likes"><b>❤</b>٤٠ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🪱</div>
+        <div class="cmt-body">
+          <div class="cmt-name">دودة الأرض</div>
+          <p class="cmt-text">عندي ٥ قلوب وعايشة سنجل عادي 💅</p>
+        </div>
+        <div class="likes"><b>❤</b>٢٦ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦀</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الكابوريا</div>
+          <p class="cmt-text">أنا ماشية جنب الحيطة طول عمري... وبرضه قلبي اتكسر</p>
+        </div>
+        <div class="likes"><b>❤</b>١٧ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🧍</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الإنسان</div>
+          <p class="cmt-text">أنا عندي قلب واحد وكسرته على ماتش كورة ⚽</p>
+        </div>
+        <div class="likes"><b>❤</b>٧</div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="note">
+    <h2>🧪 للأمانة العلمية</h2>
+    <p>الأخطبوط عنده فعلاً ٣ قلوب: اتنين بيضخوا الدم للخياشيم، وواحد للجسم كله. ودمه أزرق عشان فيه نحاس بدل الحديد. والأغرب إن القلب الرئيسي بيبطّل يدق وهو بيعوم، وعشان كده بيحب يزحف أكتر ما يعوم. وكمان بيغيّر لونه حسب مزاجه، وبيرش حبر لما يتخض. يعني الدراما دي كلها مش تأليف 🥲</p>
+  </aside>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعتها لحد قلبه مكسور</button></div>
+  <div id="next"></div>
+
+  <footer>مفيش أي أخطبوط اتأذى في عمل الصفحة دي... هو بس محتاج شوية وقت 🐙</footer>
+</main>
+
+<script src="common.js"></script>
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const octo = document.getElementById("octo");
+  const hearts = [...document.querySelectorAll("#hearts .heart")];
+  const notif = document.getElementById("notif");
+  const brows = document.getElementById("brows");
+  const mouth = document.getElementById("mouth");
+  const cap = document.getElementById("cap");
+  const btn = document.getElementById("msgBtn");
+
+  const COLORS = ["#F07AB8", "#C98BDB", "#9D98C9", "#8E9AAF"];
+  const BROWS = ["M108 88L138 88M162 88L192 88", "M108 88L138 84M162 84L192 88", "M108 92L138 82M162 82L192 92", "M108 94L138 80M162 80L192 94"];
+  const MOUTHS = ["M138 140Q150 152 162 140", "M138 144L162 144", "M138 148Q150 139 162 148", "M136 150Q150 136 164 150"];
+  const STEPS = [
+    { cap: "الأخطبوط مبسوط وعنده ٣ قلوب سليمة ❤️❤️❤️", btn: "💬 ابعتله: «إحنا لازم نتكلم»" },
+    { msg: "💬 «إحنا لازم نتكلم»", cap: "القلب الأول اتكسر 💔 ... «عادي، لسه عندي اتنين احتياطي»", btn: "💬 «إنت أخطبوط كويس بس...»" },
+    { msg: "💬 «إنت أخطبوط كويس بس...»", cap: "القلب التاني اتكسر 💔💔 ... وقعد يعيّط حبر 🖤", btn: "💬 «أنا عملتلك أنفولو»" },
+    { msg: "💬 «أنا عملتلك أنفولو»", cap: "القلب التالت... خلاص 💔💔💔 بقى بيسمع أغاني حزينة بـ ٨ سماعات 🎧", btn: "🩹 صالحه" },
+  ];
+  let state = 0;
+  let mended = false;
+
+  function apply() {
+    const s = STEPS[state];
+    hearts.forEach((h, i) => {
+      const broken = i < state;
+      h.classList.toggle("broken", broken);
+      h.querySelector(".h-ico").textContent = broken ? "💔" : mended ? "❤️‍🩹" : "❤️";
+    });
+    stage.classList.remove("s1", "s2", "s3");
+    if (state) stage.classList.add("s" + state);
+    octo.style.setProperty("--oc", COLORS[state]);
+    brows.setAttribute("d", BROWS[state]);
+    mouth.setAttribute("d", MOUTHS[state]);
+    notif.hidden = !s.msg;
+    if (s.msg) { notif.textContent = s.msg; notif.style.animation = "none"; notif.offsetWidth; notif.style.animation = ""; }
+    cap.textContent = s.cap;
+    btn.textContent = s.btn;
+  }
+
+  btn.addEventListener("click", () => {
+    if (state < 3) {
+      state++;
+      apply();
+      return;
+    }
+    state = 0;
+    mended = true;
+    apply();
+    cap.textContent = "رجعتله القلوب التلاتة... بس بقى عنده تراست إيشوز 🙂";
+  });
+})();
+</script>
+</body>
+</html>

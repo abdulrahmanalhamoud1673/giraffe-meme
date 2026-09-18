@@ -3,648 +3,137 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="عمرك فكرت إن لو الزرافة طلبت هوت شوكلت، قبل ما يوصل بطنها هيكون برد؟ 🦒☕">
+<title>عمرك فكرت؟</title>
+<meta name="description" content="أسئلة وجودية عن حيوانات محدش فكّر فيها... عشان الإنسان ما بيفكرش غير في نفسه 💔">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/">
-<meta property="og:title" content="الزرافة والهوت شوكلت 🦒☕">
-<meta property="og:description" content="عمرك فكرت إن لو الزرافة طلبت هوت شوكلت، قبل ما يوصل بطنها هيكون برد؟ جرّب بنفسك 🥶">
-<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og.png">
+<meta property="og:title" content="عمرك فكرت؟ 🦒🐙🦥🦩">
+<meta property="og:description" content="أسئلة وجودية عن حيوانات محدش فكّر فيها... عشان الإنسان ما بيفكرش غير في نفسه 💔">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/index.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#2A140B">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦒%3C/text%3E%3C/svg%3E">
-<title>الزرافة والهوت شوكلت</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
 <style>
-  :root {
-    --cocoa: #2A140B;
-    --cocoa-2: #3A1D10;
-    --milk: #FFF3E2;
-    --milk-dim: #D9BFA6;
-    --paper: #FFFDF8;
-    --stage: #FFE9BA;
-    --ink: #1A0E08;
-    --ink-soft: #6B4E3D;
-    --giraffe: #F5B83D;
-    --spot: #B5621E;
-    --hot: #FF5A36;
-    --cold: #6FD3FF;
-    --display: "Lalezar", "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
-    --body: "Baloo Bhaijaan 2", "Segoe UI", Tahoma, sans-serif;
-    --outline: 3px 3px 0 #000, -3px 3px 0 #000, 3px -3px 0 #000, -3px -3px 0 #000,
-               0 3px 0 #000, 0 -3px 0 #000, 3px 0 0 #000, -3px 0 0 #000;
+  h1.hub-title { font-size: clamp(58px, 17vw, 96px); line-height: 1.1; }
+  .og h1.hub-title { font-size: 70px; }
+  .cast { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .cast a {
+    width: 48px; height: 48px; display: grid; place-items: center;
+    font-size: 26px; line-height: 1; text-decoration: none;
+    border-radius: 50%; background: var(--cocoa-2); border: 2px dashed var(--milk-dim);
+    filter: grayscale(1); opacity: .55;
+    transition: transform .15s;
   }
-  body {
-    background-color: var(--cocoa);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='%23361b0f'%3E%3Cpath d='M10 12l22-4 12 14-6 20-24 2-8-16z'/%3E%3Cpath d='M70 8l26 6 4 20-18 12-16-10z'/%3E%3Cpath d='M58 62l24-2 14 18-10 22-26-2-8-18z'/%3E%3Cpath d='M8 70l20 2 8 18-12 20-18-8z'/%3E%3C/g%3E%3C/svg%3E");
-    color: var(--milk);
-    font-family: var(--body);
-    font-size: 17px;
-    line-height: 1.6;
-  }
-  .wrap {
-    max-width: 560px;
-    margin: 0 auto;
-    padding-inline: 16px;
-    padding-block: 28px 56px;
-    display: flex;
-    flex-direction: column;
-    gap: 34px;
-  }
+  .cast a:nth-child(odd) { transform: rotate(-6deg); }
+  .cast a:nth-child(even) { transform: rotate(6deg); }
+  .cast a:hover { transform: scale(1.12); }
+  .cast a.seen { filter: none; opacity: 1; border: 2px solid var(--ink); background: var(--c); }
+  .progress { margin: 0; font-weight: 800; color: var(--milk-dim); }
+  .progress b { color: var(--giraffe); font-variant-numeric: tabular-nums; }
 
-  /* ---------- hero ---------- */
-  .hero { display: flex; flex-direction: column; gap: 14px; text-align: center; align-items: center; }
-  .eyebrow {
-    display: inline-block;
-    font-weight: 800;
-    font-size: 14px;
-    letter-spacing: .02em;
-    color: var(--ink);
-    background: var(--giraffe);
-    border: 2px solid var(--ink);
-    border-radius: 999px;
-    padding: 2px 14px;
-    transform: rotate(-2deg);
+  .stories { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 24px; }
+  .story {
+    display: grid; grid-template-columns: 86px 1fr; gap: 14px; align-items: center;
+    background: var(--paper); color: var(--ink);
+    border: 3px solid var(--ink); border-radius: 16px;
+    box-shadow: 7px 7px 0 var(--c);
+    padding: 12px;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
   }
-  .meme-text {
-    font-family: var(--display);
-    font-weight: 400;
-    color: #fff;
-    text-shadow: var(--outline);
-    text-wrap: balance;
-    margin: 0;
+  .stories li:nth-child(odd) .story { transform: rotate(-1deg); }
+  .stories li:nth-child(even) .story { transform: rotate(.8deg); }
+  .stories .story:hover { transform: translateY(-3px) rotate(0); box-shadow: 9px 10px 0 var(--c); }
+  .story-pic {
+    width: 86px; height: 86px; display: grid; place-items: center;
+    font-size: 50px; line-height: 1;
+    border-radius: 12px; border: 2px solid var(--ink); background: var(--c);
   }
-  h1.meme-text { font-size: clamp(34px, 9.4vw, 52px); line-height: 1.3; }
-  .hero .sub { font-size: clamp(24px, 6.4vw, 34px); line-height: 1.4; }
-  .hl-g { color: var(--giraffe); }
-  .hl-c { color: var(--cold); }
+  .story-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 800; font-size: 14px; color: var(--ink-soft); }
+  .seen-badge { font-size: 12px; background: #D6F4D2; border: 1.5px solid var(--ink); border-radius: 6px; padding: 0 6px; color: var(--ink); }
+  .story-q { display: block; margin: 2px 0 4px; font-family: var(--display); font-weight: 400; font-size: 21px; line-height: 1.35; text-wrap: balance; }
+  .story-go { display: block; font-weight: 800; font-size: 14px; color: var(--hot); }
 
-  /* ---------- meme panels ---------- */
-  .panel {
-    background: var(--paper);
-    color: var(--ink);
-    border: 3px solid var(--ink);
-    border-radius: 16px;
-    box-shadow: 7px 7px 0 var(--giraffe);
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-  .tilt-l { transform: rotate(-1.2deg); }
-  .tilt-r { transform: rotate(1deg); }
-  .panel h2 {
-    font-family: var(--display);
-    font-weight: 400;
-    font-size: 26px;
-    line-height: 1.25;
-    margin: 0;
-    text-wrap: balance;
-  }
-  .panel .lede { margin: -6px 0 0; color: var(--ink-soft); font-size: 16px; }
-
-  .btn {
-    align-self: center;
-    font-family: var(--display);
-    font-size: 21px;
-    line-height: 1;
-    color: #fff;
-    background: var(--hot);
-    border: 3px solid var(--ink);
-    border-radius: 999px;
-    padding: 13px 26px 11px;
-    box-shadow: 0 5px 0 var(--ink);
-    cursor: pointer;
-    transition: transform .08s, box-shadow .08s;
-  }
-  .btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
-  .btn:disabled { filter: saturate(.4); cursor: progress; }
-  .btn:focus-visible { outline: 3px solid var(--giraffe); outline-offset: 4px; }
-
-  /* ---------- the experiment ---------- */
-  .stage {
-    background: var(--stage);
-    border: 2px solid var(--ink);
-    border-radius: 12px;
-    display: grid;
-    grid-template-columns: 1fr 70px;
-    align-items: center;
-    gap: 6px;
-    padding: 10px 8px 6px;
-    overflow: hidden;
-  }
-  .giraffe-box { position: relative; min-width: 0; }
-  .giraffe-box svg { display: block; width: 100%; height: auto; max-height: 470px; }
-  .bubble {
-    position: absolute;
-    top: 3%;
-    left: 0;
-    max-width: 56%;
-    background: #fff;
-    border: 2px solid var(--ink);
-    border-radius: 14px;
-    padding: 6px 10px;
-    font-weight: 800;
-    font-size: 15px;
-    line-height: 1.35;
-    animation: pop .35s cubic-bezier(.2, 1.6, .5, 1);
-  }
-  .bubble::after {
-    content: "";
-    position: absolute;
-    right: -9px;
-    top: 14px;
-    border: 8px solid transparent;
-    border-left-color: var(--ink);
-    border-right: 0;
-  }
-  @keyframes pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-  .thermo { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-  .thermo-read {
-    font-family: var(--display);
-    font-size: 26px;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .thermo-tube {
-    position: relative;
-    width: 20px;
-    height: 230px;
-    background: #fff;
-    border: 2px solid var(--ink);
-    border-bottom: 0;
-    border-radius: 12px 12px 0 0;
-    overflow: hidden;
-  }
-  .thermo-fill {
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 89%;
-    background: var(--hot);
-  }
-  .thermo-bulb {
-    width: 36px;
-    height: 36px;
-    margin-top: -8px;
-    border-radius: 50%;
-    border: 2px solid var(--ink);
-    background: var(--thermo-color, var(--hot));
-  }
-  .thermo-dist { font-size: 13px; font-weight: 800; color: var(--ink-soft); text-align: center; line-height: 1.3; }
-
-  .lab-caption {
-    margin: 0;
-    min-height: 2.8em;
-    text-align: center;
-    font-family: var(--display);
-    font-size: 22px;
-    line-height: 1.35;
-  }
-
-  #frost, .tear { opacity: 0; transition: opacity .4s; }
-  .is-cold #frost, .is-cold .tear { opacity: 1; }
-  .steam path { animation: rise 1.6s ease-in-out infinite; }
-  .steam path:nth-child(2) { animation-delay: .5s; }
-  @keyframes rise { 0%, 100% { transform: translateY(0); opacity: .9; } 50% { transform: translateY(-4px); opacity: .4; } }
-
-  /* ---------- punchline (video-caption style) ---------- */
-  .panel.punch {
-    background: #120804;
-    color: #fff;
-    box-shadow: 7px 7px 0 var(--hot);
-    text-align: center;
-    gap: 10px;
-    padding-block: 26px 22px;
-  }
-  .silence {
-    margin: 0;
-    color: var(--milk-dim);
-    font-weight: 600;
-    font-size: 16px;
-    font-variant-numeric: tabular-nums;
-  }
-  .caption-line { margin: 0; line-height: 1.35; }
-  .caption-line.big { font-size: clamp(34px, 9vw, 46px); }
-  .caption-line.small { font-size: clamp(25px, 6.6vw, 32px); }
-  .w { display: inline-block; transition: opacity .15s, color .15s, transform .15s; }
-  .playing .w { opacity: .25; }
-  .playing .w.said { opacity: 1; }
-  .w.on { color: var(--giraffe); transform: scale(1.14); }
-
-  /* ---------- drake / brain formats ---------- */
-  .format {
-    display: grid;
-    grid-template-columns: 104px 1fr;
-    border: 3px solid var(--ink);
-    border-radius: 10px;
-    overflow: hidden;
-  }
-  .format > * { border-bottom: 3px solid var(--ink); }
-  .format > :nth-last-child(-n+2) { border-bottom: 0; }
-  .format .pic {
-    display: grid;
-    place-items: center;
-    font-size: 54px;
-    line-height: 1;
-    padding: 14px 0;
-    border-left: 3px solid var(--ink);
-    background: var(--stage);
-  }
-  .format .txt {
-    display: flex;
-    align-items: center;
-    padding: 12px 14px;
-    font-family: var(--display);
-    font-size: 21px;
-    line-height: 1.35;
-    text-wrap: balance;
-  }
-  .drake .no.pic { background: #FFD9CF; }
-  .drake .yes.pic { background: #D6F4D2; }
-  .drake .no.txt { color: var(--ink-soft); text-decoration: line-through 2px var(--hot); }
-
-  .brain .pic { font-size: 46px; }
-  .brain .b1 { background: #EFE6DA; filter: saturate(.3); }
-  .brain .b2 { background: #FFE7A3; }
-  .brain .b2 span { filter: drop-shadow(0 0 6px #ffd24d); }
-  .brain .b3 { background: #FFB45C; }
-  .brain .b3 span { filter: drop-shadow(0 0 12px #fff3b0); }
-  .brain .b4 {
-    background:
-      radial-gradient(circle at 20% 25%, #fff 0 1px, transparent 2px),
-      radial-gradient(circle at 75% 20%, #fff 0 1px, transparent 2px),
-      radial-gradient(circle at 60% 80%, #fff 0 1.5px, transparent 2.5px),
-      radial-gradient(circle at 30% 75%, #cfe9ff 0 1px, transparent 2px),
-      radial-gradient(circle at 50% 50%, #8a4dff 0, #2a0f5c 60%, #0d0425 100%);
-  }
-  .brain .b4 span { filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 22px #b58cff); }
-  .brain .t4 { background: #0d0425; color: #fff; }
-
-  /* ---------- comments ---------- */
-  .comments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
-  .cmt { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: start; }
-  .avatar {
-    width: 44px; height: 44px;
-    display: grid; place-items: center;
-    border-radius: 50%;
-    background: var(--stage);
-    border: 2px solid var(--ink);
-    font-size: 24px;
-    line-height: 1;
-  }
-  .cmt-body { min-width: 0; }
-  .cmt-name { font-weight: 800; font-size: 15px; color: var(--ink-soft); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
-  .badge { font-size: 12px; font-weight: 800; color: var(--ink); background: var(--giraffe); border-radius: 6px; padding: 0 6px; }
-  .cmt-text { margin: 0; font-size: 17px; line-height: 1.5; }
-  .likes { font-size: 13px; font-weight: 800; color: var(--ink-soft); text-align: center; line-height: 1.2; padding-top: 4px; font-variant-numeric: tabular-nums; }
-  .likes b { display: block; font-size: 17px; color: var(--hot); }
-
-  /* ---------- science note ---------- */
-  .note {
-    border: 2px dashed var(--milk-dim);
-    border-radius: 14px;
-    padding: 16px 18px;
-    color: var(--milk);
-  }
-  .note h2 { margin: 0 0 6px; font-family: var(--display); font-weight: 400; font-size: 22px; color: var(--giraffe); }
-  .note p { margin: 0; max-width: 62ch; }
-
-  footer { text-align: center; color: var(--milk-dim); font-size: 14px; }
-
-  @media (max-width: 400px) {
-    .format { grid-template-columns: 84px 1fr; }
-    .format .pic { font-size: 44px; }
-    .format .txt { font-size: 19px; }
-    .stage { grid-template-columns: 1fr 58px; }
-    .thermo-tube { height: 190px; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .steam path, .bubble { animation: none; }
-    .w, .btn, #frost, .tear { transition: none; }
-  }
+  .trophy { text-align: center; box-shadow: 7px 7px 0 var(--giraffe); }
+  .trophy .big { font-size: 64px; line-height: 1; }
+  .origin { text-align: center; }
+  .origin p { margin: 0 auto; max-width: 46ch; color: var(--milk-dim); }
 </style>
-<style>body{margin:0}</style>
 </head>
-<body>
-<main class="wrap" dir="rtl" lang="ar-EG">
+<body style="--accent:#F5B83D">
+<main class="wrap">
 
   <header class="hero">
-    <span class="eyebrow">سؤال وجودي 🦒</span>
-    <h1 class="meme-text">عمرك فكرت إن لو <span class="hl-g">الزرافة</span> طلبت هوت شوكلت...</h1>
-    <p class="meme-text sub">...وقبل ما يوصل من بلعومها لحد بطنها هيكون <span class="hl-c">بَرَد</span>؟ 🥶</p>
+    <span class="eyebrow">موسوعة الأسئلة الوجودية 🧠</span>
+    <h1 class="meme-text hub-title">عمرك فكرت<span class="hl">؟</span></h1>
+    <p class="meme-text sub">أسئلة عن حيوانات محدش فكّر فيها... عشان الإنسان ما بيفكرش غير في نفسه 💔</p>
+    <nav class="cast" id="cast" aria-label="الحيوانات"></nav>
+    <p class="progress" id="progress" aria-live="polite"></p>
+    <button class="btn" id="surpriseBtn" type="button">🎲 فاجئني بسؤال</button>
   </header>
 
-  <!-- ===== the experiment ===== -->
-  <section class="panel" aria-labelledby="lab-h">
-    <h2 id="lab-h">🔬 التجربة العملية</h2>
-    <p class="lede">رقبة الزرافة حوالي ٢ متر. دوس على الزرار وتابع الهوت شوكلت وهو نازل.</p>
-
-    <div class="stage" id="stage">
-      <div class="giraffe-box">
-        <svg viewBox="0 0 340 560" role="img" aria-label="زرافة بتشرب هوت شوكلت بشفاطة، والمشروب نازل في رقبتها الطويلة">
-          <defs>
-            <pattern id="gspots" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="rotate(8)">
-              <rect width="46" height="46" fill="#F5B83D"/>
-              <path d="M4 5h15l5 9-6 10H7L2 14z" fill="#B5621E" stroke="#B5621E" stroke-width="3" stroke-linejoin="round"/>
-              <path d="M27 22h12l4 8-5 9H28l-4-9z" fill="#B5621E" stroke="#B5621E" stroke-width="3" stroke-linejoin="round"/>
-            </pattern>
-            <linearGradient id="hotcold" gradientUnits="userSpaceOnUse" x1="0" y1="130" x2="0" y2="490">
-              <stop offset="0" stop-color="#FF5A36"/>
-              <stop offset=".5" stop-color="#E0A060"/>
-              <stop offset="1" stop-color="#6FD3FF"/>
-            </linearGradient>
-          </defs>
-
-          <!-- mane -->
-          <path d="M93 492C124 376 164 248 198 138" fill="none" stroke="#8A4212" stroke-width="11" stroke-linecap="round" stroke-dasharray="7 5"/>
-          <!-- body -->
-          <ellipse cx="110" cy="545" rx="125" ry="70" fill="url(#gspots)" stroke="#1A0E08" stroke-width="3"/>
-          <!-- neck -->
-          <path d="M100 500C130 380 170 250 205 140L250 150C225 260 205 380 195 505Z" fill="url(#gspots)" stroke="#1A0E08" stroke-width="3" stroke-linejoin="round"/>
-          <!-- patch hides the neck/body seam -->
-          <ellipse cx="148" cy="500" rx="42" ry="15" fill="url(#gspots)"/>
-
-          <!-- gullet: faint route + the trail the drink leaves -->
-          <path id="gullet" d="M268 134C250 142 236 145 226 150C205 250 178 370 150 490" fill="none" stroke="#8A4212" stroke-opacity=".55" stroke-width="3" stroke-dasharray="2 7" stroke-linecap="round"/>
-          <path id="trail" d="M268 134C250 142 236 145 226 150C205 250 178 370 150 490" fill="none" stroke="url(#hotcold)" stroke-width="7" stroke-linecap="round" opacity=".85"/>
-
-          <!-- head -->
-          <ellipse cx="196" cy="94" rx="22" ry="9" transform="rotate(-20 196 94)" fill="#F5B83D" stroke="#1A0E08" stroke-width="3"/>
-          <line x1="218" y1="80" x2="208" y2="46" stroke="#1A0E08" stroke-width="11" stroke-linecap="round"/>
-          <line x1="240" y1="76" x2="238" y2="42" stroke="#1A0E08" stroke-width="11" stroke-linecap="round"/>
-          <line x1="218" y1="80" x2="208" y2="46" stroke="#F5B83D" stroke-width="6" stroke-linecap="round"/>
-          <line x1="240" y1="76" x2="238" y2="42" stroke="#F5B83D" stroke-width="6" stroke-linecap="round"/>
-          <circle cx="208" cy="42" r="7.5" fill="#6B3410" stroke="#1A0E08" stroke-width="2.5"/>
-          <circle cx="238" cy="38" r="7.5" fill="#6B3410" stroke="#1A0E08" stroke-width="2.5"/>
-          <ellipse cx="232" cy="105" rx="42" ry="32" transform="rotate(12 232 105)" fill="#F5B83D" stroke="#1A0E08" stroke-width="3"/>
-          <path d="M214 96l8-5 7 6-4 8-9-1z" fill="#B5621E"/>
-          <path d="M226 120l7-4 6 5-3 7-8-1z" fill="#B5621E"/>
-          <ellipse cx="282" cy="124" rx="30" ry="22" transform="rotate(12 282 124)" fill="#F9D98A" stroke="#1A0E08" stroke-width="3"/>
-          <ellipse cx="300" cy="117" rx="3.5" ry="2.5" fill="#6B3410"/>
-          <path d="M262 138Q284 147 304 134" fill="none" stroke="#1A0E08" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- deadpan eye -->
-          <ellipse cx="250" cy="100" rx="10" ry="11" fill="#fff" stroke="#1A0E08" stroke-width="2"/>
-          <circle cx="246" cy="103" r="5" fill="#1A0E08"/>
-          <path d="M239.5 100A10.5 10.5 0 0 1 260.5 100Z" fill="#F5B83D" stroke="#1A0E08" stroke-width="2"/>
-          <path class="tear" d="M245 115q-5 8 0 11q5-3 0-11z" fill="#6FD3FF" stroke="#1A0E08" stroke-width="1.2"/>
-
-          <!-- mug + straw -->
-          <line x1="287" y1="192" x2="292" y2="140" stroke="#FF5A36" stroke-width="5" stroke-linecap="round"/>
-          <line x1="287" y1="192" x2="292" y2="140" stroke="#fff" stroke-width="5" stroke-dasharray="4 5"/>
-          <path d="M302 176q15 0 15 12t-15 12" fill="none" stroke="#1A0E08" stroke-width="4"/>
-          <rect x="262" y="166" width="40" height="42" rx="7" fill="#fff" stroke="#1A0E08" stroke-width="2.5"/>
-          <ellipse cx="282" cy="168" rx="18" ry="3.5" fill="#6B3410"/>
-          <text x="282" y="195" text-anchor="middle" font-family="Lalezar, sans-serif" font-size="13" fill="#FF5A36">سخن</text>
-          <g class="steam" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
-            <path d="M272 160q-4-5 0-10"/>
-            <path d="M309 162q4-5 0-10"/>
-          </g>
-
-          <!-- labels -->
-          <g font-family="'Baloo Bhaijaan 2', sans-serif" font-weight="800" font-size="15" fill="#1A0E08" stroke="#FFE9BA" stroke-width="5" paint-order="stroke" text-anchor="middle">
-            <text x="148" y="170">البلعوم ⬅</text>
-            <text x="62" y="528">البطن</text>
-          </g>
-          <g id="frost" font-size="24">
-            <text x="112" y="530">❄️</text>
-            <text x="176" y="548">❄️</text>
-          </g>
-
-          <!-- the sip of hot chocolate -->
-          <g id="blob">
-            <g class="steam" id="blobSteam" fill="none" stroke="#1A0E08" stroke-opacity=".6" stroke-width="2" stroke-linecap="round">
-              <path d="M-4-13q-3-4 0-8"/>
-              <path d="M4-13q3-4 0-8"/>
-            </g>
-            <circle id="blobCore" r="9" fill="#7B3F1D" stroke="#FF5A36" stroke-width="3"/>
-          </g>
-        </svg>
-        <div class="bubble" id="bubble" hidden>أنا طالبة هوت شوكلت... مش آيس شوكلت 😭</div>
-      </div>
-
-      <div class="thermo" aria-hidden="true">
-        <div class="thermo-read" id="tempRead">٨٠°</div>
-        <div class="thermo-tube"><div class="thermo-fill" id="thermoFill"></div></div>
-        <div class="thermo-bulb" id="thermoBulb"></div>
-        <div class="thermo-dist" id="distRead">٠٫٠ من ٢ م</div>
-      </div>
-    </div>
-
-    <p class="lab-caption" id="labCaption" aria-live="polite">دوس الزرار وتابع الهوت شوكلت وهو نازل 👇</p>
-    <button class="btn" id="drinkBtn" type="button">☕ اشربي يا زرافة</button>
+  <section class="panel trophy" id="trophy" hidden>
+    <div class="big" aria-hidden="true">🏆</div>
+    <h2>مبروك! فكّرت في الـ٨ حيوانات كلهم</h2>
+    <p class="lede">إنت رسمياً أول إنسان بيفكر في حد غير نفسه. الزرافة فخورة بيك 🦒❤️</p>
   </section>
 
-  <!-- ===== the punchline ===== -->
-  <section class="panel punch tilt-l" aria-label="الرد">
-    <p class="silence" id="silence">( ٤ ثواني صمت درامي... )</p>
-    <p class="meme-text caption-line big" id="line1">
-      <span class="w">لا</span> <span class="w">أكيد</span> <span class="w">عمرك</span> <span class="w">ما</span> <span class="w">فكرت.</span>
-    </p>
-    <p class="meme-text caption-line small" id="line2">
-      <span class="w">عشان</span> <span class="w">الإنسان</span> <span class="w">ما</span> <span class="w">بيفكرش</span> <span class="w">غير</span> <span class="w">في</span> <span class="w">نفسه</span> <span class="w">💔</span>
-    </p>
-    <button class="btn" id="playBtn" type="button">▶ شغّل الرد زي الفيديو</button>
+  <ul class="stories" id="stories"></ul>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعت الموقع لحد مش بيفكر غير في نفسه</button></div>
+
+  <section class="origin">
+    <p>كله بدأ من فيديو وصل على واتساب، بنت بتسأل: «عمرك فكرت إن لو الزرافة طلبت هوت شوكلت، قبل ما يوصل بطنها هيكون برد؟»... ومن ساعتها واحنا مش عارفين ننام 🦒☕</p>
   </section>
 
-  <!-- ===== drake format ===== -->
-  <section class="panel tilt-r" aria-labelledby="drake-h">
-    <h2 id="drake-h">دماغك الساعة ٣ الفجر:</h2>
-    <div class="format drake">
-      <div class="pic no" aria-hidden="true">🙅‍♂️</div>
-      <div class="txt no">تفكر في مستقبلك وشغلك والامتحانات</div>
-      <div class="pic yes" aria-hidden="true">😌👉</div>
-      <div class="txt yes">تفكر هل الهوت شوكلت بتاع الزرافة بيوصل بطنها سخن ولا لأ</div>
-    </div>
-  </section>
-
-  <!-- ===== expanding brain ===== -->
-  <section class="panel tilt-l" aria-labelledby="brain-h">
-    <h2 id="brain-h">مراحل الوعي ☕</h2>
-    <div class="format brain">
-      <div class="pic b1" aria-hidden="true"><span>🧠</span></div>
-      <div class="txt">تشرب هوت شوكلت</div>
-      <div class="pic b2" aria-hidden="true"><span>🧠</span></div>
-      <div class="txt">تنفخ فيه عشان ميلسعكش</div>
-      <div class="pic b3" aria-hidden="true"><span>🧠</span></div>
-      <div class="txt">تحمد ربنا إن رقبتك قصيرة</div>
-      <div class="pic b4" aria-hidden="true"><span>🧠</span></div>
-      <div class="txt t4">تسهر لحد الفجر قلقان على الهوت شوكلت بتاع الزرافة</div>
-    </div>
-  </section>
-
-  <!-- ===== comments ===== -->
-  <section class="panel" aria-labelledby="cmt-h">
-    <h2 id="cmt-h">التعليقات (٦)</h2>
-    <ul class="comments">
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🦒</div>
-        <div class="cmt-body">
-          <div class="cmt-name">الزرافة <span class="badge">📌 صاحبة الموضوع</span></div>
-          <p class="cmt-text">أخيراً حد فكّر فيّا... أنا بعيّط 😭❤️</p>
-        </div>
-        <div class="likes"><b>❤</b>٩٩ ألف</div>
-      </li>
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🐍</div>
-        <div class="cmt-body">
-          <div class="cmt-name">الثعبان</div>
-          <p class="cmt-text">طب وأنا اللي جسمي كله بلعوم؟ محدش سأل عليّا 🙂</p>
-        </div>
-        <div class="likes"><b>❤</b>٤٨ ألف</div>
-      </li>
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🐘</div>
-        <div class="cmt-body">
-          <div class="cmt-name">الفيل</div>
-          <p class="cmt-text">أنا بشربه بخرطومي الأول... يعني بيبرد مرتين يا جماعة</p>
-        </div>
-        <div class="likes"><b>❤</b>٣١ ألف</div>
-      </li>
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🦩</div>
-        <div class="cmt-body">
-          <div class="cmt-name">البشروش</div>
-          <p class="cmt-text">أنا باكل وراسي مقلوبة ومحدش عمل عليّا فيديو واحد</p>
-        </div>
-        <div class="likes"><b>❤</b>١٩ ألف</div>
-      </li>
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🐧</div>
-        <div class="cmt-body">
-          <div class="cmt-name">البطريق</div>
-          <p class="cmt-text">أنا عايش في التلج... كل حاجة عندي آيس أصلاً 🧊</p>
-        </div>
-        <div class="likes"><b>❤</b>١٢ ألف</div>
-      </li>
-      <li class="cmt">
-        <div class="avatar" aria-hidden="true">🧍</div>
-        <div class="cmt-body">
-          <div class="cmt-name">الإنسان</div>
-          <p class="cmt-text">طب وأنا؟ محدش هيسألني أنا عامل إيه؟ 🤳</p>
-        </div>
-        <div class="likes"><b>❤</b>٣</div>
-      </li>
-    </ul>
-  </section>
-
-  <!-- ===== honest science ===== -->
-  <aside class="note">
-    <h2>🧪 للأمانة العلمية</h2>
-    <p>رقبة الزرافة فعلاً طولها حوالي ٢ متر، بس المشروب جوه جسمها مش هيبرد أقل من حرارة جسمها (حوالي ٣٨°). يعني هيوصل دافي، والترمومتر اللي فوق مبالغ فيه عشان الدراما. بس إحنا مش هنا عشان العلم... إحنا هنا عشان المشاعر 💔</p>
-  </aside>
-
-  <footer>الفكرة من فيديو وصل على واتساب · مفيش أي زرافة اتأذت في عمل الصفحة دي 🦒☕</footer>
+  <footer>مفيش أي حيوان اتأذى في عمل الموقع ده • كل صفحة فيها «للأمانة العلمية» عشان تتعلم حاجة وإنت بتضحك 🧪</footer>
 </main>
 
+<script src="common.js"></script>
 <script>
 (() => {
-  const $ = (id) => document.getElementById(id);
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const ar = (n, d = 0) => n.toLocaleString("ar-EG", { minimumFractionDigits: d, maximumFractionDigits: d });
-  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
-  const mix = (a, b, t) => {
-    const A = rgb(a), B = rgb(b);
-    return "rgb(" + A.map((v, i) => Math.round(v + (B[i] - v) * t)).join(",") + ")";
-  };
+  const seen = Visited.get();
+  const cast = document.getElementById("cast");
+  const list = document.getElementById("stories");
 
-  /* ---------- the experiment ---------- */
-  const gullet = $("gullet"), trail = $("trail"), blob = $("blob"), core = $("blobCore"), steam = $("blobSteam");
-  const read = $("tempRead"), fill = $("thermoFill"), bulb = $("thermoBulb"), dist = $("distRead");
-  const cap = $("labCaption"), btn = $("drinkBtn"), stage = $("stage"), bubble = $("bubble");
-  const L = gullet.getTotalLength();
-  const T_START = 80, T_END = 8, NECK_M = 2;
-  trail.style.strokeDasharray = L;
+  STORIES.forEach((s, i) => {
+    const was = seen.includes(s.id);
+    const a = document.createElement("a");
+    a.href = storyUrl(s);
+    a.className = was ? "seen" : "";
+    a.style.setProperty("--c", s.color);
+    a.title = s.name;
+    a.textContent = s.emoji;
+    cast.append(a);
 
-  const stages = [
-    [0, "نار يا حبيبي نار 🔥 الزرافة لسه بتشفط"],
-    [0.12, "دخل البلعوم... لسه سخن 😋"],
-    [0.38, "أول الرقبة... بدأ يفتر 😐"],
-    [0.62, "نص الرقبة... بقى دافي بالعافية 😬"],
-    [0.84, "لسه ماشي... الطريق طويل يا جدعان 🚶"],
-    [1, "وصل البطن... وبرد خلاص 🥶"],
-  ];
-
-  function render(p) {
-    const pt = gullet.getPointAtLength(L * p);
-    blob.setAttribute("transform", `translate(${pt.x} ${pt.y})`);
-    trail.style.strokeDashoffset = L * (1 - p);
-    const t = T_START + (T_END - T_START) * p;
-    const c = mix("#FF5A36", "#6FD3FF", p);
-    read.textContent = ar(Math.round(t)) + "°";
-    fill.style.height = (t / 90) * 100 + "%";
-    fill.style.background = c;
-    bulb.style.background = c;
-    core.setAttribute("fill", mix("#7B3F1D", "#BDEBFF", p));
-    core.setAttribute("stroke", c);
-    steam.style.opacity = Math.max(0, 1 - p * 1.8);
-    dist.textContent = `${ar(NECK_M * p, 1)} من ${ar(NECK_M)} م`;
-    let msg = stages[0][1];
-    for (const [at, m] of stages) if (p >= at) msg = m;
-    if (cap.textContent !== msg) cap.textContent = msg;
-  }
-
-  render(0);
-  cap.textContent = "دوس الزرار وتابع الهوت شوكلت وهو نازل 👇";
-
-  let raf = 0;
-  btn.addEventListener("click", () => {
-    cancelAnimationFrame(raf);
-    stage.classList.remove("is-cold");
-    bubble.hidden = true;
-    btn.disabled = true;
-    btn.textContent = "بتشرب... ☕";
-    const dur = reduce ? 0 : 5600;
-    const t0 = performance.now();
-    const tick = (now) => {
-      const p = dur ? Math.min(1, (now - t0) / dur) : 1;
-      render(p);
-      if (p < 1) { raf = requestAnimationFrame(tick); return; }
-      stage.classList.add("is-cold");
-      bubble.hidden = false;
-      btn.disabled = false;
-      btn.textContent = "🔁 نجرب تاني؟";
-    };
-    raf = requestAnimationFrame(tick);
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <a class="story" href="${storyUrl(s)}" style="--c:${s.color}">
+        <span class="story-pic" aria-hidden="true">${s.emoji}</span>
+        <span>
+          <span class="story-meta">${s.name} • سؤال رقم ${ar(i + 1)} ${was ? '<span class="seen-badge">✓ فكّرت فيه</span>' : ""}</span>
+          <span class="story-q">عمرك فكرت إن ${s.q}</span>
+          <span class="story-go">${was ? "افتحه تاني ←" : "جرّب التجربة ←"}</span>
+        </span>
+      </a>`;
+    list.append(li);
   });
 
-  /* ---------- punchline, word by word like the video captions ---------- */
-  const silence = $("silence"), playBtn = $("playBtn"), punch = playBtn.closest(".punch");
-  const line1 = [...$("line1").querySelectorAll(".w")];
-  const line2 = [...$("line2").querySelectorAll(".w")];
-  const SILENCE_TEXT = silence.textContent;
-  let timers = [];
-  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const n = STORIES.filter((s) => seen.includes(s.id)).length;
+  document.getElementById("progress").innerHTML = n
+    ? `فكّرت في <b>${ar(n)}</b> من <b>${ar(STORIES.length)}</b> حيوانات`
+    : "لسه ما فكّرتش في ولا حيوان... زي أي إنسان 🙂";
+  document.getElementById("trophy").hidden = n < STORIES.length;
 
-  playBtn.addEventListener("click", () => {
-    timers.forEach(clearTimeout);
-    timers = [];
-    const all = [...line1, ...line2];
-    all.forEach((w) => w.classList.remove("on", "said"));
-    punch.classList.add("playing");
-    playBtn.disabled = true;
-
-    let at = 0;
-    [4, 3, 2, 1].forEach((n) => { later(at, () => { silence.textContent = `( صمت درامي... ${ar(n)} )`; }); at += 900; });
-    later(at, () => { silence.textContent = SILENCE_TEXT; });
-
-    const say = (words, gap) => words.forEach((w) => {
-      later(at, () => { all.forEach((x) => x.classList.remove("on")); w.classList.add("on", "said"); });
-      at += gap;
-    });
-    say(line1, 430);
-    at += 450;
-    say(line2, 380);
-    later(at + 500, () => {
-      all.forEach((x) => x.classList.remove("on"));
-      punch.classList.remove("playing");
-      playBtn.disabled = false;
-      playBtn.textContent = "🔁 تاني";
-    });
-  });
+  document.getElementById("surpriseBtn").addEventListener("click", () => goRandom(null));
+  document.getElementById("shareBtn").addEventListener("click", () =>
+    shareOnWhatsApp("عمرك فكرت؟ 🦒 أسئلة وجودية عن حيوانات محدش فكّر فيها... عشان الإنسان ما بيفكرش غير في نفسه 💔"));
 })();
 </script>
 </body>

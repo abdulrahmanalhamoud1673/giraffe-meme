@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>السلحفاة والديليفري • عمرك فكرت؟</title>
+<meta name="description" content="عمرك فكرت إن السلحفاة لو طلبت ديليفري... هتلحق تفتح الباب قبل الطيار ما يمشي؟ 🐢🛵">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/turtle.html">
+<meta property="og:title" content="السلحفاة والديليفري 🐢🛵">
+<meta property="og:description" content="لو السلحفاة طلبت ديليفري... هتلحق تفتح الباب؟ زقّها إنت وشوف">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/turtle.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2A140B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐢%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .rider { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center; padding: 10px 12px; border-bottom: 2px solid var(--ink); background: #fff; }
+  .rider-emoji { font-size: 34px; line-height: 1; }
+  .patience-label { display: flex; justify-content: space-between; font-weight: 800; font-size: 13px; color: var(--ink-soft); }
+  .patience { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: #eee; overflow: hidden; }
+  .patience i { display: block; height: 100%; width: 100%; background: #3DDC97; transition: background .3s; }
+  .call { grid-column: 1 / -1; min-height: 1.5em; font-weight: 800; font-size: 15px; }
+  .call.ring { animation: shake .4s; }
+  .hall { position: relative; height: 150px; background: linear-gradient(#FFE9BA 0 72%, #D9A96A 72%); }
+  .hall::after { content: ""; position: absolute; inset: 72% 0 auto; border-top: 2px solid var(--ink); }
+  .door, .couch { position: absolute; bottom: 22%; font-size: 58px; line-height: 1; }
+  .door { left: 6px; }
+  .couch { right: 4px; font-size: 50px; }
+  .turtle { position: absolute; bottom: 20%; width: 92px; inset-inline-start: 18%; transition: inset-inline-start .2s linear; }
+  .turtle svg { display: block; width: 100%; height: auto; }
+  .turtle.push svg { animation: waddle .25s; }
+  @keyframes waddle { 50% { transform: translateY(-4px) rotate(-3deg); } }
+  .dist { position: absolute; top: 8px; right: 10px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 0 12px; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .order { position: absolute; top: 8px; left: 10px; background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 0 12px; font-weight: 800; font-size: 14px; }
+</style>
+</head>
+<body data-story="turtle" style="--accent:#3DDC97">
+<main class="wrap">
+
+  <nav class="topbar">
+    <a class="logo" href="./">عمرك فكرت<span>؟</span></a>
+    <button class="chip" id="randomBtn" type="button">🎲 سؤال تاني</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">السلحفاة 🐢 • سؤال وجودي رقم ٦</span>
+    <h1 class="meme-text">عمرك فكرت إن <span class="hl">السلحفاة</span> لو طلبت ديليفري...</h1>
+    <p class="meme-text sub">...هتلحق تفتح الباب قبل الطيار ما يمشي؟ 🛵</p>
+  </header>
+
+  <section class="panel" aria-labelledby="lab-h">
+    <h2 id="lab-h">🏁 التجربة الرياضية</h2>
+    <p class="lede">الطيار تحت ومعاه بيتزا. زُقّ السلحفاة ناحية الباب بأسرع ما تقدر... بالتوفيق 🙂</p>
+
+    <div class="stage" id="stage">
+      <div class="rider">
+        <span class="rider-emoji" aria-hidden="true">🛵</span>
+        <div>
+          <div class="patience-label"><span>صبر الطيار</span><span id="patienceTxt">١٠ ثواني</span></div>
+          <div class="patience"><i id="patience"></i></div>
+        </div>
+        <div class="call" id="call" aria-live="polite">الطيار لسه ما وصلش...</div>
+      </div>
+      <div class="hall">
+        <span class="order">الأوردر: بيتزا 🍕</span>
+        <span class="dist" id="dist">٠٫٠ من ٨ متر</span>
+        <span class="door" aria-hidden="true">🚪</span>
+        <span class="couch" aria-hidden="true">🛋️</span>
+        <div class="turtle" id="turtle">
+          <svg viewBox="0 0 120 72" role="img" aria-label="سلحفاة ماشية ناحية الباب">
+            <ellipse cx="30" cy="60" rx="9" ry="7" fill="#8BC34A" stroke="#1A0E08" stroke-width="2.5"/>
+            <ellipse cx="94" cy="60" rx="9" ry="7" fill="#8BC34A" stroke="#1A0E08" stroke-width="2.5"/>
+            <path d="M106 46L118 50L106 54Z" fill="#8BC34A" stroke="#1A0E08" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M18 52Q22 8 62 8Q104 8 108 52Z" fill="#2E9E5B" stroke="#1A0E08" stroke-width="3"/>
+            <path d="M44 20L58 16L70 24L66 38L50 40L42 30ZM70 24L86 20L96 32L88 44L66 38M42 30L28 36L34 50M50 40L52 52M88 44L100 50" fill="none" stroke="#1B6E3C" stroke-width="2.5" stroke-linejoin="round"/>
+            <rect x="14" y="47" width="98" height="9" rx="4.5" fill="#F5D76E" stroke="#1A0E08" stroke-width="2.5"/>
+            <ellipse cx="46" cy="63" rx="9" ry="7" fill="#8BC34A" stroke="#1A0E08" stroke-width="2.5"/>
+            <ellipse cx="80" cy="63" rx="9" ry="7" fill="#8BC34A" stroke="#1A0E08" stroke-width="2.5"/>
+            <path d="M22 44Q14 44 10 38" fill="none" stroke="#1A0E08" stroke-width="12" stroke-linecap="round"/>
+            <path d="M22 44Q14 44 10 38" fill="none" stroke="#A5D66F" stroke-width="7" stroke-linecap="round"/>
+            <circle cx="12" cy="34" r="11" fill="#A5D66F" stroke="#1A0E08" stroke-width="2.5"/>
+            <circle cx="8" cy="31" r="2.6" fill="#1A0E08"/>
+            <path d="M3 39Q7 42 11 40" fill="none" stroke="#1A0E08" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <p class="caption" id="cap" aria-live="polite">لما تدوس، الجرس هيرن والوقت هيبدأ ⏱️</p>
+    <button class="btn" id="pushBtn" type="button">🐢 زقّها ناحية الباب!</button>
+  </section>
+
+  <section class="panel punch tilt-l" id="punch" aria-label="الرد"></section>
+
+  <section class="panel tilt-r" aria-labelledby="cmt-h">
+    <h2 id="cmt-h">التعليقات (٥)</h2>
+    <ul class="comments">
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐢</div>
+        <div class="cmt-body">
+          <div class="cmt-name">السلحفاة <span class="badge">📌 صاحبة الموضوع</span></div>
+          <p class="cmt-text">أنا كنت نازلة والله... بس السلم كان طويل 🥲</p>
+        </div>
+        <div class="likes"><b>❤</b>٨٨ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐇</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الأرنب</div>
+          <p class="cmt-text">أنا كنت هفتحلها الباب... بس نمت في النص زي آخر مرة 😴</p>
+        </div>
+        <div class="likes"><b>❤</b>٦١ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦥</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الكسلان</div>
+          <p class="cmt-text">كنت هقولها تستعجل... بس لسه بكتب الكومنت</p>
+        </div>
+        <div class="likes"><b>❤</b>٢٧ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🛵</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الطيار</div>
+          <p class="cmt-text">يا فندم أنا رنيت ١٢ مرة، وقيّمتوني نجمة واحدة 😤</p>
+        </div>
+        <div class="likes"><b>❤</b>١٩ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🧍</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الإنسان</div>
+          <p class="cmt-text">أنا بطلب وأنا واقف عند الباب أصلاً... عشان محدش ياخد أكلي 🍕</p>
+        </div>
+        <div class="likes"><b>❤</b>٦</div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="note">
+    <h2>🧪 للأمانة العلمية</h2>
+    <p>سلاحف البر فعلاً بطيئة: بتمشي أقل من نص كيلو في الساعة. بس السلحفاة البحرية «جلدية الظهر» ممكن تعوم بأكتر من ٣٠ كيلو في الساعة! يعني المشكلة مش فيها... المشكلة إن الطيار ساكن على البر 🌊</p>
+  </aside>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعتها لحد بيتأخر على الباب</button></div>
+  <div id="next"></div>
+
+  <footer>مفيش أي سلحفاة اتأذت في عمل الصفحة دي... بس البيتزا اتاكلت عند الجيران 🍕</footer>
+</main>
+
+<script src="common.js"></script>
+<script>
+(() => {
+  const turtle = document.getElementById("turtle");
+  const btn = document.getElementById("pushBtn");
+  const cap = document.getElementById("cap");
+  const call = document.getElementById("call");
+  const bar = document.getElementById("patience");
+  const patienceTxt = document.getElementById("patienceTxt");
+  const dist = document.getElementById("dist");
+
+  const HALL_M = 8, START = 18, END = 80;      // turtle position, % of the hallway
+  const DURATION = 10000, CRAWL = 0.0025, PUSH = 0.007;
+  const CALLS = [
+    [0, "🔔 الطيار رن الجرس!"],
+    [2000, "📞 «أنا تحت يا فندم»"],
+    [4500, "📞 «حضرتك فين؟ الأكل هيبرد»"],
+    [7000, "📞 «لو محدش نزل هسيبه عند البواب»"],
+    [9000, "📞 «...» (مش بيرد)"],
+  ];
+  const CHEERS = ["زُقّ كمان!! 💪", "يلا يا سلحفاة!! 🐢", "أسرع!! الطيار زهق 😬", "شدّي حيلك!! 🔥"];
+  let running = false, t0 = 0, progress = 0, pushes = 0, callIdx = 0, raf = 0;
+
+  function place() {
+    turtle.style.insetInlineStart = (START + (END - START) * progress) + "%";
+    dist.textContent = `${ar(HALL_M * progress, 1)} من ${ar(HALL_M)} متر`;
+  }
+
+  function ringCall(text) {
+    call.textContent = text;
+    call.classList.remove("ring");
+    void call.offsetWidth;
+    call.classList.add("ring");
+  }
+
+  function tick(now) {
+    const t = now - t0;
+    const left = Math.max(0, 1 - t / DURATION);
+    progress = Math.min(0.99, progress + CRAWL / 60);
+    bar.style.width = left * 100 + "%";
+    bar.style.background = left > .5 ? "#3DDC97" : left > .2 ? "#FFB347" : "#FF5A36";
+    patienceTxt.textContent = `${ar(Math.ceil(left * 10))} ثواني`;
+    while (callIdx < CALLS.length && t >= CALLS[callIdx][0]) ringCall(CALLS[callIdx++][1]);
+    place();
+    if (left > 0) { raf = requestAnimationFrame(tick); return; }
+    finish();
+  }
+
+  function finish() {
+    running = false;
+    ringCall("🛵💨 الطيار مشي");
+    const pct = Math.round(progress * 100);
+    cap.textContent = `الطيار مشي 🛵💨 والسلحفاة لسه في الصالة... وصلت ${ar(pct)}٪ من الطريق بـ ${ar(pushes)} زقّة 🐢 «جاية أهو!»`;
+    btn.disabled = true;
+    setTimeout(() => {
+      cap.textContent += " ... والبيتزا اتاكلت عند الجيران 🍕";
+      btn.disabled = false;
+      btn.textContent = "🔁 نطلب تاني؟";
+    }, 1400);
+  }
+
+  btn.addEventListener("click", () => {
+    if (!running) {
+      running = true;
+      progress = 0; pushes = 0; callIdx = 0;
+      t0 = performance.now();
+      btn.textContent = "🐢 زقّها!! زقّها!!";
+      cap.textContent = "يلا!! دوس كتير وبسرعة 👆👆👆";
+      place();
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(tick);
+      return;
+    }
+    pushes++;
+    progress = Math.min(0.99, progress + PUSH);
+    turtle.classList.remove("push");
+    void turtle.offsetWidth;
+    turtle.classList.add("push");
+    if (pushes % 6 === 0) cap.textContent = CHEERS[(pushes / 6) % CHEERS.length];
+    place();
+  });
+
+  place();
+})();
+</script>
+</body>
+</html>

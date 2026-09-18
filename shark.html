@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>القرش والإجازة • عمرك فكرت؟</title>
+<meta name="description" content="عمرك فكرت إن في قروش لو وقفت عوم بتتخنق... يعني عمرها ما خدت إجازة؟ 🦈🏖️">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/shark.html">
+<meta property="og:title" content="القرش والإجازة 🦈🏖️">
+<meta property="og:description" content="في قروش لو وقفت عوم بتتخنق... يعني عمرها ما خدت إجازة؟ جرّب تديله إجازة">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/shark.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2A140B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦈%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .ocean { background: linear-gradient(#8EDCFF, #2A7FC0 75%, #1F5F94); padding: 10px 12px 0; min-height: 300px; display: flex; flex-direction: column; gap: 8px; }
+  .o2 { display: grid; grid-template-columns: auto 1fr auto; gap: 8px; align-items: center; background: rgba(255,255,255,.85); border: 2px solid var(--ink); border-radius: 12px; padding: 4px 10px; font-weight: 800; font-size: 14px; }
+  .o2-bar { height: 14px; border: 2px solid var(--ink); border-radius: 999px; background: #fff; overflow: hidden; }
+  .o2-bar i { display: block; height: 100%; width: 100%; background: #3DDC97; }
+  .o2 b { font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: left; }
+  .sea-floor { position: relative; flex: 1; display: grid; place-items: center; }
+  .shark { width: 88%; max-width: 330px; height: auto; animation: swim 2.2s ease-in-out infinite; }
+  @keyframes swim { 0%, 100% { transform: translate(0, 0) rotate(0); } 50% { transform: translate(-10px, -8px) rotate(-2deg); } }
+  .vac .shark { animation: sink 2.4s ease-in forwards; }
+  @keyframes sink { to { transform: translate(8px, 34px) rotate(10deg); } }
+  #shades, #drink { opacity: 0; transition: opacity .3s; }
+  .vac #shades, .vac #drink { opacity: 1; }
+  .vac #speed { opacity: 0; }
+  #speed { transition: opacity .3s; }
+  .bubbles span {
+    position: absolute; bottom: -10px; width: 12px; height: 12px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.8); animation: bubble 4s linear infinite;
+  }
+  .bubbles span:nth-child(1) { right: 12%; animation-delay: 0s; }
+  .bubbles span:nth-child(2) { right: 30%; width: 8px; height: 8px; animation-delay: 1.2s; }
+  .bubbles span:nth-child(3) { right: 68%; animation-delay: 2.1s; }
+  .bubbles span:nth-child(4) { right: 84%; width: 9px; height: 9px; animation-delay: 3s; }
+  @keyframes bubble { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-260px); opacity: 0; } }
+  .weed { position: absolute; bottom: 0; font-size: 34px; line-height: 1; }
+  .controls { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .switch-row { display: flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 22px; }
+  .switch {
+    position: relative; width: 70px; height: 38px; border-radius: 999px;
+    border: 3px solid var(--ink); background: #D6D2CC; cursor: pointer; padding: 0;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .knob { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #fff; border: 2px solid var(--ink); transition: right .2s; }
+  .switch[aria-checked="true"] { background: #FFD166; }
+  .switch[aria-checked="true"] .knob { right: calc(100% - 30px); }
+  .stats { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .stat { background: var(--stage); border: 2px solid var(--ink); border-radius: 999px; padding: 0 12px; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body data-story="shark" style="--accent:#6FD3FF">
+<main class="wrap">
+
+  <nav class="topbar">
+    <a class="logo" href="./">عمرك فكرت<span>؟</span></a>
+    <button class="chip" id="randomBtn" type="button">🎲 سؤال تاني</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">القرش 🦈 • سؤال وجودي رقم ٨</span>
+    <h1 class="meme-text">عمرك فكرت إن في <span class="hl">قروش</span> لو وقفت عوم بتتخنق...</h1>
+    <p class="meme-text sub">...يعني عمرها ما خدت إجازة؟ 🏖️</p>
+  </header>
+
+  <section class="panel" aria-labelledby="lab-h">
+    <h2 id="lab-h">🏖️ التجربة الإدارية</h2>
+    <p class="lede">إنت المدير. شغّل له «وضع الإجازة» وشوف هيستحمل قد إيه.</p>
+
+    <div class="stage ocean" id="stage">
+      <div class="o2" aria-hidden="true">
+        <span>🫧 الأكسجين</span>
+        <div class="o2-bar"><i id="o2"></i></div>
+        <b id="o2Txt">١٠٠٪</b>
+      </div>
+      <div class="sea-floor">
+        <div class="bubbles" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+        <span class="weed" style="right:4%" aria-hidden="true">🌿</span>
+        <span class="weed" style="left:6%" aria-hidden="true">🪸</span>
+        <svg class="shark" viewBox="0 0 320 150" role="img" aria-label="قرش بيعوم، ولما ياخد إجازة بيبدأ يغرق">
+          <g id="speed" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".8">
+            <path d="M300 60h16M304 80h14M298 100h18"/>
+          </g>
+          <path d="M128 52L158 6L176 50" fill="#6E95B8" stroke="#1A0E08" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M18 88C50 50 150 40 232 70L290 36L278 84L296 126L234 100C160 128 60 124 18 88Z" fill="#7FA7C9" stroke="#1A0E08" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M24 93C62 116 150 118 222 99C150 106 72 106 24 93Z" fill="#EAF2F8"/>
+          <path d="M108 104L92 138L134 108" fill="#6E95B8" stroke="#1A0E08" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M92 72q-4 12 0 24M101 72q-4 12 0 24M110 72q-4 12 0 24" fill="none" stroke="#4A6E8E" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="58" cy="78" r="6" fill="#1A0E08"/>
+          <circle cx="60" cy="76" r="2" fill="#fff"/>
+          <path d="M30 98Q52 108 78 100" fill="none" stroke="#1A0E08" stroke-width="3" stroke-linecap="round"/>
+          <path d="M40 101l3 5 3-5M50 103l3 5 3-5M60 103l3 5 3-5" fill="#fff" stroke="#1A0E08" stroke-width="1.2" stroke-linejoin="round"/>
+          <g id="shades">
+            <path d="M44 70h28v7q-4 9-14 9q-10 0-14-9Z" fill="#1A0E08"/>
+            <path d="M72 72L96 66" stroke="#1A0E08" stroke-width="3" stroke-linecap="round"/>
+            <path d="M50 74l6-3" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </g>
+          <text id="drink" x="2" y="80" font-size="24">🍹</text>
+        </svg>
+      </div>
+    </div>
+
+    <p class="caption" id="cap" aria-live="polite">القرش شغّال ٢٤ ساعة، ٣٦٥ يوم في السنة 🦈</p>
+    <div class="controls">
+      <div class="switch-row">
+        <button class="switch" id="vacSwitch" type="button" role="switch" aria-checked="false" aria-labelledby="vacLabel"><span class="knob"></span></button>
+        <span id="vacLabel">🏖️ وضع الإجازة</span>
+      </div>
+    </div>
+    <div class="stats" aria-hidden="true">
+      <span class="stat">محاولات الإجازة: <b id="tries">٠</b></span>
+      <span class="stat">أيام الإجازة المتبقية: <b>٠</b></span>
+    </div>
+  </section>
+
+  <section class="panel punch tilt-l" id="punch" aria-label="الرد"></section>
+
+  <section class="panel tilt-r" aria-labelledby="cmt-h">
+    <h2 id="cmt-h">التعليقات (٥)</h2>
+    <ul class="comments">
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦈</div>
+        <div class="cmt-body">
+          <div class="cmt-name">القرش <span class="badge">📌 صاحب الموضوع</span></div>
+          <p class="cmt-text">مش فاضي أقرا التعليقات... بعوم 🏊</p>
+        </div>
+        <div class="likes"><b>❤</b>٨٢ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐬</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الدرفيل</div>
+          <p class="cmt-text">أنا بنام بنص مخي بس، والنص التاني صاحي... يعني إجازتي نص إجازة 🥲</p>
+        </div>
+        <div class="likes"><b>❤</b>٥٥ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦈</div>
+        <div class="cmt-body">
+          <div class="cmt-name">قرش الممرضة</div>
+          <p class="cmt-text">أنا بقعد على القاع أرتاح عادي 😌 مش كل القروش زي بعض على فكرة</p>
+        </div>
+        <div class="likes"><b>❤</b>٣١ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐠</div>
+        <div class="cmt-body">
+          <div class="cmt-name">نيمو</div>
+          <p class="cmt-text">يا ريت ياخد إجازة بجد 🙏 وتكون طويلة وبعيدة عننا</p>
+        </div>
+        <div class="likes"><b>❤</b>٢٤ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🧍</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الإنسان</div>
+          <p class="cmt-text">أنا بشتغل ٨ ساعات... وبرضه أنا اللي تعبان أكتر من القرش 😮‍💨</p>
+        </div>
+        <div class="likes"><b>❤</b>٩</div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="note">
+    <h2>🧪 للأمانة العلمية</h2>
+    <p>مش كل القروش كده. قروش زي «القرش الأبيض الكبير» و«الماكو» لازم تفضل تعوم عشان المية تعدي على الخياشيم وتتنفس. لكن قروش تانية زي «قرش الممرضة» بتقدر تضخ المية بنفسها وتقعد على القاع ترتاح عادي. يعني في قروش عندها إجازة... بس مش دي 🦈</p>
+  </aside>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعتها لحد ما خدش إجازة من سنين</button></div>
+  <div id="next"></div>
+
+  <footer>مفيش أي قرش اتأذى في عمل الصفحة دي... هو أصلاً ما وقفش يقرأها 🦈</footer>
+</main>
+
+<script src="common.js"></script>
+<script>
+(() => {
+  const stage = document.getElementById("stage");
+  const sw = document.getElementById("vacSwitch");
+  const cap = document.getElementById("cap");
+  const o2 = document.getElementById("o2");
+  const o2Txt = document.getElementById("o2Txt");
+  const triesEl = document.getElementById("tries");
+  const EXCUSES = [
+    "«لا لا، هكمّل شغل... الإجازة للي عندهم رئة» 🫁",
+    "«طب نص يوم؟» ... الأكسجين قال لأ 😵",
+    "«هقعد على الكنبة دقيقة—» 🫧🫧 «لا خلاص رجعت»",
+    "«أنا عمري ٣٠ سنة وما قعدتش ولا مرة» 🥲",
+    "قدّم استقالة... واترفضت عشان هو اللي ماسك البحر كله 🌊",
+    "«الإجازة الجاية... في الحياة التانية» 🦈",
+  ];
+  let tries = 0, busy = false, level = 1;
+
+  function setO2(v) {
+    level = v;
+    o2.style.width = v * 100 + "%";
+    o2.style.background = v > .5 ? "#3DDC97" : v > .25 ? "#FFB347" : "#FF5A36";
+    o2Txt.textContent = ar(Math.round(v * 100)) + "٪";
+  }
+
+  function animateO2(to, ms, done) {
+    const from = level, t0 = performance.now();
+    const step = (now) => {
+      const p = REDUCE ? 1 : Math.min(1, (now - t0) / ms);
+      setO2(from + (to - from) * p);
+      if (p < 1) requestAnimationFrame(step); else done?.();
+    };
+    requestAnimationFrame(step);
+  }
+
+  sw.addEventListener("click", () => {
+    if (busy) return;
+    busy = true;
+    sw.setAttribute("aria-checked", "true");
+    stage.classList.add("vac");
+    cap.textContent = "القرش بيحاول يرتاح... 🏖️😎";
+    animateO2(0.12, 2400, () => {
+      sw.setAttribute("aria-checked", "false");
+      stage.classList.remove("vac");
+      tries++;
+      triesEl.textContent = ar(tries);
+      cap.textContent = EXCUSES[(tries - 1) % EXCUSES.length];
+      animateO2(1, 900, () => { busy = false; });
+    });
+  });
+})();
+</script>
+</body>
+</html>

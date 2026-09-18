@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>البشروش والكشري • عمرك فكرت؟</title>
+<meta name="description" content="عمرك فكرت إن البشروش لونه بمبي عشان بياكل جمبري... طب لو أكل كشري هيبقى لونه إيه؟ 🦩🍝">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/flamingo.html">
+<meta property="og:title" content="البشروش والكشري 🦩🍝">
+<meta property="og:description" content="البشروش لونه بمبي عشان بياكل جمبري... طب لو أكل كشري؟ أكّله إنت وشوف">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/flamingo.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2A140B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦩%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .flamingo { display: block; width: 100%; max-width: 300px; height: auto; margin: 0 auto; }
+  .flamingo { --fl: #FF8FB1; }
+  .fl { fill: var(--fl); transition: fill .7s; }
+  .fl-line { stroke: var(--fl); transition: stroke .7s; }
+  #flames { opacity: 0; transition: opacity .3s; }
+  .fire #flames { opacity: 1; }
+  .fire #flames text { animation: rise .5s ease-in-out infinite; }
+  .fire .flamingo { animation: shake .5s 2; }
+  .swatch-row { position: absolute; top: 10px; right: 10px; display: flex; align-items: center; gap: 6px;
+    background: #fff; border: 2px solid var(--ink); border-radius: 999px; padding: 2px 12px 2px 6px; font-weight: 800; font-size: 14px; }
+  .swatch { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); background: var(--sw, #FF8FB1); transition: background .7s; }
+  .menu { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .food {
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+    background: #fff; color: var(--ink);
+    border: 2px solid var(--ink); border-radius: 12px; padding: 6px 2px 4px;
+    font-family: var(--body); font-weight: 800; font-size: 14px; line-height: 1.2;
+    cursor: pointer; box-shadow: 0 3px 0 var(--ink);
+  }
+  .food span { font-size: 28px; line-height: 1.1; }
+  .food[aria-pressed="true"] { background: var(--accent); transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+</style>
+</head>
+<body data-story="flamingo" style="--accent:#FF8FB1">
+<main class="wrap">
+
+  <nav class="topbar">
+    <a class="logo" href="./">عمرك فكرت<span>؟</span></a>
+    <button class="chip" id="randomBtn" type="button">🎲 سؤال تاني</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">البشروش (الفلامنجو) 🦩 • سؤال وجودي رقم ٤</span>
+    <h1 class="meme-text">عمرك فكرت إن <span class="hl">البشروش</span> لونه بمبي عشان بياكل جمبري...</h1>
+    <p class="meme-text sub">...طب لو أكل كشري هيبقى لونه إيه؟ 🍝</p>
+  </header>
+
+  <section class="panel" aria-labelledby="lab-h">
+    <h2 id="lab-h">🍽️ التجربة الغذائية</h2>
+    <p class="lede">اختار له أكلة من المنيو وشوف لونه هيقلب لإيه.</p>
+
+    <div class="stage" id="stage">
+      <div class="swatch-row" aria-hidden="true"><span class="swatch" id="swatch"></span><span id="colorName">بمبي جمبري</span></div>
+      <svg class="flamingo" id="flamingo" viewBox="0 0 260 380" role="img" aria-label="بشروش واقف على رجل واحدة في المية، ولونه بيتغير حسب الأكل">
+        <rect width="260" height="380" fill="#FFF1D6"/>
+        <circle cx="40" cy="62" r="22" fill="#FFD166"/>
+        <!-- folded leg -->
+        <path d="M140 220L164 262L138 274" fill="none" stroke="#1A0E08" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="fl-line" d="M140 220L164 262L138 274" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- standing leg -->
+        <path d="M126 222L124 292L128 354L148 357" fill="none" stroke="#1A0E08" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path class="fl-line" d="M126 222L124 292L128 354L148 357" fill="none" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- tail + body -->
+        <path class="fl" d="M76 180L50 194L76 202Z" stroke="#1A0E08" stroke-width="3" stroke-linejoin="round"/>
+        <ellipse class="fl" cx="130" cy="188" rx="62" ry="38" transform="rotate(-10 130 188)" stroke="#1A0E08" stroke-width="3"/>
+        <path d="M96 176C122 158 164 162 180 184C160 202 118 206 96 176Z" fill="#1A0E08" opacity=".13"/>
+        <path d="M94 180C86 192 80 198 70 202L98 198Z" fill="#1A0E08"/>
+        <!-- neck -->
+        <path d="M176 172C206 150 204 118 178 108C150 98 142 72 160 52" fill="none" stroke="#1A0E08" stroke-width="20" stroke-linecap="round"/>
+        <path class="fl-line" d="M176 172C206 150 204 118 178 108C150 98 142 72 160 52" fill="none" stroke-width="13" stroke-linecap="round"/>
+        <!-- head + beak -->
+        <circle class="fl" cx="165" cy="50" r="17" stroke="#1A0E08" stroke-width="3"/>
+        <path d="M178 40C197 40 208 52 205 71C204 78 197 80 195 73C195 62 190 57 178 58Z" fill="#fff" stroke="#1A0E08" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M205 63C205 72 203 79 196 74C196 69 197 65 197 62Z" fill="#1A0E08"/>
+        <circle cx="170" cy="45" r="3.8" fill="#1A0E08"/>
+        <circle cx="171.3" cy="43.8" r="1.2" fill="#fff"/>
+        <!-- water -->
+        <path d="M0 336Q20 330 40 336T80 336T120 336T160 336T200 336T240 336T280 336V380H0Z" fill="#7FC8F0" opacity=".85"/>
+        <path d="M20 352q10-4 20 0M180 360q10-4 20 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <g id="flames" font-size="26">
+          <text x="140" y="26">🔥</text>
+          <text x="176" y="20">🔥</text>
+        </g>
+      </svg>
+    </div>
+
+    <p class="caption" id="cap" aria-live="polite">واكل جمبري... عشان كده بمبي 💖 اختار له أكلة تانية 👇</p>
+    <div class="menu" id="menu" role="group" aria-label="منيو البشروش"></div>
+  </section>
+
+  <section class="panel punch tilt-l" id="punch" aria-label="الرد"></section>
+
+  <section class="panel tilt-r" aria-labelledby="cmt-h">
+    <h2 id="cmt-h">التعليقات (٥)</h2>
+    <ul class="comments">
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦩</div>
+        <div class="cmt-body">
+          <div class="cmt-name">البشروش <span class="badge">📌 صاحب الموضوع</span></div>
+          <p class="cmt-text">أنا مش ملوّن... أنا بس باكل كويس 💅</p>
+        </div>
+        <div class="likes"><b>❤</b>٧٨ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦐</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الجمبري</div>
+          <p class="cmt-text">يعني أنا اللي بتعب وهو اللي بيحلو؟ 🙄</p>
+        </div>
+        <div class="likes"><b>❤</b>٥٢ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦎</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الحرباية</div>
+          <p class="cmt-text">هواة 🙂 أنا بغيّر لوني من غير ما آكل حاجة</p>
+        </div>
+        <div class="likes"><b>❤</b>٣٣ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦚</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الطاووس</div>
+          <p class="cmt-text">ألواني طبيعية على فكرة، من غير فلتر ولا جمبري</p>
+        </div>
+        <div class="likes"><b>❤</b>١٨ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🧍</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الإنسان</div>
+          <p class="cmt-text">أنا كلت كشري امبارح وبقيت لونه... ومحدش عمل عليّا فيديو</p>
+        </div>
+        <div class="likes"><b>❤</b>١١</div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="note">
+    <h2>🧪 للأمانة العلمية</h2>
+    <p>ده حقيقي! البشروش بيتولد لونه رمادي فاتح، وبياخد اللون البمبي من صبغات اسمها «كاروتينات» موجودة في الجمبري والطحالب اللي بياكلها. ولو بطّل ياكلها لونه بيبهت لحد ما يبقى أبيض تقريباً، وعشان كده حدايق الحيوان بتحطله صبغات في الأكل. وكمان هو فعلاً بياكل وراسه مقلوبة. أما الكشري... فمحدش جرب لسه 🍝</p>
+  </aside>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعتها لحد بياكل كشري كل يوم</button></div>
+  <div id="next"></div>
+
+  <footer>مفيش أي بشروش اتأذى في عمل الصفحة دي... بس واحد منهم لسه لونه فول 🦩</footer>
+</main>
+
+<script src="common.js"></script>
+<script>
+(() => {
+  const FOODS = [
+    { name: "جمبري",  emoji: "🦐", color: "#FF8FB1", label: "بمبي جمبري",   cap: "رجع بمبي زي ما ربنا خلقه 💖" },
+    { name: "كشري",   emoji: "🍝", color: "#C9955A", label: "بيج كشري",     cap: "بقى لونه كشري... وناقصه دقة وشطة 🟫" },
+    { name: "فول",    emoji: "🫘", color: "#8A5A2E", label: "بني فول",      cap: "بقى لونه فول... وعايز ينام الساعة ٩ الصبح 😴" },
+    { name: "ملوخية", emoji: "🥬", color: "#4E8F3A", label: "أخضر ملوخية",  cap: "بقى أخضر... وكل شوية يعمل «شهقة» 😮" },
+    { name: "رز بلبن", emoji: "🍚", color: "#F6F1E7", label: "أبيض رز بلبن", cap: "بقى أبيض... زي البشروش اللي أكلها وحش في الجنينة 🤍" },
+    { name: "توت",    emoji: "🫐", color: "#6A5ACD", label: "بنفسجي توت",   cap: "بقى بنفسجي... ومحدش فاهم ليه 🟣" },
+    { name: "شطة",    emoji: "🌶️", color: "#FF3D1F", label: "أحمر شطة",     cap: "ولّع 🔥🔥 ... هاتوله مية بسرعة!" },
+    { name: "مانجا",  emoji: "🥭", color: "#FFB000", label: "أصفر مانجا",   cap: "بقى أصفر... صيفي وعامل جو 🥭" },
+  ];
+  const svg = document.getElementById("flamingo");
+  const stage = document.getElementById("stage");
+  const menu = document.getElementById("menu");
+  const cap = document.getElementById("cap");
+  const swatch = document.getElementById("swatch");
+  const colorName = document.getElementById("colorName");
+
+  FOODS.forEach((f, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "food";
+    b.setAttribute("aria-pressed", String(i === 0));
+    b.innerHTML = `<span aria-hidden="true">${f.emoji}</span>${f.name}`;
+    b.addEventListener("click", () => feed(i));
+    menu.append(b);
+  });
+
+  function feed(i) {
+    const f = FOODS[i];
+    [...menu.children].forEach((b, j) => b.setAttribute("aria-pressed", String(j === i)));
+    svg.style.setProperty("--fl", f.color);
+    swatch.style.setProperty("--sw", f.color);
+    colorName.textContent = f.label;
+    cap.textContent = f.cap;
+    stage.classList.toggle("fire", f.name === "شطة");
+  }
+})();
+</script>
+</body>
+</html>

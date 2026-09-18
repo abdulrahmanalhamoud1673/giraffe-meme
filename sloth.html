@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ar-EG" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>الكسلان والواتساب • عمرك فكرت؟</title>
+<meta name="description" content="عمرك فكرت إن الكسلان لو عنده واتساب... هيرد عليك إمتى؟ 🦥📱">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/sloth.html">
+<meta property="og:title" content="الكسلان والواتساب 🦥📱">
+<meta property="og:description" content="عمرك فكرت إن الكسلان لو عنده واتساب... هيرد عليك إمتى؟ ابعتله وشوف بنفسك">
+<meta property="og:image" content="https://abdulrahmanalhamoud1673.github.io/giraffe-meme/og/sloth.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#2A140B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🦥%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@400;600;800&family=Lalezar&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  .phone {
+    border: 3px solid var(--ink);
+    border-radius: 22px;
+    overflow: hidden;
+    background-color: #EFEAE2;
+    background-image: radial-gradient(#e2dace 1.2px, transparent 1.6px);
+    background-size: 18px 18px;
+  }
+  .ph-head { display: flex; align-items: center; gap: 10px; background: #008069; color: #fff; padding: 10px 12px; }
+  .ph-avatar { width: 44px; height: 44px; flex: none; border-radius: 50%; border: 2px solid #fff; background: #fff; overflow: hidden; }
+  .ph-avatar svg { display: block; width: 100%; height: 100%; }
+  .ph-name { font-weight: 800; font-size: 17px; line-height: 1.2; }
+  .ph-status { font-size: 13px; opacity: .92; line-height: 1.3; min-height: 1.3em; }
+  .ph-status.typing { color: #B7F5C9; font-weight: 800; }
+  .ph-chat { min-height: 300px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .day-chip { align-self: center; background: #fff; color: #54656F; font-size: 12px; font-weight: 600; padding: 1px 10px; border-radius: 8px; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+  .msg {
+    max-width: 78%;
+    padding: 6px 10px 3px;
+    border-radius: 10px;
+    font-size: 17px;
+    line-height: 1.4;
+    color: #111B21;
+    box-shadow: 0 1px 0 rgba(0,0,0,.13);
+    animation: pop .25s ease-out;
+  }
+  .msg.out { align-self: flex-end; background: #D9FDD3; border-top-left-radius: 2px; }
+  .msg.in { align-self: flex-start; background: #fff; border-top-right-radius: 2px; }
+  .meta { display: block; text-align: left; font-size: 11px; color: #667781; margin-top: 2px; }
+  .ticks { font-weight: 800; letter-spacing: -3px; margin-inline-start: 4px; }
+  .ticks.read { color: #34B7F1; }
+  .typing-dots { align-self: flex-start; background: #fff; border-radius: 10px; padding: 10px 14px; display: flex; gap: 4px; box-shadow: 0 1px 0 rgba(0,0,0,.13); }
+  .typing-dots i { width: 7px; height: 7px; border-radius: 50%; background: #8696A0; animation: blink 1.2s infinite; }
+  .typing-dots i:nth-child(2) { animation-delay: .2s; }
+  .typing-dots i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 80%, 100% { opacity: .3; } 40% { opacity: 1; } }
+
+  .clock {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    background: var(--ink); color: #fff; border-radius: 12px; padding: 8px 14px;
+  }
+  .clock small { color: var(--milk-dim); font-weight: 800; font-size: 13px; }
+  .clock b { font-family: var(--display); font-weight: 400; font-size: 24px; color: var(--accent); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body data-story="sloth" style="--accent:#A3D65C">
+<main class="wrap">
+
+  <nav class="topbar">
+    <a class="logo" href="./">عمرك فكرت<span>؟</span></a>
+    <button class="chip" id="randomBtn" type="button">🎲 سؤال تاني</button>
+  </nav>
+
+  <header class="hero">
+    <span class="eyebrow">الكسلان 🦥 • سؤال وجودي رقم ٢</span>
+    <h1 class="meme-text">عمرك فكرت إن <span class="hl">الكسلان</span> لو عنده واتساب...</h1>
+    <p class="meme-text sub">...هيرد عليك إمتى؟ 📱</p>
+  </header>
+
+  <section class="panel" aria-labelledby="lab-h">
+    <h2 id="lab-h">📱 التجربة العملية</h2>
+    <p class="lede">ابعتله «إزيك؟» وتابع الوقت. كل ثانية هنا = كام يوم عند الكسلان.</p>
+
+    <div class="clock" aria-hidden="true">
+      <small>⏱ الوقت اللي عدّى</small>
+      <b id="elapsed">٠ دقيقة</b>
+    </div>
+
+    <div class="phone">
+      <div class="ph-head">
+        <div class="ph-avatar" aria-hidden="true">
+          <svg viewBox="0 0 100 100">
+            <rect width="100" height="100" fill="#DCEFC0"/>
+            <circle cx="50" cy="56" r="40" fill="#B08D6A" stroke="#1A0E08" stroke-width="3"/>
+            <ellipse cx="50" cy="62" rx="31" ry="26" fill="#EAD9BF"/>
+            <ellipse cx="35" cy="57" rx="12" ry="7" transform="rotate(22 35 57)" fill="#5A3E2B"/>
+            <ellipse cx="65" cy="57" rx="12" ry="7" transform="rotate(-22 65 57)" fill="#5A3E2B"/>
+            <path d="M30 57q5 3 10 0M60 57q5 3 10 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+            <ellipse cx="50" cy="67" rx="6" ry="4.5" fill="#3A2618"/>
+            <path d="M43 76q7 5 14 0" stroke="#3A2618" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="ph-name">الكسلان 🦥</div>
+          <div class="ph-status" id="status">آخر ظهور: من ٣ أيام</div>
+        </div>
+      </div>
+      <div class="ph-chat" id="chat" aria-live="polite">
+        <span class="day-chip">النهارده</span>
+      </div>
+    </div>
+
+    <p class="caption" id="cap">ابعتله وخلّيك صبور 👇</p>
+    <button class="btn" id="sendBtn" type="button">📨 ابعت «إزيك؟ 👋»</button>
+  </section>
+
+  <section class="panel punch tilt-l" id="punch" aria-label="الرد"></section>
+
+  <section class="panel tilt-r" aria-labelledby="cmt-h">
+    <h2 id="cmt-h">التعليقات (٥)</h2>
+    <ul class="comments">
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦥</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الكسلان <span class="badge">📌 صاحب الموضوع</span></div>
+          <p class="cmt-text">شكراً على الاهتمام، هرد على كل التعليقات الشهر الجاي إن شاء الله</p>
+        </div>
+        <div class="likes"><b>❤</b>٨٧ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐢</div>
+        <div class="cmt-body">
+          <div class="cmt-name">السلحفاة</div>
+          <p class="cmt-text">استنوني... أنا جاية أعلّق</p>
+        </div>
+        <div class="likes"><b>❤</b>٣٤ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🐌</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الحلزونة</div>
+          <p class="cmt-text">بصراحة أنا شايفاه سريع 🤷‍♀️</p>
+        </div>
+        <div class="likes"><b>❤</b>٢٢ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🦒</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الزرافة</div>
+          <p class="cmt-text">على الأقل رسالته وصلت... الهوت شوكلت بتاعي موصلش سخن 🥶</p>
+        </div>
+        <div class="likes"><b>❤</b>١٤ ألف</div>
+      </li>
+      <li class="cmt">
+        <div class="avatar" aria-hidden="true">🧍</div>
+        <div class="cmt-body">
+          <div class="cmt-name">الإنسان</div>
+          <p class="cmt-text">أنا بعمل كده برضه... بس عشان مش عايز أرد 😌</p>
+        </div>
+        <div class="likes"><b>❤</b>٤</div>
+      </li>
+    </ul>
+  </section>
+
+  <aside class="note">
+    <h2>🧪 للأمانة العلمية</h2>
+    <p>الكسلان فعلاً بطيء جداً: أقصى سرعة له حوالي ربع كيلو في الساعة، وممكن ياخد لحد شهر عشان يهضم أكلة واحدة، وبينزل من الشجرة مرة في الأسبوع بس عشان الحمام. بس هو مش كسلان، ده بيوفّر طاقته لأن أكله (ورق الشجر) فقير جداً. يعني هو بيرد متأخر عشان عنده ظروف... إنت إيه عذرك؟ 🤨</p>
+  </aside>
+
+  <div class="row"><button class="btn wa" id="shareBtn" type="button">📲 ابعتها لصاحبك اللي بيرد بعد أسبوع</button></div>
+  <div id="next"></div>
+
+  <footer>مفيش أي كسلان اتأذى في عمل الصفحة دي... هو لسه ما عرفش إنها اتعملت 🦥</footer>
+</main>
+
+<script src="common.js"></script>
+<script>
+(() => {
+  const chat = document.getElementById("chat");
+  const status = document.getElementById("status");
+  const elapsed = document.getElementById("elapsed");
+  const cap = document.getElementById("cap");
+  const btn = document.getElementById("sendBtn");
+  let timers = [];
+  let typing = null;
+
+  const later = (ms, fn) => timers.push(setTimeout(fn, ms));
+
+  function bubble(kind, text, meta) {
+    const m = document.createElement("div");
+    m.className = "msg " + kind;
+    m.innerHTML = `${text}<span class="meta">${meta}</span>`;
+    chat.append(m);
+    return m;
+  }
+  function setTyping(on) {
+    if (on && !typing) {
+      typing = document.createElement("div");
+      typing.className = "typing-dots";
+      typing.innerHTML = "<i></i><i></i><i></i>";
+      chat.append(typing);
+    } else if (!on && typing) {
+      typing.remove();
+      typing = null;
+    }
+    status.textContent = on ? "بيكتب..." : "متصل";
+    status.classList.toggle("typing", on);
+  }
+
+  function reset() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    typing = null;
+    chat.innerHTML = '<span class="day-chip">النهارده</span>';
+    status.textContent = "آخر ظهور: من ٣ أيام";
+    status.classList.remove("typing");
+    elapsed.textContent = "٠ دقيقة";
+  }
+
+  btn.addEventListener("click", () => {
+    reset();
+    btn.disabled = true;
+    btn.textContent = "مستني الرد... ⏳";
+
+    const mine = bubble("out", "إزيك؟ 👋", 'النهارده <span class="ticks">✓</span>');
+    const ticks = mine.querySelector(".ticks");
+    cap.textContent = "اتبعتت ✓ ... يلا نستنى";
+
+    const steps = [
+      [1300, () => { ticks.textContent = "✓✓"; elapsed.textContent = "يومين"; cap.textContent = "وصلت ✓✓ ... بس لسه ما شافهاش"; }],
+      [2800, () => { ticks.classList.add("read"); elapsed.textContent = "٥ أيام"; status.textContent = "متصل"; cap.textContent = "شافها! 👀 (بعد ٥ أيام بس)"; }],
+      [4000, () => { setTyping(true); elapsed.textContent = "٥ أيام و٣ ساعات"; cap.textContent = "بيكتب... اصبر عليه"; }],
+      [5700, () => { elapsed.textContent = "٨ أيام"; cap.textContent = "لسه بيكتب... 🫠"; }],
+      [7100, () => { setTyping(false); bubble("in", "الحمد", "بعد ١١ يوم"); elapsed.textContent = "١١ يوم"; cap.textContent = "رد! ... بنص كلمة 🙃"; }],
+      [8300, () => { setTyping(true); elapsed.textContent = "١٥ يوم"; cap.textContent = "استنى، في كمان..."; }],
+      [9800, () => { setTyping(false); bubble("in", "لله", "بعد ٢٠ يوم"); elapsed.textContent = "٢٠ يوم"; cap.textContent = "كمّل الجملة بعد ٩ أيام 👏"; }],
+      [11000, () => { setTyping(true); elapsed.textContent = "٢٥ يوم"; cap.textContent = "لأ ده لسه في كمان!"; }],
+      [12600, () => {
+        setTyping(false);
+        bubble("in", "وإنت؟ 🙂", "بعد شهر");
+        status.textContent = "آخر ظهور: دلوقتي";
+        elapsed.textContent = "شهر كامل 🗓️";
+        cap.textContent = "الكسلان رد في شهر... وإنت بتزعل لما صاحبك يتأخر ساعتين 🙄";
+        btn.disabled = false;
+        btn.textContent = "🔁 ابعت تاني";
+      }],
+    ];
+    steps.forEach(([ms, fn]) => later(ms, fn));
+  });
+})();
+</script>
+</body>
+</html>
