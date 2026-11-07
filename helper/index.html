@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1f6f5c">
+<title>تواصل مع البيت</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏠%3C/text%3E%3C/svg%3E">
+<style>
+  :root { --bg:#f4f1ea; --card:#fff; --ink:#1d2a26; --mute:#66736e; --green:#1f6f5c; --red:#c0392b; --blue:#2c6fbb; --amber:#d98a0b; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14201c; --card:#1d2d28; --ink:#eef3f1; --mute:#9fb0aa; } }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family: Tahoma, "Segoe UI", system-ui, sans-serif; min-height:100dvh;
+         padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)); }
+  main { max-width: 480px; margin: 0 auto; }
+  h1 { font-size: 26px; margin: 8px 0 4px; }
+  .sub { color: var(--mute); margin: 0 0 18px; font-size: 18px; }
+  .grid { display:grid; gap:14px; }
+  button { font: inherit; border:0; border-radius:20px; color:#fff; cursor:pointer; width:100%;
+           display:flex; align-items:center; gap:14px; padding:18px 20px; font-size:24px; font-weight:700; text-align:right;
+           box-shadow: 0 3px 0 rgba(0,0,0,.18); }
+  button:active { transform: translateY(2px); box-shadow:none; }
+  button:disabled { opacity:.55; }
+  button .ic { font-size:38px; line-height:1; }
+  .arrived{background:var(--green)} .done{background:var(--blue)} .ask{background:var(--amber)} .help{background:var(--red)} .call{background:#444; text-decoration:none}
+  a.call { display:flex; align-items:center; gap:14px; padding:18px 20px; border-radius:20px; color:#fff; font-size:24px; font-weight:700; background:#4a4a4a; text-decoration:none; box-shadow:0 3px 0 rgba(0,0,0,.18); }
+  .card { background:var(--card); border-radius:20px; padding:18px; }
+  textarea, input { width:100%; font: inherit; font-size:22px; padding:14px; border-radius:14px; border:2px solid var(--mute); background:var(--bg); color:var(--ink); }
+  textarea { min-height:140px; resize:vertical; }
+  .row { display:flex; gap:10px; margin-top:12px; }
+  .row button { justify-content:center; font-size:22px; }
+  .ghost { background: var(--mute); }
+  #toast { position:fixed; inset-inline:16px; bottom: max(20px, env(safe-area-inset-bottom)); max-width:448px; margin:auto; padding:18px; border-radius:18px;
+           font-size:22px; font-weight:700; text-align:center; color:#fff; display:none; }
+  #toast.ok{background:var(--green); display:block} #toast.err{background:var(--red); display:block}
+  .last { margin-top:18px; color:var(--mute); font-size:17px; text-align:center; }
+  .link { background:none; color:var(--mute); box-shadow:none; font-size:16px; font-weight:400; text-decoration:underline; justify-content:center; padding:8px; margin-top:6px; }
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<main>
+  <!-- شاشة الاسم (أول مرة بس) -->
+  <section id="nameView" hidden>
+    <h1>أهلاً فيكي 👋</h1>
+    <p class="sub">شو اسمك؟</p>
+    <div class="card">
+      <input id="nameInput" autocomplete="given-name" maxlength="30" placeholder="اكتبي اسمك">
+      <div class="row"><button class="arrived" id="nameSave"><span class="ic">✅</span>تمام</button></div>
+    </div>
+  </section>
+
+  <!-- الشاشة الرئيسية -->
+  <section id="mainView" hidden>
+    <h1 id="hello">أهلاً 👋</h1>
+    <p class="sub">دوسي على الزر، ورسالتك بتوصل لكل العيلة.</p>
+    <div class="grid">
+      <button class="arrived" data-kind="arrived"><span class="ic">🚪</span>وصلت البيت</button>
+      <button class="done"    data-kind="done"><span class="ic">✅</span>خلّصت الشغل</button>
+      <button class="help"    data-kind="help"><span class="ic">🆘</span>محتاجة مساعدة</button>
+      <button class="ask"     data-kind="text"><span class="ic">✏️</span>بدي أكتب رسالة</button>
+      <a class="call" id="callBtn" hidden><span class="ic" style="font-size:38px">📞</span>اتصلي بالست</a>
+    </div>
+    <p class="last" id="last"></p>
+    <button class="link" id="changeName">مش أنا؟ غيّري الاسم</button>
+  </section>
+
+  <!-- كتابة رسالة -->
+  <section id="textView" hidden>
+    <h1>اكتبي رسالتك ✏️</h1>
+    <div class="card">
+      <textarea id="msgInput" maxlength="500" placeholder="مثلاً: وين ألاقي المكنسة؟"></textarea>
+      <div class="row">
+        <button class="arrived" id="msgSend"><span class="ic">📨</span>ابعتي</button>
+        <button class="ghost" id="msgBack">رجوع</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- رابط ناقص -->
+  <section id="badView" hidden>
+    <h1>الرابط ناقص 😕</h1>
+    <p class="sub">اطلبي من العيلة يبعتولك الرابط من جديد.</p>
+  </section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const store = {
+    get(k){ try { return localStorage.getItem(k) } catch { return null } },
+    set(k,v){ try { localStorage.setItem(k,v) } catch {} }
+  };
+
+  // الإعدادات بتجي من الرابط: #t=الموضوع&p=رقم_الاتصال  (ما في أسرار بالكود نفسه)
+  const hp = new URLSearchParams(location.hash.slice(1));
+  let topic = hp.get('t') || store.get('topic');
+  let phone = hp.get('p') || store.get('phone') || '';
+  if (hp.get('t')) { store.set('topic', topic); store.set('phone', phone); }
+  topic = topic && /^[A-Za-z0-9_-]{8,64}$/.test(topic) ? topic : null;
+
+  const views = ['nameView','mainView','textView','badView'];
+  const show = v => views.forEach(x => $(x).hidden = x !== v);
+  let name = (store.get('name') || '').trim();
+
+  const LABELS = {
+    arrived: { title: 'وصلت', msg: 'وصلت البيت 🚪', tags: ['house'],            priority: 3 },
+    done:    { title: 'خلّصت', msg: 'خلّصت الشغل ✅', tags: ['white_check_mark'], priority: 3 },
+    help:    { title: 'محتاجة مساعدة', msg: 'محتاجة مساعدة، رجاءً كلموني أو ردّوا عليّ', tags: ['sos'], priority: 5 },
+    text:    { title: 'رسالة', msg: '', tags: ['speech_balloon'], priority: 4 },
+  };
+
+  let toastTimer;
+  function toast(msg, cls){ const t=$('toast'); t.textContent=msg; t.className=cls; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.className='',4500); }
+
+  async function send(kind, text) {
+    const L = LABELS[kind];
+    const body = {
+      topic,
+      title: `${name} — ${L.title}`,
+      message: (text || L.msg),
+      priority: L.priority,
+      tags: L.tags,
+    };
+    const ctl = new AbortController(); const to = setTimeout(()=>ctl.abort(), 12000);
+    try {
+      const r = await fetch('https://ntfy.sh/', { method:'POST', body: JSON.stringify(body), signal: ctl.signal });
+      if (!r.ok) throw new Error(r.status);
+      store.set('last', JSON.stringify({ t: Date.now(), m: body.message }));
+      renderLast();
+      toast('وصلت رسالتك ✅', 'ok');
+      return true;
+    } catch (e) {
+      toast(phone ? 'ما وصلت الرسالة ❌ جرّبي مرة ثانية أو اتصلي' : 'ما وصلت الرسالة ❌ جرّبي مرة ثانية', 'err');
+      return false;
+    } finally { clearTimeout(to); }
+  }
+
+  function renderLast() {
+    try {
+      const l = JSON.parse(store.get('last') || 'null');
+      if (!l) { $('last').textContent = ''; return; }
+      const mins = Math.max(0, Math.round((Date.now()-l.t)/60000));
+      const ago = mins < 1 ? 'هلأ' : mins < 60 ? `قبل ${mins} دقيقة` : `قبل ${Math.round(mins/60)} ساعة`;
+      $('last').textContent = `آخر رسالة بعتيها (${ago}): ${l.m}`;
+    } catch { $('last').textContent = ''; }
+  }
+
+  function enterMain() {
+    $('hello').textContent = `أهلاً ${name} 👋`;
+    if (phone) { $('callBtn').href = 'tel:' + phone.replace(/[^\d+]/g,''); $('callBtn').hidden = false; }
+    renderLast(); show('mainView');
+  }
+
+  // أزرار الإرسال السريعة (مع منع الضغط المكرر)
+  document.querySelectorAll('[data-kind]').forEach(b => b.addEventListener('click', async () => {
+    const kind = b.dataset.kind;
+    if (kind === 'text') { $('msgInput').value=''; show('textView'); $('msgInput').focus(); return; }
+    if (kind === 'help' && !confirm('نبعت طلب مساعدة للعيلة؟')) return;
+    b.disabled = true; await send(kind); setTimeout(()=>b.disabled=false, 3000);
+  }));
+
+  $('msgSend').addEventListener('click', async () => {
+    const text = $('msgInput').value.trim();
+    if (!text) return;
+    $('msgSend').disabled = true;
+    if (await send('text', text)) show('mainView');
+    $('msgSend').disabled = false;
+  });
+  $('msgBack').addEventListener('click', () => show('mainView'));
+
+  $('nameSave').addEventListener('click', () => {
+    const v = $('nameInput').value.trim(); if (!v) { $('nameInput').focus(); return; }
+    name = v; store.set('name', v); enterMain();
+  });
+  $('nameInput').addEventListener('keydown', e => { if (e.key==='Enter') $('nameSave').click(); });
+  $('changeName').addEventListener('click', () => { $('nameInput').value=''; show('nameView'); $('nameInput').focus(); });
+
+  if (!topic) show('badView');
+  else if (!name) show('nameView');
+  else enterMain();
+})();
+</script>
+</body>
+</html>

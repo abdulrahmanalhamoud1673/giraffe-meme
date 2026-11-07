@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>إعداد تواصل البيت</title>
+<style>
+  body{font-family:Tahoma,system-ui,sans-serif;max-width:560px;margin:0 auto;padding:20px;line-height:1.7;background:#f4f1ea;color:#1d2a26}
+  @media (prefers-color-scheme: dark){body{background:#14201c;color:#eef3f1}.box{background:#1d2d28!important}input{background:#14201c!important;color:#eef3f1!important}}
+  h1{font-size:24px} h2{font-size:18px;margin:0 0 6px}
+  .box{background:#fff;border-radius:16px;padding:16px;margin:14px 0}
+  input{width:100%;font:inherit;padding:10px;border-radius:10px;border:1px solid #999;box-sizing:border-box;direction:ltr;text-align:left}
+  button,a.btn{font:inherit;display:inline-block;margin:8px 6px 0 0;padding:10px 16px;border:0;border-radius:12px;background:#1f6f5c;color:#fff;text-decoration:none;cursor:pointer}
+  code{word-break:break-all;direction:ltr;display:block;background:rgba(0,0,0,.07);padding:8px;border-radius:8px;text-align:left;font-size:13px}
+  #qr{margin-top:10px;background:#fff;display:inline-block;padding:10px;border-radius:10px} #qr:empty{display:none}
+  ol{padding-inline-start:22px}
+</style>
+</head>
+<body>
+<h1>🏠 إعداد تواصل البيت (مرة وحدة بس)</h1>
+
+<div class="box">
+  <h2>1) رقم الاتصال (اختياري)</h2>
+  <p>بيطلع زر "اتصلي بالست" عند الشغالة. حطي رقم أمك أو أي حدا من العيلة.</p>
+  <input id="phone" type="tel" placeholder="+9627XXXXXXXX" inputmode="tel">
+</div>
+
+<div class="box">
+  <h2>2) الرابط للشغالة</h2>
+  <code id="link"></code>
+  <div id="qr"></div><br>
+  <button id="copy">نسخ الرابط</button>
+  <a class="btn" id="wa" target="_blank" rel="noopener">إرسال بالواتساب</a>
+  <button id="test">إرسال رسالة تجربة</button>
+  <span id="testRes"></span>
+  <p>بتبعتيه مرة وحدة، وهي بتحطه على الشاشة الرئيسية. وبتقدري تطبعي الـQR وتلزقيه بالمطبخ، كل وحدة جديدة بتمسحه وبتشتغل. 📌</p>
+</div>
+
+<div class="box">
+  <h2>3) كل واحد من العيلة يستقبل الإشعارات</h2>
+  <ol>
+    <li>نزّل تطبيق <b>ntfy</b> (مجاني، أندرويد وآيفون).</li>
+    <li>اضغط <b>+</b> (Subscribe to topic) والصق اسم الموضوع:<code id="topic"></code></li>
+    <li>خلّص. أي رسالة من الشغالة بتجي إشعار لكل اللي مشتركين. 🔔</li>
+  </ol>
+  <p>رسائل "محتاجة مساعدة" بتطلع بأولوية عالية (إشعار عاجل).</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const get = k => { try { return localStorage.getItem(k) } catch { return null } };
+  const set = (k,v) => { try { localStorage.setItem(k,v) } catch {} };
+  const rand = () => { const a = new Uint8Array(18); crypto.getRandomValues(a); return 'bayt-' + Array.from(a, b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join(''); };
+  let topic = get('topic') || rand(); set('topic', topic);
+  $('phone').value = get('phone') || '';
+  $('topic').textContent = topic;
+
+  let last = '';
+  function render() {
+    const phone = $('phone').value.trim(); set('phone', phone);
+    const base = new URL('./', location.href).href;
+    const link = base + '#t=' + topic + (phone ? '&p=' + encodeURIComponent(phone) : '');
+    $('link').textContent = link; last = link;
+    $('wa').href = 'https://wa.me/?text=' + encodeURIComponent('افتحي هاد الرابط وكبسي عليه لما توصلي: ' + link);
+    $('qr').innerHTML = '';
+    if (window.QRCode) new QRCode($('qr'), { text: link, width: 200, height: 200 });
+  }
+  $('phone').addEventListener('input', render);
+  $('copy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(last); $('copy').textContent = 'اننسخ ✅'; } catch { prompt('انسخ الرابط:', last); } });
+  $('test').addEventListener('click', async () => {
+    try {
+      const r = await fetch('https://ntfy.sh/', { method:'POST', body: JSON.stringify({ topic, title:'تجربة 🏠', message:'إذا وصلتك هاي الرسالة، كله تمام ✅', tags:['tada'] }) });
+      $('testRes').textContent = r.ok ? ' تم الإرسال، شوف جوالك ✅' : ' فشل ❌';
+    } catch { $('testRes').textContent = ' فشل ❌'; }
+  });
+  render();
+})();
+</script>
+</body>
+</html>
