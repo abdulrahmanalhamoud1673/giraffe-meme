@@ -15,9 +15,11 @@
 <div class="wrap">
   <header class="top"><a class="logo" href="index.html">يا نشمي</a><a class="back" href="index.html">الرئيسية</a></header>
   <main>
+    <ol class="crumbs" id="crumbs"><li class="on" id="c1"><b>1</b>بياناتك</li><li id="c2"><b>2</b>رمزك</li><li id="c3"><b>3</b>اطبعه</li></ol>
+
     <section id="formView">
       <h1>احصل على ستيكرك</h1>
-      <p class="lead">سجّل بيانات بسيطة، وبيطلعلك رمز QR خاص بسيارتك تطبعه وتحطه على الزجاج. إذا حدا احتاجك، بتوصلك رسالته بدون ما يعرف رقمك.</p>
+      <p class="lead">ثلاث خانات وبيطلعلك رمز QR خاص بسيارتك. إذا حدا احتاجك، بتوصلك رسالته بدون ما يعرف رقمك.</p>
       <form id="f" novalidate>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <label class="f">اسمك
@@ -34,17 +36,18 @@
         </label>
         <label class="consent"><input type="checkbox" id="consent"><span>موافق إنكم تحفظوا اسمي ورقمي لغرض إرسال التنبيهات فقط، وبقدر أطلب حذفهم بأي وقت.</span></label>
         <p class="err" id="err" role="alert"></p>
-        <button class="cta" type="submit" id="btn" style="justify-self:start">احصل على الرمز</button>
+        <button class="cta" type="submit" id="btn" style="justify-self:start;min-width:180px">احصل على الرمز</button>
       </form>
     </section>
 
     <section id="doneView" hidden>
       <h1>جاهز يا نشمي</h1>
-      <p class="lead">هاد رمزك الخاص. اطبعه وحطه على زجاج السيارة من جوا، بمكان واضح.</p>
+      <p class="lead">هاد رمزك الخاص. اطبعه وحطه على زجاج السيارة من جوا.</p>
       <div id="print-area"><div class="sticker">
         <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
         <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
       </div></div>
+      <ul class="tips" id="tips"></ul>
       <div class="stack" style="margin-top:26px">
         <button class="cta" id="printBtn" type="button">اطبع الرمز</button>
         <button class="cta alt" id="pngBtn" type="button">احفظه كصورة</button>
@@ -61,9 +64,16 @@
 <script>
 const f=document.getElementById('f'),err=document.getElementById('err'),btn=document.getElementById('btn');
 const ERR={name_required:'اكتب اسمك.',bad_phone:'رقم الموبايل غير صحيح. مثال: 0795551234',consent_required:'لازم توافق على حفظ البيانات.',rate_limited:'محاولات كثيرة. جرب بعد شوي.'};
+document.getElementById('tips').innerHTML=[
+  'حطه على الزجاج الأمامي من جوا، بمكان ظاهر ومش مغطى.',
+  'الأفضل يكون ملصق مقاوم للشمس. للتجربة تكفي ورقة عادية.',
+  'اختبره بنفسك: امسحه بموبايل ثاني وتأكد إنه الرسالة بتوصل.'
+].map(t=>'<li>'+ICON.check+'<span>'+t+'</span></li>').join('');
+function step(n){for(let i=1;i<=3;i++)document.getElementById('c'+i).classList.toggle('on',i<=n)}
 function show(token,key){
   document.getElementById('formView').hidden=true;
   document.getElementById('doneView').hidden=false;
+  step(3);
   document.getElementById('qr').innerHTML=qrSvg(scanUrl(token));
   const link=new URL('inbox.html',location.href).href+'#'+key;
   document.getElementById('inboxLink').href='inbox.html#'+key;
@@ -96,4 +106,5 @@ document.getElementById('pngBtn').onclick=async()=>{
   c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='yanashmi-sticker.png';a.click()});
 };
 </script>
-</body></html>
+</body>
+</html>

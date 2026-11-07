@@ -13,49 +13,76 @@
 <body>
 <div class="band" aria-hidden="true"></div>
 <div class="wrap">
-  <header class="top"><span class="logo">يا نشمي</span><span class="pill">رقمه مخفي</span></header>
+  <header class="top">
+    <span class="logo">يا نشمي</span>
+    <span class="pill" id="lockPill"></span>
+  </header>
   <main>
     <section id="pick" hidden>
-      <h1>أرسل رسالة لصاحب السيارة</h1>
-      <p class="lead" id="who">اختر رسالة جاهزة وبنوصلها له فوراً.</p>
-      <div class="stack" id="list"></div>
-      <p class="err" id="err" role="alert" style="margin-top:14px"></p>
-      <p class="note" style="margin-top:14px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
-    </section>
-    <section id="sent" hidden>
-      <div class="status" role="status" aria-live="polite">
-        <h2>تم الإرسال</h2>
-        <p id="sentMsg" class="lead" style="margin-bottom:0"></p>
-        <p id="replyBox" style="margin-top:14px">بانتظار رد صاحب السيارة…</p>
+      <div class="who">
+        <span class="ic" id="whoIc"></span>
+        <div><b id="whoName">صاحب السيارة</b><small>رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div>
       </div>
+      <h1>شو بدك تقوله؟</h1>
+      <div id="list"></div>
+      <p class="err" id="err" role="alert" style="margin-top:14px"></p>
+      <p class="note" style="margin-top:10px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
     </section>
-    <section id="bad" hidden><h1 id="badTitle">الرابط غير صحيح</h1><p class="lead" id="badText">تأكد إنك مسحت الرمز بشكل كامل.</p><p class="note" id="dbg" dir="ltr"></p></section>
+
+    <section id="sent" hidden>
+      <h1>تم الإرسال</h1>
+      <p class="lead" id="sentMsg" style="margin-bottom:0"></p>
+      <ol class="track" aria-live="polite">
+        <li class="done"><span class="dot" id="dotSent"></span><div><b>وصلت رسالتك</b><div class="note">لصاحب السيارة.</div></div></li>
+        <li class="wait" id="stepReply"><span class="dot" id="dotReply"></span><div><b id="replyTitle">بانتظار ردّه</b><div class="note" id="replyBox">خلّي هالصفحة مفتوحة، الرد بيظهر هون لحاله.</div></div></li>
+      </ol>
+      <div class="reply" id="replyCard" hidden><span class="note">ردّ صاحب السيارة</span><b id="replyText"></b></div>
+    </section>
+
+    <section id="bad" hidden>
+      <h1 id="badTitle">الرابط غير صحيح</h1>
+      <p class="lead" id="badText">تأكد إنك مسحت الرمز بشكل كامل.</p>
+      <p class="note" id="dbg" dir="ltr"></p>
+    </section>
   </main>
 </div>
 <script src="/shared.js"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
+$('lockPill').innerHTML=ICON.lock+'رقمه مخفي';
+$('whoIc').innerHTML=ICON.block;
+$('dotSent').innerHTML=ICON.check;
 function view(id){for(const v of ['pick','sent','bad'])$(v).hidden=v!==id}
+function build(){
+  const list=$('list');
+  for(const [title,keys] of GROUPS){
+    const g=document.createElement('div');g.className='group';g.textContent=title;list.appendChild(g);
+    const box=document.createElement('div');box.className='stack';
+    keys.forEach((k,i)=>{
+      const b=document.createElement('button');b.className='opt'+(k==='block'?' primary':'');
+      b.innerHTML='<span class="ic">'+ICON[k]+'</span><span></span>';b.lastChild.textContent=MSG[k];
+      b.onclick=()=>send(k);box.appendChild(b);
+    });
+    list.appendChild(box);
+  }
+}
 async function init(){
   try{
     const car=await api('/car?t='+encodeURIComponent(token));
-    if(car.paused){$('badTitle').textContent='الاستقبال متوقف مؤقتاً';$('badText').textContent='صاحب السيارة أوقف الرسائل حالياً.';view('bad');return}
-    if(car.nickname)$('who').textContent='السيارة: '+car.nickname+'. اختر رسالة جاهزة وبنوصلها له فوراً.';
-    for(const [k,t] of Object.entries(MSG)){
-      const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>send(k,b);$('list').appendChild(b);
-    }
-    view('pick');
+    if(car.paused){$('badTitle').textContent='صاحب السيارة مش متاح حالياً';$('badText').textContent='أوقف استقبال الرسائل مؤقتاً. جرب بعد شوي.';view('bad');return}
+    if(car.nickname)$('whoName').textContent=car.nickname;
+    build();view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
-async function send(kind,btn){
+async function send(kind){
   $('err').textContent='';
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
     const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind})});
-    $('sentMsg').textContent=MSG[kind];view('sent');poll(r.id,Date.now());
+    $('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());
   }catch(e){
-    const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة أوقف الرسائل حالياً.'};
+    const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة مش متاح حالياً.'};
     $('err').textContent=m[e.code]||('صار خطأ، جرب كمان مرة. (رمز: '+(e.status||'شبكة')+' '+(e.code||'')+' '+(e.detail||'')+')');
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
   }
@@ -63,11 +90,16 @@ async function send(kind,btn){
 async function poll(id,t0){
   try{
     const r=await api('/status?id='+encodeURIComponent(id));
-    if(r.reply){$('replyBox').innerHTML='صاحب السيارة رد: <b>'+REPLY[r.reply]+'</b>';return}
+    if(r.reply){
+      $('replyText').textContent=REPLY[r.reply];$('replyCard').hidden=false;
+      $('replyTitle').textContent='رد عليك';$('replyBox').textContent='';
+      const li=$('stepReply');li.className='done';$('dotReply').innerHTML=ICON.check;return;
+    }
   }catch(_){}
   if(Date.now()-t0<20*60*1000)setTimeout(()=>poll(id,t0),4000);
-  else $('replyBox').textContent='ما وصل رد لسا. ممكن صاحب السيارة بعيد عن موبايله.';
+  else{$('replyTitle').textContent='لسا ما رد';$('replyBox').textContent='ممكن يكون بعيد عن موبايله. جرب تنتظر شوي.';$('stepReply').className='';}
 }
 init();
 </script>
-</body></html>
+</body>
+</html>
