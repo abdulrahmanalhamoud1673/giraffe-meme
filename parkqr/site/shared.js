@@ -17,7 +17,7 @@ async function api(path, opts = {}) {
   const r = await fetch('/api' + path, opts);
   let data = {};
   try { data = await r.json(); } catch (_) {}
-  if (!r.ok) { const e = new Error(data.error || 'error'); e.code = data.error; e.status = r.status; throw e; }
+  if (!r.ok) { const e = new Error(data.error || 'error'); e.code = data.error; e.status = r.status; e.detail = data.detail || ''; throw e; }
   return data;
 }
 function ago(ts) {

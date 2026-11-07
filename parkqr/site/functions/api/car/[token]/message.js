@@ -1,6 +1,11 @@
 import { json, rid, deviceHash, MSG_KINDS } from '../../_shared.js';
 
-export async function onRequestPost({ params, request, env }) {
+export async function onRequestPost(ctx) {
+  try { return await handle(ctx); }
+  catch (err) { return json({ error: 'server', detail: String(err && err.message || err).slice(0, 160) }, 500); }
+}
+
+async function handle({ params, request, env }) {
   let b;
   try { b = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
   if (!MSG_KINDS.includes(b.kind)) return json({ error: 'bad_kind' }, 400);
