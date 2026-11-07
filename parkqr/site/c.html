@@ -29,7 +29,7 @@
         <p id="replyBox" style="margin-top:14px">بانتظار رد صاحب السيارة…</p>
       </div>
     </section>
-    <section id="bad" hidden><h1 id="badTitle">الرابط غير صحيح</h1><p class="lead" id="badText">تأكد إنك مسحت الرمز بشكل كامل.</p></section>
+    <section id="bad" hidden><h1 id="badTitle">الرابط غير صحيح</h1><p class="lead" id="badText">تأكد إنك مسحت الرمز بشكل كامل.</p><p class="note" id="dbg" dir="ltr"></p></section>
   </main>
 </div>
 <script src="/shared.js"></script>
@@ -46,7 +46,7 @@ async function init(){
       const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>send(k,b);$('list').appendChild(b);
     }
     view('pick');
-  }catch(_){view('bad')}
+  }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
 async function send(kind,btn){
   $('err').textContent='';
