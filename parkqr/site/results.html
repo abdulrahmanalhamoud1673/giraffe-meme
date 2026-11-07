@@ -1,22 +1,113 @@
 <!doctype html>
-<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>نتائج الاستبيان</title>
-<style>body{font-family:system-ui,sans-serif;max-width:560px;margin:0 auto;padding:16px;line-height:1.7}
-input,button{font:inherit;padding:8px;margin:4px 0}pre{white-space:pre-wrap;background:#0001;padding:12px;border-radius:8px}</style></head>
-<body><h1>نتائج الاستبيان</h1>
-<input id="k" type="password" placeholder="مفتاح الإدارة"> <button id="go">عرض</button>
-<div id="out"></div>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>لوحة الأرقام — يا نشمي</title>
+<meta name="robots" content="noindex">
+<style>
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.tile small{display:block;color:var(--muted);font-size:.85rem;line-height:1.5}
+.tile b{display:block;font-family:var(--display);font-size:2rem;line-height:1.2;margin-top:4px}
+.tile span{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.tile.wide{grid-column:1/-1}
+.tile.good b{color:var(--green)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:90px;margin-top:10px}
+.bars div{flex:1;display:grid;justify-items:center;align-content:end;gap:4px;height:100%}
+.bars i{display:block;width:100%;min-height:3px;background:var(--green);border-radius:4px 4px 0 0}
+.bars small{font-size:.7rem;color:var(--muted)}
+.bars em{font-style:normal;font-size:.75rem}
+h2.sec{font-size:1.25rem;margin:30px 0 12px}
+table.dist{width:100%;border-collapse:collapse;font-size:.95rem}
+table.dist td{padding:7px 0;border-top:1px solid var(--line);vertical-align:top}
+table.dist td:last-child{text-align:left;direction:ltr;color:var(--muted);white-space:nowrap}
+table.dist caption{text-align:start;font-weight:600;padding:12px 0 4px}
+.keyrow{display:flex;gap:8px;margin:14px 0 4px}
+.keyrow input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><a class="logo" href="index.html">يا نشمي</a><span class="pill">لوحة الأرقام</span></header>
+  <main>
+    <h1>لوحة الأرقام</h1>
+    <p class="lead">أرقام استخدام المنتج ونتائج الاستبيان. أعداد بس، بدون أسماء ولا أرقام هواتف.</p>
+    <form class="keyrow" id="kf"><input id="k" type="password" placeholder="مفتاح الإدارة" autocomplete="off"><button class="cta" type="submit">عرض</button></form>
+    <p class="err" id="err" role="alert"></p>
+    <div id="out"></div>
+  </main>
+</div>
 <script>
-const L={sure:'أكيد',probably:'غالباً',maybe:'ممكن',no:'لا'};
-document.getElementById('go').onclick=async()=>{
-  const r=await fetch('/api/results',{headers:{authorization:'Bearer '+document.getElementById('k').value}});
-  const o=document.getElementById('out');
-  if(!r.ok){o.textContent='مفتاح غلط';return}
-  const d=await r.json();
-  const w=d.counts.would_use||{};
-  const yes=(w.sure||0)+(w.probably||0);
-  const pct=d.total?Math.round(100*yes/d.total):0;
-  o.innerHTML='<h2>عدد الإجابات: '+d.total+'</h2><p>"أكيد" أو "غالباً": <b>'+pct+'%</b> (الهدف 40%)</p><pre></pre>';
-  o.querySelector('pre').textContent=JSON.stringify(d.counts,null,2)+'\n\nجهات اتصال:\n'+d.contacts.join('\n');
+const $=id=>document.getElementById(id);
+const LABEL={
+  age:{under25:'أقل من 25','25-34':'25-34','35-44':'35-44','45+':'45+'},
+  city:{amman:'عمّان',irbid:'إربد',zarqa:'الزرقاء',other:'غيرها'},
+  has_car:{yes:'معه سيارة',no:'بدون سيارة'},
+  freq:{weekly:'أسبوعياً',monthly:'شهرياً',rarely:'نادراً',never:'ولا مرة'},
+  habit:{honk:'يزمّر',ask:'يسأل',note:'يترك ورقة',wait:'ينتظر',other:'غير ذلك'},
+  would_use:{sure:'أكيد',probably:'غالباً',maybe:'ممكن',no:'لا'},
+  sticker_price:{'0':'ما بدفع','1-2':'1-2 دينار','3-5':'3-5','5+':'أكثر من 5'},
+  sub_price:{'0':'ما بدفع','3-5':'3-5 دنانير','5-10':'5-10','10+':'أكثر من 10'},
+  worry:{privacy:'خصوصية الرقم',spam:'الإزعاج',adoption:'الناس ما رح تستخدمه',other:'غير ذلك'},
 };
-</script></body></html>
+const TITLE={age:'العمر',city:'المدينة',has_car:'السيارة',freq:'كم مرة يتسكّر عليه',habit:'شو بيعمل',would_use:'يستخدم الستيكر؟',sticker_price:'سعر الستيكر',sub_price:'اشتراك سنوي',worry:'أكثر شي بيقلقه'};
+const pct=(a,b)=>b?Math.round(100*a/b)+'%':'—';
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+function tile(label,value,sub,cls){const t=el('div','tile'+(cls?' '+cls:''));t.append(el('small',null,label),el('b',null,String(value)));if(sub)t.append(el('span',null,sub));return t}
+function render(d){
+  const o=$('out');o.textContent='';
+  const u=d.usage||{};const c=u.cars||{};const m=u.messages||{};
+  o.append(el('h2','sec','المنتج'));
+  const g=el('div','tiles');
+  g.append(
+    tile('سجّلوا',c.total??0,'آخر 24 ساعة: '+(c.last24h??0)+' · آخر 7 أيام: '+(c.last7d??0)),
+    tile('فعّلوا التنبيهات',pct(u.pushCars||0,c.total||0),(u.pushCars||0)+' من '+(c.total||0)+' (أجهزة: '+(u.pushDevices||0)+')',(c.total&&u.pushCars/c.total>=.5)?'good':''),
+    tile('وصلتهم رسائل',(u.carsWithMessages||0)+' سيارة','من '+(c.total||0)+' مسجّلة'),
+    tile('الرسائل',m.total??0,'آخر 24 ساعة: '+(m.last24h??0)+' · آخر 7 أيام: '+(m.last7d??0)),
+    tile('نسبة الرد',pct(m.replied||0,m.total||0),(m.replied||0)+' من '+(m.total||0)),
+    tile('متوسط وقت الرد',m.avgReplyMinutes==null?'—':m.avgReplyMinutes+' د','بالدقائق')
+  );
+  o.append(g);
+  const days=(c.perDay||[]);
+  if(days.length){
+    const max=Math.max(...days.map(x=>x.n),1);
+    const t=el('div','tile wide');t.append(el('small',null,'التسجيلات اليومية (آخر 7 أيام)'));
+    const bars=el('div','bars');
+    for(const x of days){const col=el('div');const e=el('em',null,String(x.n));const i=el('i');i.style.height=Math.round(100*x.n/max*0.6)+'%';col.append(e,i,el('small',null,x.day.slice(5)));bars.append(col)}
+    t.append(bars);const st=el('div','stack');st.style.marginTop='12px';st.append(t);o.append(st);
+  }
+  o.append(el('h2','sec','الاستبيان'));
+  const w=(d.counts&&d.counts.would_use)||{};const yes=(w.sure||0)+(w.probably||0);
+  const g2=el('div','tiles');
+  g2.append(tile('عدد الإجابات',d.total??0),tile('"أكيد" أو "غالباً"',pct(yes,d.total||0),'الهدف: 40% أو أكثر',(d.total&&yes/d.total>=.4)?'good':''));
+  o.append(g2);
+  for(const k of Object.keys(LABEL)){
+    const data=(d.counts&&d.counts[k])||{};const tb=el('table','dist');tb.append(el('caption',null,TITLE[k]));
+    const keys=Object.keys(LABEL[k]);
+    for(const v of keys){const tr=el('tr');tr.append(el('td',null,LABEL[k][v]),el('td',null,(data[v]||0)+'  ('+pct(data[v]||0,d.total||0)+')'));tb.append(tr)}
+    o.append(tb);
+  }
+  if((d.contacts||[]).length){
+    const det=el('details','help');det.append(el('summary',null,'جهات اتصال تركوها بالاستبيان ('+d.contacts.length+')'));
+    const pre=el('pre');pre.style.cssText='white-space:pre-wrap;direction:ltr;text-align:left;font-size:.9rem;padding-bottom:12px';pre.textContent=d.contacts.join('\n');det.append(pre);o.append(det);
+  }
+}
+async function load(key){
+  $('err').textContent='';
+  const r=await fetch('/api/results',{headers:{authorization:'Bearer '+key}});
+  if(!r.ok){$('err').textContent=r.status===401?'مفتاح غلط.':'صار خطأ ('+r.status+').';return}
+  try{sessionStorage.setItem('yn_admin',key)}catch(_){}
+  render(await r.json());
+}
+$('kf').addEventListener('submit',e=>{e.preventDefault();load($('k').value)});
+try{const k=sessionStorage.getItem('yn_admin');if(k){$('k').value=k;load(k)}}catch(_){}
+</script>
+</body>
+</html>

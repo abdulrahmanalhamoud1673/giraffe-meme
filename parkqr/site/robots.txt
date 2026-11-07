@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /results.html
+Disallow: /inbox.html
+Disallow: /survey.html
+Disallow: /c.html

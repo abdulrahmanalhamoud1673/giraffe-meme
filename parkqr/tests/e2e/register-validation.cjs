@@ -1,0 +1,16 @@
+const OUT=process.argv[2]||require('os').tmpdir();
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const errs=[];
+const c=await b.newContext({viewport:{width:400,height:900}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://localhost:8788/register.html');
+const msg=async()=>(await p.textContent('#err')).trim();
+const tryIt=async(first,last,phone,consent=true)=>{await p.fill('#first',first);await p.fill('#last',last);await p.fill('#phone',phone);await p.setChecked('#consent',consent);await p.click('#btn');await p.waitForTimeout(250);return msg()};
+console.log('1 only first name  :',await tryIt('أحمد','','0795551234'));
+console.log('2 digits in name   :',await tryIt('أحمد','الخطيب2','0795551234'));
+console.log('3 test name        :',await tryIt('test','test','0795551234'));
+console.log('4 one letter       :',await tryIt('أ','ب','0795551234'));
+console.log('5 fake phone       :',await tryIt('أحمد','الخطيب','0777777777'));
+console.log('6 not jordanian    :',await tryIt('أحمد','الخطيب','0701234567'));
+console.log('7 no consent       :',await tryIt('أحمد','الخطيب','0795551234',false));
+await p.screenshot({path:OUT+'/form_err.png',fullPage:true});
+console.log('8 valid            :',JSON.stringify(await tryIt('أحمد','الخطيب','0795551234')),'->',await p.evaluate(()=>!document.getElementById('doneView').hidden));
+console.log('errs',errs);await b.close()})();

@@ -1,0 +1,27 @@
+const OUT=process.argv[2]||require('os').tmpdir();
+const {chromium}=require('playwright');
+(async()=>{const b=await chromium.launch({args:['--autoplay-policy=no-user-gesture-required']});const errs=[];
+const oc=await b.newContext({viewport:{width:400,height:860}});const op=await oc.newPage();op.on('pageerror',e=>errs.push('owner:'+e.message));
+await op.goto('http://localhost:8788/register.html');
+await op.fill('#first','أحمد');await op.fill('#last','الخطيب');await op.fill('#nickname','تويوتا بيضاء');await op.fill('#phone','0795551234');await op.check('#consent');await op.click('#btn');
+await op.waitForSelector('#doneView:not([hidden])');const {token,key}=await op.evaluate(()=>window.__reg);
+await op.goto('http://localhost:8788/inbox.html?demo=enabled#'+key);await op.waitForSelector('.empty-chat');
+await op.screenshot({path:OUT+'/c_empty.png'});
+// two senders
+const send=async(i,kind)=>{const c=await b.newContext({viewport:{width:400,height:800},userAgent:'u'+i});const p=await c.newPage();await p.goto('http://localhost:8788/c?t='+token);await p.waitForSelector('.opt');await p.locator('.opt').nth(kind).click();await p.waitForSelector('#sent:not([hidden])');await c.close()};
+await send(1,0);
+await op.evaluate(()=>load());await op.waitForSelector('.thread');
+console.log('chime on first new message:',await op.evaluate(()=>window.__chimes));
+await op.evaluate(()=>load());console.log('no repeat chime:',await op.evaluate(()=>window.__chimes));
+await op.locator('.thread .chip',{hasText:'دقيقتين'}).click();await op.waitForSelector('.bub.out');
+await send(2,3);await send(3,5);
+await op.evaluate(()=>load());await op.waitForFunction(()=>document.querySelectorAll('.thread').length===3);
+console.log('chimes after 2 more:',await op.evaluate(()=>window.__chimes));
+await op.screenshot({path:OUT+'/c_chat.png',fullPage:true});
+await op.click('#stripBtn');await op.click('#nTest');await op.waitForTimeout(300);
+console.log('test button chime count:',await op.evaluate(()=>window.__chimes));
+await op.click('details.help summary');
+await op.screenshot({path:OUT+'/c_panel.png',fullPage:true});
+await op.click('#pauseBtn');await op.waitForTimeout(500);
+await op.screenshot({path:OUT+'/c_off.png',fullPage:true});
+console.log('title:',await op.title(),'errs',errs);await b.close()})();

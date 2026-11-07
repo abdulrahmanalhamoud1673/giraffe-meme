@@ -1,5 +1,7 @@
 import { OPTIONS } from './_shared.js';
 
+const one = async (env, sql) => (await env.DB.prepare(sql).first()) || {};
+
 export async function onRequestGet({ request, env }) {
   const auth = request.headers.get('authorization') || '';
   if (!env.ADMIN_KEY || auth !== 'Bearer ' + env.ADMIN_KEY) {
@@ -12,7 +14,21 @@ export async function onRequestGet({ request, env }) {
     counts[key] = Object.fromEntries(results.map(r => [r.v, r.n]));
   }
   const { results: contacts } = await env.DB.prepare("SELECT contact FROM responses WHERE contact != ''").all();
-  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact) }), {
+  // Product usage numbers. Counts only: no names, no phone numbers.
+  const day = 86400;
+  const cars = await one(env, 'SELECT COUNT(*) AS n, SUM(created_at > unixepoch() - ' + day + ') AS d1, SUM(created_at > unixepoch() - ' + 7 * day + ') AS d7 FROM cars');
+  const msgs = await one(env, 'SELECT COUNT(*) AS n, SUM(reply IS NOT NULL) AS replied, SUM(created_at > unixepoch() - ' + day + ') AS d1, SUM(created_at > unixepoch() - ' + 7 * day + ') AS d7, AVG(CASE WHEN replied_at IS NOT NULL THEN replied_at - created_at END) AS avg_reply FROM messages');
+  const withMsg = await one(env, 'SELECT COUNT(DISTINCT car_id) AS n FROM messages');
+  const push = await one(env, 'SELECT COUNT(*) AS devices, COUNT(DISTINCT car_id) AS cars FROM push_subs');
+  const { results: perDay } = await env.DB.prepare("SELECT strftime('%Y-%m-%d', created_at, 'unixepoch') AS day, COUNT(*) AS n FROM cars WHERE created_at > unixepoch() - " + 7 * day + ' GROUP BY day ORDER BY day').all();
+  const usage = {
+    cars: { total: cars.n || 0, last24h: cars.d1 || 0, last7d: cars.d7 || 0, perDay },
+    pushCars: push.cars || 0,
+    pushDevices: push.devices || 0,
+    carsWithMessages: withMsg.n || 0,
+    messages: { total: msgs.n || 0, replied: msgs.replied || 0, last24h: msgs.d1 || 0, last7d: msgs.d7 || 0, avgReplyMinutes: msgs.avg_reply == null ? null : Math.round(msgs.avg_reply / 6) / 10 },
+  };
+  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact), usage }), {
     headers: { 'content-type': 'application/json; charset=utf-8' },
   });
 }

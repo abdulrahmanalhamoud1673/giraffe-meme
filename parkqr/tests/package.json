@@ -1,0 +1,10 @@
+{
+  "name": "yanashmi-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --no-warnings unit/static.test.mjs && node --no-warnings unit/validate.test.mjs && node --no-warnings unit/push.test.mjs && node --no-warnings unit/api.test.mjs && node --no-warnings unit/results.test.mjs",
+    "dev": "node --no-warnings dev-server.mjs"
+  },
+  "devDependencies": { "http_ece": "^1.2.0" }
+}
