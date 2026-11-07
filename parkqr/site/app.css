@@ -232,3 +232,10 @@ details.help .how{padding-bottom:6px}
 .empty-chat .art{width:84px;height:84px;margin:0 auto 14px;border-radius:50%;background:var(--soft-green);color:var(--green);display:grid;place-items:center}
 .empty-chat .art svg{width:42px;height:42px}
 .empty-chat b{display:block;color:var(--ink);font-size:1.1rem;margin-bottom:4px}
+
+/* register: two-part name */
+fieldset.f2{border:0;padding:0;margin:0;display:grid;gap:6px;min-width:0}
+fieldset.f2 legend{font-weight:600;padding:0;margin-bottom:6px}
+fieldset.f2 small{color:var(--muted);line-height:1.6}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+input[aria-invalid="true"]{border-color:var(--red)!important;box-shadow:0 0 0 3px var(--soft-red)}

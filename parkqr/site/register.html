@@ -22,16 +22,20 @@
       <p class="lead">ثلاث خانات وبيطلعلك رمز QR خاص بسيارتك. إذا حدا احتاجك، بتوصلك رسالته بدون ما يعرف رقمك.</p>
       <form id="f" novalidate>
         <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <label class="f">اسمك
-          <small>بس إنت بتشوفه. ما بيظهر لأي حدا.</small>
-          <input type="text" id="name" maxlength="60" autocomplete="given-name" required>
-        </label>
+        <fieldset class="f2">
+          <legend>اسمك الحقيقي</legend>
+          <small>اسمك الأول واسم العائلة، مثل: أحمد الخطيب. بنحفظه بس لنتأكد إنك صاحب السيارة، وما بيظهر لأي حدا.</small>
+          <div class="pair">
+            <input type="text" id="first" maxlength="30" autocomplete="given-name" placeholder="الاسم الأول" aria-label="الاسم الأول" required>
+            <input type="text" id="last" maxlength="30" autocomplete="family-name" placeholder="اسم العائلة" aria-label="اسم العائلة" required>
+          </div>
+        </fieldset>
         <label class="f">وصف السيارة (اختياري)
           <small>مثلاً: تويوتا بيضاء. بيظهر للي بيمسح الرمز عشان يتأكد إنها السيارة الصح.</small>
           <input type="text" id="nickname" maxlength="60">
         </label>
         <label class="f">رقم الموبايل
-          <small>ما بيظهر أبداً. بنستخدمه بس لننبهك لما توصلك رسالة.</small>
+          <small>رقم أردني حقيقي (077 أو 078 أو 079). ما بيظهر أبداً.</small>
           <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="079xxxxxxx" dir="ltr" style="text-align:right" required>
         </label>
         <label class="consent"><input type="checkbox" id="consent"><span>موافق إنكم تحفظوا اسمي ورقمي لغرض إرسال التنبيهات فقط، وبقدر أطلب حذفهم بأي وقت.</span></label>
@@ -71,7 +75,7 @@
 <script src="shared.js"></script>
 <script>
 const f=document.getElementById('f'),err=document.getElementById('err'),btn=document.getElementById('btn');
-const ERR={name_required:'اكتب اسمك.',bad_phone:'رقم الموبايل غير صحيح. مثال: 0795551234',consent_required:'لازم توافق على حفظ البيانات.',rate_limited:'محاولات كثيرة. جرب بعد شوي.'};
+const ERR=ERR_TEXT;
 document.getElementById('tips').innerHTML=[
   'حطه على الزجاج الأمامي من جوا، بمكان ظاهر ومش مغطى.',
   'الأفضل يكون ملصق مقاوم للشمس. للتجربة تكفي ورقة عادية.',
@@ -89,12 +93,19 @@ function show(token,key){
   window.__reg={token,key};
 }
 try{const s=JSON.parse(localStorage.getItem('yn_reg')||'null');if(s&&s.token&&s.key)show(s.token,s.key)}catch(_){}
+function mark(ids,on){for(const id of ids){const el=document.getElementById(id);if(el)el.setAttribute('aria-invalid',on?'true':'false')}}
 f.addEventListener('submit',async e=>{
-  e.preventDefault();err.textContent='';
+  e.preventDefault();err.textContent='';mark(['first','last','phone'],false);
+  const fullName=normalizeName(f.first.value+' '+f.last.value);
+  const ne=validateName(fullName);
+  if(ne){err.textContent=ERR[ne];mark(['first','last'],true);(f.first.value.trim()?f.last:f.first).focus();return}
+  const pv=validatePhone(f.phone.value);
+  if(pv.error){err.textContent=ERR[pv.error];mark(['phone'],true);f.phone.focus();return}
+  if(!f.consent.checked){err.textContent=ERR.consent_required;return}
   btn.disabled=true;
   try{
     const r=await api('/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
-      name:f.name.value,nickname:f.nickname.value,phone:f.phone.value,consent:f.consent.checked,website:f.website.value})});
+      name:fullName,nickname:f.nickname.value,phone:f.phone.value,consent:f.consent.checked,website:f.website.value})});
     try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
     show(r.token,r.owner_key);
   }catch(x){err.textContent=ERR[x.code]||'صار خطأ، جرب كمان مرة.';btn.disabled=false}

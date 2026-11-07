@@ -33,11 +33,7 @@ export async function deviceHash(request, env) {
   return sha(ip + '|' + ua + '|' + (env.SALT || 'dev-salt'));
 }
 
-export function normalizeJoPhone(input) {
-  const digits = String(input || '').replace(/[\s\-()]/g, '');
-  const m = digits.match(/^(?:\+?962|0)?(7[789]\d{7})$/);
-  return m ? '+962' + m[1] : null;
-}
+export { normalizeJoPhone } from './_validate.js';
 
 export async function carByKey(env, request) {
   const auth = request.headers.get('authorization') || '';

@@ -81,7 +81,7 @@ const clock=ts=>new Date(ts*1000).toLocaleTimeString('ar-JO-u-nu-latn',{hour:'nu
 const dbl='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4 8-9"/><path d="M10 15l2 2 9-10"/></svg>';
 
 function render(d){
-  $('who').textContent=d.car.nickname||d.car.name||'سيارتك';
+  $('who').textContent=d.car.nickname||(d.car.name||'').split(' ')[0]||'سيارتك';
   paused=d.car.paused;
   $('pauseBtn').setAttribute('aria-checked',String(!paused));
   $('dot').className='dot'+(paused?' off':'');
