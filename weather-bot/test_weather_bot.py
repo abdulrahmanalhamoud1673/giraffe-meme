@@ -153,7 +153,7 @@ class SecondOpinionTests(unittest.TestCase):
     def test_models_disagree_with_dry_forecast(self):
         d = make_data(curve(9, 14), now_hour=6)
         msg = wb.build_message(d, None, models=mmodels(icon_seamless=[9, 10]))
-        self.assertIn("الألماني ICON بتوقع مطر خفيف حوالي 9ص", msg)
+        self.assertIn("الألماني ICON بتوقع مطر خفيف 9ص لـ 10ص", msg)
 
     def test_two_models_agree_adds_umbrella_and_span(self):
         d = make_data(curve(9, 14), now_hour=6)
