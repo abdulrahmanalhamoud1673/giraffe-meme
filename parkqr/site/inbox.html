@@ -17,29 +17,24 @@
 <meta name="robots" content="noindex">
 </head>
 <body>
-<div class="band" aria-hidden="true"></div>
-<div class="wrap">
-  <header class="top"><a class="logo" href="index.html">يا نشمي</a><span class="pill" id="who"></span></header>
-  <main>
-    <h1>صندوق رسائلك</h1>
-    <p class="lead">أي رسالة بتوصل لسيارتك بتظهر هون. اضغط على ردّك وهو بيشوفه مباشرة.</p>
-
-    <section class="notif" id="notif" hidden></section>
-
-    <div class="reception" id="reception">
-      <div class="txt">
-        <b><i></i><span id="recTitle">استقبال الرسائل شغّال</span></b>
-        <span id="recText">أي حدا بيمسح رمزك بيقدر يرسلك رسالة.</span>
-      </div>
-      <button class="switch" id="pauseBtn" role="switch" aria-checked="true" aria-label="استقبال الرسائل" type="button"></button>
+<div class="chat-page">
+  <header class="chat-head">
+    <div class="av" id="av"></div>
+    <div class="meta">
+      <b id="who">سيارتك</b>
+      <small><i class="dot" id="dot"></i><span id="recTitle">استقبال الرسائل شغّال</span></small>
     </div>
+    <div class="sw-wrap">
+      <button class="switch sm" id="pauseBtn" role="switch" aria-checked="true" aria-label="استقبال الرسائل" type="button"></button>
+      <span>استقبال</span>
+    </div>
+  </header>
 
-    <div class="inbox-h"><h2>الرسائل</h2><span class="note" id="count"></span></div>
-    <div class="stack" id="msgs"><p class="note">جاري التحميل…</p></div>
+  <div class="chat-top"><section class="notif" id="notif" hidden></section></div>
 
-    <p class="note" style="margin-top:24px">الرسائل بتضل محفوظة هون حتى لو فاتك التنبيه.</p>
-  </main>
+  <main class="chat-body" id="msgs"><p class="note" style="text-align:center">جاري التحميل…</p></main>
 </div>
+
 <script src="shared.js"></script>
 <script src="push.js"></script>
 <script>
@@ -51,56 +46,104 @@ try{
 if(key.length>=16){const m=document.getElementById('manifest');if(m)m.href='/manifest.webmanifest?k='+encodeURIComponent(key)}
 const $=id=>document.getElementById(id);
 const H={authorization:'Bearer '+key,'content-type':'application/json'};
-let paused=false,busy=false;
-function renderReception(){
-  const on=!paused;
-  $('reception').classList.toggle('off',!on);
-  $('pauseBtn').setAttribute('aria-checked',String(on));
-  $('recTitle').textContent=on?'استقبال الرسائل شغّال':'استقبال الرسائل متوقف';
-  $('recText').textContent=on?'أي حدا بيمسح رمزك بيقدر يرسلك رسالة.':'اللي بيمسح رمزك بيشوف إنك مش متاح، وما بيقدر يرسل.';
+$('av').innerHTML=ICON.block;
+let paused=false,busy=false,sig='',seen=null;
+
+/* ---------- sound (only while the page is open; the phone decides the notification sound itself) ---------- */
+let ac=null;
+const soundOn=()=>{try{return localStorage.getItem('yn_sound')!=='0'}catch(_){return true}};
+function audio(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)()}catch(_){}}return ac}
+function unlock(){const a=audio();if(a&&a.state==='suspended')a.resume().catch(()=>{})}
+['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,unlock,{passive:true}));
+function chime(force){
+  if(!force&&!soundOn())return;
+  window.__chimes=(window.__chimes||0)+1;
+  try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(_){}
+  const a=audio();if(!a||a.state!=='running')return;
+  const t=a.currentTime;
+  [[880,0],[1175,.17],[1568,.34]].forEach(([f,d])=>{
+    const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;
+    g.gain.setValueAtTime(0,t+d);g.gain.linearRampToValueAtTime(.28,t+d+.02);g.gain.exponentialRampToValueAtTime(.001,t+d+.4);
+    o.connect(g);g.connect(a.destination);o.start(t+d);o.stop(t+d+.45);
+  });
+}
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='yn-push'){load()}});
+
+/* ---------- chat ---------- */
+const dayKey=ts=>{const d=new Date(ts*1000);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()};
+function dayLabel(ts){
+  const k=dayKey(ts),now=Date.now()/1000;
+  if(k===dayKey(now))return 'اليوم';
+  if(k===dayKey(now-86400))return 'أمس';
+  return new Date(ts*1000).toLocaleDateString('ar-JO-u-nu-latn',{day:'numeric',month:'long'});
+}
+const clock=ts=>new Date(ts*1000).toLocaleTimeString('ar-JO-u-nu-latn',{hour:'numeric',minute:'2-digit'});
+const dbl='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4 8-9"/><path d="M10 15l2 2 9-10"/></svg>';
+
+function render(d){
+  $('who').textContent=d.car.nickname||d.car.name||'سيارتك';
+  paused=d.car.paused;
+  $('pauseBtn').setAttribute('aria-checked',String(!paused));
+  $('dot').className='dot'+(paused?' off':'');
+  $('recTitle').textContent=paused?'استقبال الرسائل متوقف':'استقبال الرسائل شغّال';
+  const list=d.messages.slice().sort((a,b)=>a.created_at-b.created_at);
+  const waiting=list.filter(m=>!m.reply).length;
+  document.title=(waiting?'('+waiting+') ':'')+'صندوق الرسائل — يا نشمي';
+  const box=$('msgs');box.textContent='';
+  if(paused){const s=document.createElement('div');s.className='sys';s.textContent='الاستقبال متوقف: اللي بيمسح رمزك بيشوف إنك مش متاح وما بيقدر يرسل.';box.appendChild(s)}
+  if(!list.length){
+    const e=document.createElement('div');e.className='empty-chat';
+    e.innerHTML='<div class="art">'+ICON.inbox+'</div><b>ما في رسائل لسا</b>لما حدا يمسح رمزك ويرسل رسالة، بتظهر هون وبيوصلك تنبيه. جرّب بنفسك: امسح رمزك بموبايل ثاني.';
+    box.appendChild(e);return;
+  }
+  let lastDay='';
+  for(const m of list){
+    const dk=dayKey(m.created_at);
+    if(dk!==lastDay){lastDay=dk;const s=document.createElement('div');s.className='day';s.textContent=dayLabel(m.created_at);box.appendChild(s)}
+    const th=document.createElement('div');th.className='thread';
+    const inb=document.createElement('div');inb.className='bub in'+(m.reply?'':' new');
+    inb.innerHTML='<div class="who">شخص مسكّر عليك'+(m.reply?'':'<span class="badge-new">جديدة</span>')+'</div>'
+      +'<div class="line"><span class="mic">'+(ICON[m.kind]||'')+'</span><div class="tx"></div></div>'
+      +'<div class="meta"><span></span></div>';
+    inb.querySelector('.tx').textContent=MSG[m.kind]||'';
+    inb.querySelector('.meta span').textContent=clock(m.created_at);
+    th.appendChild(inb);
+    if(m.reply){
+      const out=document.createElement('div');out.className='bub out';
+      out.innerHTML='<div class="line"><div class="tx"></div></div><div class="meta"><span></span>'+dbl+'</div>';
+      out.querySelector('.tx').textContent=REPLY[m.reply];
+      out.querySelector('.meta span').textContent=clock(m.replied_at||m.created_at);
+      th.appendChild(out);
+    }else{
+      const hint=document.createElement('div');hint.className='qr-hint';hint.textContent='ردّ بضغطة:';th.appendChild(hint);
+      const row=document.createElement('div');row.className='qr-row';
+      for(const [k,l] of Object.entries(REPLY)){
+        const b=document.createElement('button');b.className='chip';b.textContent=l;
+        b.onclick=async()=>{for(const x of row.children)x.disabled=true;try{await api('/inbox/reply',{method:'POST',headers:H,body:JSON.stringify({id:m.id,reply:k})})}catch(_){}sig='';load()};
+        row.appendChild(b);
+      }
+      th.appendChild(row);
+    }
+    box.appendChild(th);
+  }
 }
 async function load(){
   try{
     const d=await api('/inbox',{headers:H});
-    $('who').innerHTML=ICON.user+'';
-    const nm=document.createElement('span');nm.textContent=d.car.nickname||d.car.name||'';$('who').appendChild(nm);
-    paused=d.car.paused;renderReception();
-    const waiting=d.messages.filter(m=>!m.reply).length;
-    $('count').textContent=waiting?waiting+' بانتظار ردّك':'';
-    document.title=(waiting?'('+waiting+') ':'')+'صندوق الرسائل — يا نشمي';
-    const box=$('msgs');box.textContent='';
-    if(!d.messages.length){
-      const e=document.createElement('div');e.className='empty';
-      e.innerHTML=ICON.inbox+'<div>ما في رسائل لسا.</div><div class="note">لما حدا يمسح رمزك بتظهر هون.</div>';
-      box.appendChild(e);
-    }
-    for(const m of d.messages){
-      const c=document.createElement('div');c.className='msgcard'+(m.reply?'':' new');
-      const head=document.createElement('div');head.className='head';
-      head.innerHTML='<span class="ic">'+(ICON[m.kind]||'')+'</span><div><b></b><small></small></div>'+(m.reply?'':'<span class="badge-new">جديدة</span>');
-      head.querySelector('b').textContent=MSG[m.kind]||'';
-      head.querySelector('small').textContent=ago(m.created_at);
-      c.appendChild(head);
-      if(m.reply){
-        const r=document.createElement('div');r.className='replied';r.innerHTML=ICON.check;
-        const t=document.createElement('span');t.textContent='ردّيت: '+REPLY[m.reply];r.appendChild(t);c.appendChild(r);
-      }else{
-        const row=document.createElement('div');row.className='chips';
-        for(const [k,l] of Object.entries(REPLY)){
-          const b=document.createElement('button');b.className='chip';b.textContent=l;
-          b.onclick=async()=>{for(const x of row.children)x.disabled=true;await api('/inbox/reply',{method:'POST',headers:H,body:JSON.stringify({id:m.id,reply:k})});load()};
-          row.appendChild(b);
-        }
-        c.appendChild(row);
-      }
-      box.appendChild(c);
-    }
+    const s=JSON.stringify([d.car,d.messages]);
+    const fresh=seen===null?[]:d.messages.filter(m=>!m.reply&&!seen.has(m.id));
+    seen=new Set(d.messages.map(m=>m.id));
+    if(s===sig)return;
+    const first=sig==='';sig=s;
+    render(d);
+    if(fresh.length)chime();
+    if(first||fresh.length)window.scrollTo({top:document.body.scrollHeight,behavior:first?'auto':'smooth'});
   }catch(e){$('msgs').innerHTML='<div class="warn">الرابط غير صحيح. افتح صندوقك من الرابط اللي حفظته عند التسجيل.</div>'}
 }
 $('pauseBtn').onclick=async()=>{
   if(busy)return;busy=true;$('pauseBtn').disabled=true;
   try{await api('/inbox/pause',{method:'POST',headers:H,body:JSON.stringify({paused:!paused})});}catch(_){}
-  busy=false;$('pauseBtn').disabled=false;load();
+  busy=false;$('pauseBtn').disabled=false;sig='';load();
 };
 
 /* ---------- notifications card ---------- */
@@ -113,14 +156,33 @@ function pcWarn(){
   return '<div class="pc-warn">'+ICON.alert+'<div>إنت هلأ على الكمبيوتر، فالتنبيه رح يوصل لهالكمبيوتر بس. عشان يوصلك على موبايلك، افتح الصندوق من موبايلك. <button class="chip" id="copyLink" type="button" style="margin-top:8px">انسخ الرابط وابعته لنفسك</button></div></div>';
 }
 function head(icon,title,sub){return '<div class="n-head"><span class="n-ic">'+ICON[icon]+'</span><div><b>'+title+'</b><small>'+sub+'</small></div></div>'}
+function soundHelp(platform){
+  const common='<p class="n-note">الموقع ما بيقدر يغيّر صوت الإشعار بنفسه. الموبايل هو اللي بيقرر، وإنت بتضبطه مرة وحدة:</p>';
+  const steps=platform==='ios'
+    ?li(1,'تأكد إنه <b>وضع التركيز / عدم الإزعاج</b> مطفي، وإنه الموبايل مش على الصامت.')
+     +li(2,'افتح <b>الإعدادات</b> ثم <b>الإشعارات</b> ثم <b>يا نشمي</b>.')
+     +li(3,'فعّل <b>الأصوات</b>، وخلّي <b>شاشة القفل</b> مفعّلة.')
+    :li(1,'تأكد إنه <b>عدم الإزعاج</b> مطفي (لو ظهرت أيقونة ⊖ بأعلى الشاشة فهو شغّال)، وإنه صوت الرنين مرفوع.')
+     +li(2,'لمّا يوصلك إشعار، اضغط عليه <b>مطوّلاً</b> ثم <b>الإعدادات</b>. أو من <b>إعدادات الموبايل ← التطبيقات ← Chrome ← الإشعارات</b>، وافتح إعدادات هالموقع.')
+     +li(3,'اختر <b>تنبيه (Alerting)</b> أو أهم، وفعّل <b>الصوت</b>، وإذا بدك يوصل حتى بـ«عدم الإزعاج» فعّل <b>تجاوز عدم الإزعاج</b>.')
+     +li(4,'لتظهر الرسائل على <b>شاشة القفل</b>: خلّي الإشعارات على شاشة القفل مفعّلة بإعدادات الموبايل.');
+  return '<details class="help"><summary>ما سمعت صوت؟ شوف هون</summary>'+common+'<ol class="how">'+steps+'</ol></details>';
+}
 async function renderNotif(){
   const st=await Push.state();
-  nEl.hidden=false;nEl.className='notif '+(st==='enabled'?'enabled':st==='denied'?'denied':'');
+  nEl.hidden=false;
   const platform=Push.demo?(Push.demo==='ios'||Push.demo==='ios-install'?'ios':'android'):(Push.isIOS?'ios':'android');
   let h='';
+  nEl.className='notif'+(st==='denied'?' denied':'');
   if(st==='enabled'){
-    h=head('bell','التنبيهات شغّالة على هالجهاز','أي رسالة بتوصل لسيارتك بتطلع لك فوراً كتنبيه، حتى لو الموقع مسكّر.')
-     +'<div class="n-body"><div class="btn-row"><button class="cta alt" id="nTest" type="button">جرّب تنبيه</button><button class="cta alt" id="nOff" type="button">أوقفها</button></div><p class="n-msg" id="nMsg" role="status"></p><p class="n-note">لو بتستخدم أكثر من جهاز، فعّلها على كل واحد.</p></div>';
+    nEl.className='strip';
+    h='<button class="strip-b" id="stripBtn" type="button" aria-expanded="false"><span class="ic">'+ICON.bell+'</span><b>التنبيهات شغّالة</b><small>صوت وإعدادات</small><span class="chev">‹</span></button>'
+     +'<div class="panel" id="panel" hidden>'
+     +'<div class="btn-row"><button class="cta alt" id="nTest" type="button">جرّب تنبيه وصوت</button><button class="cta alt" id="nOff" type="button">أوقفها</button></div>'
+     +'<label class="sound-opt"><input type="checkbox" id="soundOpt"'+(soundOn()?' checked':'')+'>شغّل صوت لما توصل رسالة والصفحة مفتوحة</label>'
+     +'<p class="n-msg" id="nMsg" role="status"></p>'
+     +soundHelp(platform)
+     +'<p class="n-note">لو بتستخدم أكثر من جهاز، فعّلها على كل واحد.</p></div>';
   }else if(st==='ios-install'){
     h=head('bell','فعّل التنبيهات على الآيفون','آبل بتطلب خطوة إضافية مرة وحدة: إضافة الموقع للشاشة الرئيسية. بعدها بتظهر لك الإشعارات زي أي تطبيق.')
      +'<div class="n-body"><ol class="how">'
@@ -149,9 +211,12 @@ async function renderNotif(){
   }
   nEl.innerHTML=h;
   const msg=(t,c)=>{const m=$('nMsg');if(m){m.textContent=t;m.className='n-msg '+(c||'')}};
+  if($('stripBtn'))$('stripBtn').onclick=()=>{const p=$('panel'),o=p.hidden;p.hidden=!o;$('stripBtn').setAttribute('aria-expanded',String(o))};
+  if($('soundOpt'))$('soundOpt').onchange=e=>{try{localStorage.setItem('yn_sound',e.target.checked?'1':'0')}catch(_){}};
   if($('copyLink'))$('copyLink').onclick=async()=>{try{await navigator.clipboard.writeText(inboxUrl());$('copyLink').textContent='انتسخ. الصقه برسالة لنفسك'}catch(_){$('copyLink').textContent=inboxUrl()}};
   if($('nOn'))$('nOn').onclick=async()=>{
     if(Push.demo){msg('هاي نسخة تجريبية للشرح فقط.','');return}
+    unlock();
     $('nOn').disabled=true;msg('جاري التفعيل…','');
     try{
       const r=await Push.enable(H);
@@ -161,13 +226,14 @@ async function renderNotif(){
         msg(r.reason==='not_configured'?'التنبيهات لسا قيد الإعداد عندنا. جرب بعد شوي.':r.reason==='default'?'ما اخترت شي. اضغط الزر وبعدين «السماح».':'ما قدرنا نفعّل التنبيهات. حدّث الصفحة وجرب كمان مرة.','bad');return;
       }
       await renderNotif();
-      try{const t=await Push.test(H);const m=$('nMsg');if(m){m.textContent=t.sent?'فعّلناها وأرسلنا لك تنبيه تجريبي. شفته؟':'فعّلناها. جرّب زر «جرّب تنبيه».';m.className='n-msg ok'}}catch(_){}
+      try{await Push.test(H);chime(true);const p=$('panel'),b=$('stripBtn');if(p&&b){p.hidden=false;b.setAttribute('aria-expanded','true')}const m=$('nMsg');if(m){m.textContent='فعّلناها وأرسلنا لك تنبيه تجريبي. شفته؟ وسمعت الصوت؟ إذا لا، شوف «ما سمعت صوت؟» تحت.';m.className='n-msg ok'}}catch(_){}
     }catch(e){$('nOn')&&($('nOn').disabled=false);msg('صار خطأ أثناء التفعيل (' + (e.code||e.message||'') + ').','bad')}
   };
   if($('nTest'))$('nTest').onclick=async()=>{
+    unlock();chime(true);
     if(Push.demo){msg('هاي نسخة تجريبية للشرح فقط.','');return}
     msg('جاري الإرسال…','');
-    try{const t=await Push.test(H);msg(t.sent?'أرسلنا تنبيه لجهازك. إذا ما طلع خلال ثواني، شوف إعدادات الإشعارات بالموبايل.':'ما في جهاز مسجّل. أوقفها وفعّلها من جديد.',t.sent?'ok':'bad')}catch(e){msg('ما قدرنا نرسل التنبيه ('+(e.code||e.message)+').','bad')}
+    try{const t=await Push.test(H);msg(t.sent?'سمعت الصوت اللي بالصفحة؟ وأرسلنا تنبيه لجهازك كمان. إذا وصل بدون صوت، شوف «ما سمعت صوت؟» تحت.':'ما في جهاز مسجّل. أوقفها وفعّلها من جديد.',t.sent?'ok':'bad')}catch(e){msg('ما قدرنا نرسل التنبيه ('+(e.code||e.message)+').','bad')}
   };
   if($('nOff'))$('nOff').onclick=async()=>{if(Push.demo){return}await Push.disable(H);renderNotif()};
 }

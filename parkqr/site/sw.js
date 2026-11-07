@@ -6,16 +6,23 @@ self.addEventListener('push', (event) => {
   let d = {};
   try { d = event.data ? event.data.json() : {}; } catch (_) {}
   const title = d.title || 'يا نشمي';
-  event.waitUntil(self.registration.showNotification(title, {
-    body: d.body || 'وصلتك رسالة جديدة',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
-    tag: d.tag || 'yn-msg',
-    renotify: true,
-    dir: 'rtl',
-    lang: 'ar',
-    data: { url: d.url || '/inbox.html' },
-  }));
+  event.waitUntil((async () => {
+    // If the inbox is open, let it refresh and play its own chime right away.
+    const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const w of wins) w.postMessage({ type: 'yn-push' });
+    await self.registration.showNotification(title, {
+      body: d.body || 'وصلتك رسالة جديدة',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
+      tag: d.tag || 'yn-msg',
+      renotify: true,
+      requireInteraction: true,       // stays until you act on it (where the device supports it)
+      vibrate: [250, 120, 250, 120, 500],
+      dir: 'rtl',
+      lang: 'ar',
+      data: { url: d.url || '/inbox.html' },
+    });
+  })());
 });
 
 self.addEventListener('notificationclick', (event) => {
