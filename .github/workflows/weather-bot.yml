@@ -4,7 +4,12 @@ on:
   schedule:
     # 06:30 بتوقيت عمان (UTC+3 ثابت). GitHub ممكن يأخّره كم دقيقة.
     - cron: "30 3 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "تجربة: اطبع الرسالة والبيانات الخام بدون إرسال لتيليغرام"
+        type: boolean
+        default: false
 
 jobs:
   send:
@@ -26,4 +31,4 @@ jobs:
           LAT: ${{ vars.LAT }}
           LON: ${{ vars.LON }}
           PLACE_NAME: ${{ vars.PLACE_NAME }}
-        run: python weather_bot.py
+        run: python weather_bot.py ${{ inputs.dry_run && '--dry-run --raw' || '' }}
