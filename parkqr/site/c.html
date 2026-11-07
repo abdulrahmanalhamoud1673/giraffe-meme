@@ -39,7 +39,7 @@ const $=id=>document.getElementById(id);
 function view(id){for(const v of ['pick','sent','bad'])$(v).hidden=v!==id}
 async function init(){
   try{
-    const car=await api('/car/'+encodeURIComponent(token));
+    const car=await api('/car?t='+encodeURIComponent(token));
     if(car.paused){$('badTitle').textContent='الاستقبال متوقف مؤقتاً';$('badText').textContent='صاحب السيارة أوقف الرسائل حالياً.';view('bad');return}
     if(car.nickname)$('who').textContent='السيارة: '+car.nickname+'. اختر رسالة جاهزة وبنوصلها له فوراً.';
     for(const [k,t] of Object.entries(MSG)){
@@ -52,7 +52,7 @@ async function send(kind,btn){
   $('err').textContent='';
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
-    const r=await api('/car/'+encodeURIComponent(token)+'/message',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind})});
+    const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind})});
     $('sentMsg').textContent=MSG[kind];view('sent');poll(r.id,Date.now());
   }catch(e){
     const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة أوقف الرسائل حالياً.'};
@@ -62,7 +62,7 @@ async function send(kind,btn){
 }
 async function poll(id,t0){
   try{
-    const r=await api('/message/'+id);
+    const r=await api('/status?id='+encodeURIComponent(id));
     if(r.reply){$('replyBox').innerHTML='صاحب السيارة رد: <b>'+REPLY[r.reply]+'</b>';return}
   }catch(_){}
   if(Date.now()-t0<20*60*1000)setTimeout(()=>poll(id,t0),4000);
