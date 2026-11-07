@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>بوستر يا نشمي A4</title>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+body{font-family:'IBM Plex Sans Arabic',sans-serif;color:#15120f;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{position:relative;width:210mm;height:297mm;background:#fbf8f2;overflow:hidden;display:flex;flex-direction:column}
+.band{height:10mm;flex:none;background:conic-gradient(#b3122a 25%,#fff 0 50%,#b3122a 0 75%,#fff 0) 0 0/5mm 5mm}
+.band.b{margin-top:auto}
+.pad{padding:0 16mm}
+.brand{display:flex;align-items:center;justify-content:space-between;margin-top:6mm}
+.logo{display:flex;align-items:center;gap:3mm;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:25pt}
+.logo svg{width:11mm;height:11mm;color:#0b6b43}
+.tag{font-size:11pt;color:#625b51;border:0.3mm solid #cfc4ae;border-radius:99px;padding:1mm 5mm}
+h1{font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:46pt;line-height:1.06;margin:4mm 0 0;letter-spacing:-.2mm}
+h1 .g{color:#0b6b43}
+.sub{font-family:'Reem Kufi',sans-serif;font-weight:500;font-size:21pt;margin:2mm 0 0;color:#3a342d}
+.lead{font-size:13.5pt;line-height:1.65;color:#4b443b;margin:3mm 0 0;max-width:165mm}
+.qrbox{margin:5mm auto 0;width:86mm;text-align:center}
+.cap{display:inline-flex;align-items:center;gap:3mm;font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:19pt;color:#b3122a;margin-bottom:3.5mm}
+.cap svg{width:7.5mm;height:7.5mm}
+.frame{position:relative;background:#fff;border-radius:5mm;padding:4mm;box-shadow:0 0 0 0.9mm #15120f}
+.frame svg.qr{display:block;width:100%;height:auto}
+.frame i{position:absolute;width:12mm;height:12mm;border:1.6mm solid #0b6b43}
+.frame i.a{top:-3.5mm;right:-3.5mm;border-left:0;border-bottom:0;border-top-right-radius:6mm}
+.frame i.b{top:-3.5mm;left:-3.5mm;border-right:0;border-bottom:0;border-top-left-radius:6mm}
+.frame i.c{bottom:-3.5mm;right:-3.5mm;border-left:0;border-top:0;border-bottom-right-radius:6mm}
+.frame i.d{bottom:-3.5mm;left:-3.5mm;border-right:0;border-top:0;border-bottom-left-radius:6mm}
+.url{margin-top:5mm;display:inline-block;direction:ltr;font-weight:600;font-size:23pt;letter-spacing:.2mm;background:#15120f;color:#fff;border-radius:99px;padding:2mm 10mm}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:6mm;border-top:0.4mm solid #d9cfba}
+.step{padding:4.5mm 4mm 0;border-inline-start:0.4mm solid #d9cfba;text-align:center}
+.step:first-child{border-inline-start:0}
+.step .ic{width:12.5mm;height:12.5mm;border-radius:50%;background:#e3f1ea;color:#0b6b43;display:grid;place-items:center;margin:0 auto 3mm}
+.step .ic svg{width:7mm;height:7mm}
+.step b{display:block;font-family:'Reem Kufi',sans-serif;font-size:15pt;margin-bottom:.5mm}
+.step span{font-size:11pt;line-height:1.5;color:#4b443b;display:block}
+.safe{display:flex;justify-content:center;flex-wrap:wrap;gap:2mm 6mm;margin:4mm 0 4mm;font-size:11.5pt;font-weight:500}
+.safe span{display:inline-flex;align-items:center;gap:2mm}
+.safe svg{width:5mm;height:5mm;color:#0b6b43}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <div class="band"></div>
+  <div class="pad">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="5" width="14" height="14"/><rect x="5" y="5" width="14" height="14" transform="rotate(45 12 12)"/></g></svg>يا نشمي</div>
+      <div class="tag">فكرة أردنية جديدة</div>
+    </div>
+    <h1>مسكّر عليك<br><span class="g">أحد؟</span></h1>
+    <p class="sub">يا نشمي، حرّك سيارتك.</p>
+    <p class="lead">ستيكر QR على زجاج سيارتك. اللي مسكّر عليك يمسحه ويرسلك رسالة جاهزة، ورقمك يظل عندك.</p>
+
+    <div class="qrbox">
+      <div class="cap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 011-1h3M16 4h3a1 1 0 011 1v3M20 16v3a1 1 0 01-1 1h-3M8 20H5a1 1 0 01-1-1v-3"/><path d="M8 12h8"/></svg>امسح الرمز وسجّل سيارتك</div>
+      <div class="frame">__QR__<i class="a"></i><i class="b"></i><i class="c"></i><i class="d"></i></div>
+      <div class="url">yanashmi.com</div>
+    </div>
+
+    <div class="steps">
+      <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg></div><b>سجّل بدقيقة</b><span>اسمك ورقمك، وبتاخذ رمزك الخاص.</span></div>
+      <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5M7 17H5a1 1 0 01-1-1v-5a2 2 0 012-2h12a2 2 0 012 2v5a1 1 0 01-1 1h-2"/><rect x="7" y="14" width="10" height="6"/></svg></div><b>اطبعه وحطه</b><span>على الزجاج الأمامي من جوا.</span></div>
+      <div class="step"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17V11a6 6 0 0112 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 004 0"/></svg></div><b>بتوصلك رسالته</b><span>تنبيه على موبايلك، وبتردّ بضغطة.</span></div>
+    </div>
+  </div>
+  <div class="safe pad">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>رقمك مخفي</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>رسائل جاهزة بدون كلام بذيء</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>بدون تطبيق</span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>التجربة مجانية</span>
+  </div>
+  <div class="band b"></div>
+</div>
+</body>
+</html>
