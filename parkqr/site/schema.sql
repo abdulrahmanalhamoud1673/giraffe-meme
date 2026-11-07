@@ -5,3 +5,22 @@ CREATE TABLE IF NOT EXISTS responses (
   would_use TEXT, sticker_price TEXT, sub_price TEXT, worry TEXT,
   contact TEXT
 );
+
+CREATE TABLE IF NOT EXISTS cars (
+  id TEXT PRIMARY KEY,            -- public token inside the QR (random, no personal data)
+  owner_key TEXT NOT NULL UNIQUE, -- secret for the owner's inbox
+  name TEXT, nickname TEXT, phone TEXT,
+  paused INTEGER NOT NULL DEFAULT 0,
+  ip_hash TEXT,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
+CREATE TABLE IF NOT EXISTS messages (
+  id TEXT PRIMARY KEY,
+  car_id TEXT NOT NULL,
+  kind TEXT NOT NULL,
+  device_hash TEXT,
+  reply TEXT,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+  replied_at INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_msg_car ON messages(car_id, created_at);

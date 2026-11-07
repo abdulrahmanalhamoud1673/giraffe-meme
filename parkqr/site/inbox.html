@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<title>صندوق الرسائل — يا نشمي</title>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><a class="logo" href="index.html">يا نشمي</a><span class="pill" id="who"></span></header>
+  <main>
+    <h1>صندوق رسائلك</h1>
+    <p class="lead">أي رسالة بتوصل لسيارتك بتظهر هون. اضغط رد وهو بيشوفه مباشرة. الصفحة بتتحدث لحالها كل ثواني.</p>
+    <div class="card" style="margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:12px">
+      <span id="pauseTxt">الاستقبال شغال</span>
+      <button class="cta alt" id="pauseBtn" type="button">أوقف مؤقتاً</button>
+    </div>
+    <div class="stack" id="msgs"><p class="note">جاري التحميل…</p></div>
+    <p class="note" style="margin-top:22px">نصيحة: أضف هالصفحة للشاشة الرئيسية بموبايلك عشان تفتحها بسرعة. التنبيهات التلقائية لسا قيد التجهيز.</p>
+  </main>
+</div>
+<script src="shared.js"></script>
+<script>
+const key=location.hash.slice(1);
+const $=id=>document.getElementById(id);
+const H={authorization:'Bearer '+key,'content-type':'application/json'};
+let paused=false;
+async function load(){
+  try{
+    const d=await api('/inbox',{headers:H});
+    $('who').textContent=d.car.nickname||d.car.name||'';
+    paused=d.car.paused;$('pauseTxt').textContent=paused?'الاستقبال متوقف':'الاستقبال شغال';$('pauseBtn').textContent=paused?'شغّل الاستقبال':'أوقف مؤقتاً';
+    const box=$('msgs');box.textContent='';
+    if(!d.messages.length){const p=document.createElement('p');p.className='note';p.textContent='ما في رسائل لسا. لما حدا يمسح رمزك بتظهر هون.';box.appendChild(p)}
+    for(const m of d.messages){
+      const c=document.createElement('div');c.className='card';
+      const t=document.createElement('b');t.textContent=MSG[m.kind]||'';
+      const s=document.createElement('div');s.className='note';s.textContent=ago(m.created_at);
+      c.append(t,s);
+      if(m.reply){const r=document.createElement('p');r.style.marginTop='8px';r.textContent='ردّك: '+REPLY[m.reply];c.appendChild(r)}
+      else{
+        const row=document.createElement('div');row.style.cssText='display:flex;flex-wrap:wrap;gap:8px;margin-top:10px';
+        for(const [k,l] of Object.entries(REPLY)){
+          const b=document.createElement('button');b.className='cta alt';b.textContent=l;b.style.padding='8px 14px';
+          b.onclick=async()=>{b.disabled=true;await api('/inbox/reply',{method:'POST',headers:H,body:JSON.stringify({id:m.id,reply:k})});load()};
+          row.appendChild(b);
+        }
+        c.appendChild(row);
+      }
+      box.appendChild(c);
+    }
+  }catch(e){$('msgs').innerHTML='<div class="warn">الرابط غير صحيح. افتح صندوقك من الرابط اللي حفظته عند التسجيل.</div>'}
+}
+$('pauseBtn').onclick=async()=>{await api('/inbox/pause',{method:'POST',headers:H,body:JSON.stringify({paused:!paused})});load()};
+if(key.length>=16){load();setInterval(load,8000)}else $('msgs').innerHTML='<div class="warn">ما في مفتاح بالرابط. افتح الرابط اللي حفظته عند التسجيل.</div>';
+</script>
+</body></html>

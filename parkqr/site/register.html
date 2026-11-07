@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<title>سجّل سيارتك — يا نشمي</title>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><a class="logo" href="index.html">يا نشمي</a><a class="back" href="index.html">الرئيسية</a></header>
+  <main>
+    <section id="formView">
+      <h1>احصل على ستيكرك</h1>
+      <p class="lead">سجّل بيانات بسيطة، وبيطلعلك رمز QR خاص بسيارتك تطبعه وتحطه على الزجاج. إذا حدا احتاجك، بتوصلك رسالته بدون ما يعرف رقمك.</p>
+      <form id="f" novalidate>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="f">اسمك
+          <small>بس إنت بتشوفه. ما بيظهر لأي حدا.</small>
+          <input type="text" id="name" maxlength="60" autocomplete="given-name" required>
+        </label>
+        <label class="f">وصف السيارة (اختياري)
+          <small>مثلاً: تويوتا بيضاء. بيظهر للي بيمسح الرمز عشان يتأكد إنها السيارة الصح.</small>
+          <input type="text" id="nickname" maxlength="60">
+        </label>
+        <label class="f">رقم الموبايل
+          <small>ما بيظهر أبداً. بنستخدمه بس لننبهك لما توصلك رسالة.</small>
+          <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="079xxxxxxx" dir="ltr" style="text-align:right" required>
+        </label>
+        <label class="consent"><input type="checkbox" id="consent"><span>موافق إنكم تحفظوا اسمي ورقمي لغرض إرسال التنبيهات فقط، وبقدر أطلب حذفهم بأي وقت.</span></label>
+        <p class="err" id="err" role="alert"></p>
+        <button class="cta" type="submit" id="btn" style="justify-self:start">احصل على الرمز</button>
+      </form>
+    </section>
+
+    <section id="doneView" hidden>
+      <h1>جاهز يا نشمي</h1>
+      <p class="lead">هاد رمزك الخاص. اطبعه وحطه على زجاج السيارة من جوا، بمكان واضح.</p>
+      <div id="print-area"><div class="sticker">
+        <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
+        <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
+      </div></div>
+      <div class="stack" style="margin-top:26px">
+        <button class="cta" id="printBtn" type="button">اطبع الرمز</button>
+        <button class="cta alt" id="pngBtn" type="button">احفظه كصورة</button>
+        <a class="cta alt" id="inboxLink" href="inbox.html">افتح صندوق رسائلي</a>
+      </div>
+      <div class="warn" style="margin-top:22px"><b>مهم:</b> رابط صندوق الرسائل هو مفتاحك. احفظه وما تشاركه مع حدا. إذا ضاع ما بنقدر نرجعه لك.
+        <p class="note" id="keyLink" dir="ltr" style="word-break:break-all;margin-top:8px"></p></div>
+      <p class="note" style="margin-top:18px">هاي نسخة تجريبية: التنبيهات على الموبايل لسا قيد التجهيز، فافتح صندوق الرسائل من وقت لوقت. ورقة عادية تكفي للتجربة.</p>
+    </section>
+  </main>
+</div>
+<script src="qr.js"></script>
+<script src="shared.js"></script>
+<script>
+const f=document.getElementById('f'),err=document.getElementById('err'),btn=document.getElementById('btn');
+const ERR={name_required:'اكتب اسمك.',bad_phone:'رقم الموبايل غير صحيح. مثال: 0795551234',consent_required:'لازم توافق على حفظ البيانات.',rate_limited:'محاولات كثيرة. جرب بعد شوي.'};
+function show(token,key){
+  document.getElementById('formView').hidden=true;
+  document.getElementById('doneView').hidden=false;
+  document.getElementById('qr').innerHTML=qrSvg(scanUrl(token));
+  const link=new URL('inbox.html',location.href).href+'#'+key;
+  document.getElementById('inboxLink').href='inbox.html#'+key;
+  document.getElementById('keyLink').textContent=link;
+  window.__reg={token,key};
+}
+try{const s=JSON.parse(localStorage.getItem('yn_reg')||'null');if(s&&s.token&&s.key)show(s.token,s.key)}catch(_){}
+f.addEventListener('submit',async e=>{
+  e.preventDefault();err.textContent='';
+  btn.disabled=true;
+  try{
+    const r=await api('/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
+      name:f.name.value,nickname:f.nickname.value,phone:f.phone.value,consent:f.consent.checked,website:f.website.value})});
+    try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
+    show(r.token,r.owner_key);
+  }catch(x){err.textContent=ERR[x.code]||'صار خطأ، جرب كمان مرة.';btn.disabled=false}
+});
+document.getElementById('printBtn').onclick=()=>window.print();
+document.getElementById('pngBtn').onclick=async()=>{
+  const {token}=window.__reg;const W=800,H=1000,c=document.createElement('canvas');c.width=W;c.height=H;
+  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  for(let i=0;i<W/20;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?'#b3122a':'#fff';x.fillRect(i*20,j*20,20,20)}
+  const img=new Image();const url=URL.createObjectURL(new Blob([qrSvg(scanUrl(token))],{type:'image/svg+xml'}));
+  await new Promise(r=>{img.onload=r;img.src=url});
+  x.drawImage(img,80,90,640,640);
+  try{await document.fonts.load('700 64px "Reem Kufi"')}catch(_){}
+  x.fillStyle='#15120f';x.textAlign='center';x.direction='rtl';
+  x.font='700 72px "Reem Kufi",sans-serif';x.fillText('يا نشمي',W/2,840);
+  x.fillStyle='#625b51';x.font='400 34px "IBM Plex Sans Arabic",sans-serif';x.fillText('مسكّر عليّ؟ امسح الرمز',W/2,910);
+  c.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='yanashmi-sticker.png';a.click()});
+};
+</script>
+</body></html>

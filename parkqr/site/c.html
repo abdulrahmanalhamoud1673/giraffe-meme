@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css">
+<title>رسالة لصاحب السيارة — يا نشمي</title>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><span class="logo">يا نشمي</span><span class="pill">رقمه مخفي</span></header>
+  <main>
+    <section id="pick" hidden>
+      <h1>أرسل رسالة لصاحب السيارة</h1>
+      <p class="lead" id="who">اختر رسالة جاهزة وبنوصلها له فوراً.</p>
+      <div class="stack" id="list"></div>
+      <p class="err" id="err" role="alert" style="margin-top:14px"></p>
+      <p class="note" style="margin-top:14px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
+    </section>
+    <section id="sent" hidden>
+      <div class="status" role="status" aria-live="polite">
+        <h2>تم الإرسال</h2>
+        <p id="sentMsg" class="lead" style="margin-bottom:0"></p>
+        <p id="replyBox" style="margin-top:14px">بانتظار رد صاحب السيارة…</p>
+      </div>
+    </section>
+    <section id="bad" hidden><h1 id="badTitle">الرابط غير صحيح</h1><p class="lead" id="badText">تأكد إنك مسحت الرمز بشكل كامل.</p></section>
+  </main>
+</div>
+<script src="/shared.js"></script>
+<script>
+const token=(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||new URLSearchParams(location.search).get('t')||'';
+const $=id=>document.getElementById(id);
+function view(id){for(const v of ['pick','sent','bad'])$(v).hidden=v!==id}
+async function init(){
+  try{
+    const car=await api('/car/'+encodeURIComponent(token));
+    if(car.paused){$('badTitle').textContent='الاستقبال متوقف مؤقتاً';$('badText').textContent='صاحب السيارة أوقف الرسائل حالياً.';view('bad');return}
+    if(car.nickname)$('who').textContent='السيارة: '+car.nickname+'. اختر رسالة جاهزة وبنوصلها له فوراً.';
+    for(const [k,t] of Object.entries(MSG)){
+      const b=document.createElement('button');b.className='opt';b.textContent=t;b.onclick=()=>send(k,b);$('list').appendChild(b);
+    }
+    view('pick');
+  }catch(_){view('bad')}
+}
+async function send(kind,btn){
+  $('err').textContent='';
+  for(const b of document.querySelectorAll('.opt'))b.disabled=true;
+  try{
+    const r=await api('/car/'+encodeURIComponent(token)+'/message',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({kind})});
+    $('sentMsg').textContent=MSG[kind];view('sent');poll(r.id,Date.now());
+  }catch(e){
+    const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة أوقف الرسائل حالياً.'};
+    $('err').textContent=m[e.code]||'صار خطأ، جرب كمان مرة.';
+    for(const b of document.querySelectorAll('.opt'))b.disabled=false;
+  }
+}
+async function poll(id,t0){
+  try{
+    const r=await api('/message/'+id);
+    if(r.reply){$('replyBox').innerHTML='صاحب السيارة رد: <b>'+REPLY[r.reply]+'</b>';return}
+  }catch(_){}
+  if(Date.now()-t0<20*60*1000)setTimeout(()=>poll(id,t0),4000);
+  else $('replyBox').textContent='ما وصل رد لسا. ممكن صاحب السيارة بعيد عن موبايله.';
+}
+init();
+</script>
+</body></html>
