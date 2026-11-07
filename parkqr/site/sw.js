@@ -13,7 +13,7 @@ self.addEventListener('push', (event) => {
     await self.registration.showNotification(title, {
       body: d.body || 'وصلتك رسالة جديدة',
       icon: '/icon-192.png',
-      badge: '/icon-192.png',
+      badge: '/badge-96.png',
       tag: d.tag || 'yn-msg',
       renotify: true,
       requireInteraction: true,       // stays until you act on it (where the device supports it)
