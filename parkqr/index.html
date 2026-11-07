@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>حرّكها — أرسل تنبيه لصاحب السيارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--fg:#14213d;--muted:#667085;--accent:#0b6e4f;--line:#e4e7ec}
+@media (prefers-color-scheme:dark){:root{--bg:#0e1420;--card:#18202f;--fg:#f2f4f7;--muted:#98a2b3;--accent:#34d399;--line:#2a3447}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Tajawal,system-ui,sans-serif}
+main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+h1{font-size:1.4rem;margin:8px 0 4px}
+p.sub{color:var(--muted);margin:0 0 18px}
+.badge{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:.8rem;color:var(--muted)}
+.grid{display:grid;gap:10px}
+button.msg{display:flex;align-items:center;gap:12px;width:100%;text-align:right;font:inherit;font-size:1.05rem;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer}
+button.msg:active,button.msg:focus-visible{border-color:var(--accent);outline:2px solid var(--accent)}
+button.msg .e{font-size:1.5rem}
+.status{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-top:16px}
+.status b{color:var(--accent)}
+.hidden{display:none}
+footer{margin-top:24px;font-size:.8rem;color:var(--muted);line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+  <span class="badge">🔒 رقم صاحب السيارة مخفي</span>
+  <h1>أرسل تنبيه لصاحب السيارة</h1>
+  <p class="sub">اختر رسالة جاهزة وبنوصلها له فوراً.</p>
+
+  <div class="grid" id="list"></div>
+
+  <div class="status hidden" id="status" role="status" aria-live="polite"></div>
+
+  <footer>الرسائل جاهزة فقط لحماية الجميع من الإساءة. هذه الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</footer>
+</main>
+
+<script>
+const MESSAGES = [
+  {id:'block',  e:'🚗', t:'سيارتك مسكّرة عليّ، ممكن تحرّكها؟'},
+  {id:'urgent', e:'🕒', t:'أنا مستعجل، رجاءً بأسرع وقت'},
+  {id:'lights', e:'💡', t:'الأضواء شغالة'},
+  {id:'open',   e:'🪟', t:'الشباك أو الصندوق مفتوح'},
+  {id:'fault',  e:'⚠️', t:'في إشي غلط بسيارتك (دولاب منفّس / تسريب)'},
+  {id:'hit',    e:'🚨', t:'سيارتك تتحرك أو تعرضت لضربة'},
+  {id:'thanks', e:'🙏', t:'شكراً، حرّكتها'}
+];
+const COOLDOWN_MS = 5*60*1000; // client-side only; the server must enforce the real limit
+const token = location.pathname.split('/').pop() || 'demo';
+const KEY = 'last_'+token;
+const list = document.getElementById('list');
+const status = document.getElementById('status');
+
+function lastSent(){try{return +localStorage.getItem(KEY)||0}catch(e){return 0}}
+function markSent(){try{localStorage.setItem(KEY,Date.now())}catch(e){}}
+
+MESSAGES.forEach(m=>{
+  const b = document.createElement('button');
+  b.className='msg';
+  b.innerHTML = '<span class="e">'+m.e+'</span><span></span>';
+  b.lastChild.textContent = m.t;
+  b.onclick = ()=>send(m);
+  list.appendChild(b);
+});
+
+function show(html){status.innerHTML=html;status.classList.remove('hidden')}
+
+async function send(m){
+  const wait = COOLDOWN_MS-(Date.now()-lastSent());
+  if(wait>0){show('استنى شوي <b>'+Math.ceil(wait/60000)+'</b> دقائق قبل ما ترسل رسالة ثانية.');return}
+  show('جاري الإرسال…');
+  // TODO: replace with real API: POST /api/c/<token>/message {id:m.id, captcha}
+  await new Promise(r=>setTimeout(r,800));
+  markSent();
+  show('تم الإرسال ✅ <br>رح تظهر هنا ردة صاحب السيارة.');
+  // Demo of live owner reply:
+  setTimeout(()=>show('صاحب السيارة رد: <b>جاي خلال دقيقتين</b> 🚶'),4000);
+}
+</script>
+</body>
+</html>
