@@ -28,7 +28,7 @@ function ago(ts) {
   return h < 24 ? 'قبل ' + h + ' ساعة' : 'قبل ' + Math.round(h / 24) + ' يوم';
 }
 function scanUrl(token) {
-  return window.SCAN_URL ? window.SCAN_URL(token) : location.origin + '/c/' + token;
+  return window.SCAN_URL ? window.SCAN_URL(token) : location.origin + '/c?t=' + token;
 }
 function qrSvg(text) {
   const q = qrcode(0, 'M'); q.addData(text); q.make();

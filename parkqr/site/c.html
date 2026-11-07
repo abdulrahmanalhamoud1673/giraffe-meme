@@ -34,7 +34,7 @@
 </div>
 <script src="/shared.js"></script>
 <script>
-const token=(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||new URLSearchParams(location.search).get('t')||'';
+const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
 function view(id){for(const v of ['pick','sent','bad'])$(v).hidden=v!==id}
 async function init(){
