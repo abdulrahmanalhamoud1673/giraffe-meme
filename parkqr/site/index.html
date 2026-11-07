@@ -187,8 +187,21 @@ details p{color:var(--muted);padding:0 0 22px;max-width:62ch}
 .final p{color:#b9b0a1;margin:0 auto 34px;max-width:46ch}
 .final .stars{opacity:.7}
 
-footer{padding-block:34px 56px;color:var(--muted);font-size:.92rem}
-footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+/* footer: always dark, bookends the page with the closing call to action */
+.foot{--ink:#f4efe6;--muted:#a79f90;--line:#ffffff1c;--green:#3fd193;--gold:#d4ab5c;background:#080a09;color:var(--muted);font-size:.95rem;position:relative}
+.foot .band{--band-bg:#0b0d0c;--red:#d92b45}
+.fgrid{display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:44px;padding-block:44px 34px}
+.foot .logo{color:var(--ink);font-size:1.5rem}
+.fbrand p{margin-top:12px;max-width:34ch;line-height:1.8}
+.foot h4{margin:0 0 12px;font-family:var(--body);font-weight:600;font-size:.82rem;letter-spacing:.04em;color:var(--gold)}
+.flinks{display:grid;gap:8px;align-content:start}
+.flinks a{color:var(--muted);text-decoration:none;width:fit-content}
+.flinks a:hover{color:var(--ink)}
+.fnote p{line-height:1.8;max-width:38ch}
+.fbottom{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-block:18px 28px;border-top:1px solid var(--line);font-size:.88rem}
+.fbottom .dom{direction:ltr;color:var(--ink);font-weight:600;letter-spacing:.02em}
+@media (max-width:900px){.fgrid{grid-template-columns:1fr 1fr;gap:34px}.fbrand{grid-column:1/-1}}
+@media (max-width:480px){.fgrid{grid-template-columns:1fr}}
 [hidden]{display:none!important}
 
 @media (max-width:900px){
@@ -366,7 +379,27 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 </section>
 </main>
 
-<footer><div class="wrap"><div class="row"><span>يا نشمي — صُنع في عمّان</span><span>yanashmi.com</span></div></div></footer>
+<footer class="foot">
+  <div class="band" aria-hidden="true"></div>
+  <div class="wrap fgrid">
+    <div class="fbrand">
+      <a class="logo" href="#top"><svg><use href="#star"/></svg>يا نشمي</a>
+      <p>ستيكر QR على زجاج سيارتك. اللي مسكّر عليك بيرسلك رسالة جاهزة، ورقمك بيضل عندك.</p>
+    </div>
+    <nav class="flinks" aria-label="روابط">
+      <h4>الموقع</h4>
+      <a href="register.html">سجّل سيارتك</a>
+      <a href="#how">كيف بتشتغل</a>
+      <a href="#safe">الحماية</a>
+      <a href="#faq">أسئلة</a>
+    </nav>
+    <div class="fnote">
+      <h4>تنبيه</h4>
+      <p>هاي خدمة تنبيه بين الناس، مش للطوارئ الرسمية. للطوارئ اتصل بالنجدة <b style="color:var(--ink)">911</b>.</p>
+    </div>
+  </div>
+  <div class="wrap fbottom"><span>© يا نشمي، صُنع في عمّان</span><span class="dom">yanashmi.com</span></div>
+</footer>
 
 </body>
 </html>
