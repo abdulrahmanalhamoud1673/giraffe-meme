@@ -319,8 +319,9 @@ def second_opinion(rs: dict, models: dict[str, list[int]]) -> str | None:
     wet = {k: v for k, v in models.items() if v}
     if rs["ahead_from"] is None and not rs["raining_now"] and wet:
         names = " و".join(wet)
-        first = min(v[0] for v in wet.values())
-        return f"⚠️ {names} بتوقع مطر خفيف حوالي {fmt_hour(first)} (التوقع الأساسي ما بيشوف مطر)"
+        first, last = min(v[0] for v in wet.values()), max(v[-1] for v in wet.values())
+        span = fmt_hour(first) if first == last else f"{fmt_hour(first)} لـ {fmt_hour(last)}"
+        return f"⚠️ {names} بتوقع مطر خفيف {span} (التوقع الأساسي ما بيشوف مطر)"
     if rs["ahead_from"] is not None and not wet:
         return "ℹ️ النماذج التانية (الأوروبي والألماني والأمريكي) ما بتشوف مطر، فاحتمال أقل"
     return None
@@ -341,9 +342,13 @@ def build_message(data: dict, air: dict | None, place: str = DEFAULT_PLACE,
         f"{icon} هلأ <b>{cur['temperature_2m']:.0f}°</b> (محسوسة {cur['apparent_temperature']:.0f}°) · {desc}",
         rain_line(rs),
     ]
-    opinion = second_opinion(rs, models_rain_hours(models, now_hour(data)))
+    mh = models_rain_hours(models, now_hour(data))
+    opinion = second_opinion(rs, mh)
     if opinion:
         lines.append(html.escape(opinion))
+        # نموذجين أو أكتر متفقين على مطر = بنخلي المظلة نصيحة
+        if sum(1 for v in mh.values() if v) >= 2 and not any("مظلة" in t for t in tips):
+            tips.append("🌂 خذ مظلة صغيرة احتياط (أكتر من نموذج جوي بتوقع مطر).")
     periods = period_lines(data)
     if periods:
         lines += ["", "⏰ <b>خلال اليوم:</b>", *periods]

@@ -155,6 +155,17 @@ class SecondOpinionTests(unittest.TestCase):
         msg = wb.build_message(d, None, models=mmodels(icon_seamless=[9, 10]))
         self.assertIn("الألماني ICON بتوقع مطر خفيف حوالي 9ص", msg)
 
+    def test_two_models_agree_adds_umbrella_and_span(self):
+        d = make_data(curve(9, 14), now_hour=6)
+        msg = wb.build_message(d, None, models=mmodels(ecmwf_ifs025=[12, 13], gfs_seamless=[13, 14]))
+        self.assertIn("12م لـ 2م", msg)
+        self.assertIn("مظلة صغيرة احتياط", msg)
+
+    def test_one_model_no_umbrella(self):
+        d = make_data(curve(9, 14), now_hour=6)
+        msg = wb.build_message(d, None, models=mmodels(icon_seamless=[9]))
+        self.assertNotIn("مظلة", msg)
+
     def test_models_all_dry_nothing_said(self):
         msg = wb.build_message(make_data(curve(9, 14), now_hour=6), None, models=mmodels())
         self.assertNotIn("⚠️", msg)
