@@ -31,3 +31,16 @@
 ## ملاحظات
 - التنبيهات التلقائية (إشعار/واتساب) لسا مش مبنية؛ هلأ صاحب السيارة بيفتح صندوقه بنفسه.
 - التسجيل هلأ بدون تحقق من الرقم (OTP). لازم نضيفه قبل أي إرسال فعلي لأرقام، عشان ما حدا يسجّل رقم غيره.
+
+## 7) التنبيهات (Web Push)
+1. بـ D1 Console نفّذ الأمرين (واحد واحد):
+   - `CREATE TABLE IF NOT EXISTS push_subs (id TEXT PRIMARY KEY, car_id TEXT NOT NULL, endpoint TEXT NOT NULL UNIQUE, p256dh TEXT NOT NULL, auth TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()));`
+   - `CREATE INDEX IF NOT EXISTS idx_push_car ON push_subs(car_id);`
+2. بـ Settings ← Variables and secrets أضف:
+   - `VAPID_PUBLIC` (نوع Text) = المفتاح العام.
+   - `VAPID_PRIVATE` (نوع **Secret**) = المفتاح الخاص.
+   - اختياري: `VAPID_SUBJECT` = `https://yanashmi.com`.
+3. أعد النشر (Retry deployment).
+4. جرب: افتح صندوقك من موبايلك واضغط «فعّل التنبيهات»، بعدها «جرّب تنبيه».
+
+> المفتاح الخاص سرّي. إذا انكشف بدّله بزوج جديد وأعد تسجيل الأجهزة.

@@ -42,20 +42,28 @@
 
     <section id="doneView" hidden>
       <h1>جاهز يا نشمي</h1>
-      <p class="lead">هاد رمزك الخاص. اطبعه وحطه على زجاج السيارة من جوا.</p>
+      <p class="lead">سجّلناك. باقي خطوتين: فعّل التنبيهات، واطبع رمزك.</p>
+
+      <div class="notif" style="border-color:var(--red)">
+        <div class="n-head"><span class="n-ic" id="bellIc"></span><div><b>الخطوة الأهم: فعّل التنبيهات</b><small>عشان توصلك الرسائل على موبايلك فوراً، حتى لو الموقع مسكّر. بدونها لازم تفتح الصندوق بنفسك.</small></div></div>
+        <div class="n-body">
+          <a class="btn-big" id="inboxLink" href="inbox.html" style="text-decoration:none"></a>
+          <p class="n-note">افتحها من <b>موبايلك</b> (الجهاز اللي بدك التنبيهات توصله). رح نوريك الخطوات بالضبط.</p>
+        </div>
+      </div>
+
+      <h2 style="margin:30px 0 14px;font-size:1.25rem">رمزك للطباعة</h2>
       <div id="print-area"><div class="sticker">
         <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
         <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
       </div></div>
       <ul class="tips" id="tips"></ul>
-      <div class="stack" style="margin-top:26px">
+      <div class="stack" style="margin-top:22px">
         <button class="cta" id="printBtn" type="button">اطبع الرمز</button>
         <button class="cta alt" id="pngBtn" type="button">احفظه كصورة</button>
-        <a class="cta alt" id="inboxLink" href="inbox.html">افتح صندوق رسائلي</a>
       </div>
       <div class="warn" style="margin-top:22px"><b>مهم:</b> رابط صندوق الرسائل هو مفتاحك. احفظه وما تشاركه مع حدا. إذا ضاع ما بنقدر نرجعه لك.
         <p class="note" id="keyLink" dir="ltr" style="word-break:break-all;margin-top:8px"></p></div>
-      <p class="note" style="margin-top:18px">هاي نسخة تجريبية: التنبيهات على الموبايل لسا قيد التجهيز، فافتح صندوق الرسائل من وقت لوقت. ورقة عادية تكفي للتجربة.</p>
     </section>
   </main>
 </div>
@@ -76,7 +84,7 @@ function show(token,key){
   step(3);
   document.getElementById('qr').innerHTML=qrSvg(scanUrl(token));
   const link=new URL('inbox.html',location.href).href+'#'+key;
-  document.getElementById('inboxLink').href='inbox.html#'+key;
+  const il=document.getElementById('inboxLink');il.href='inbox.html#'+key;il.innerHTML=ICON.bell+'فعّل التنبيهات الآن';document.getElementById('bellIc').innerHTML=ICON.bell;
   document.getElementById('keyLink').textContent=link;
   window.__reg={token,key};
 }

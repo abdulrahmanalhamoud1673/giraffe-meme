@@ -7,6 +7,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
+<link rel="manifest" href="/manifest.webmanifest" id="manifest">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0b0d0c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="يا نشمي">
 <title>صندوق الرسائل — يا نشمي</title>
 <meta name="robots" content="noindex">
 </head>
@@ -17,6 +23,8 @@
   <main>
     <h1>صندوق رسائلك</h1>
     <p class="lead">أي رسالة بتوصل لسيارتك بتظهر هون. اضغط على ردّك وهو بيشوفه مباشرة.</p>
+
+    <section class="notif" id="notif" hidden></section>
 
     <div class="reception" id="reception">
       <div class="txt">
@@ -29,12 +37,18 @@
     <div class="inbox-h"><h2>الرسائل</h2><span class="note" id="count"></span></div>
     <div class="stack" id="msgs"><p class="note">جاري التحميل…</p></div>
 
-    <p class="note" style="margin-top:24px">نصيحة: أضف هالصفحة للشاشة الرئيسية بموبايلك عشان تفتحها بسرعة. التنبيهات التلقائية لسا قيد التجهيز، فافتح الصفحة من وقت لوقت.</p>
+    <p class="note" style="margin-top:24px">الرسائل بتضل محفوظة هون حتى لو فاتك التنبيه.</p>
   </main>
 </div>
 <script src="shared.js"></script>
+<script src="push.js"></script>
 <script>
-const key=location.hash.slice(1);
+let key=location.hash.slice(1);
+try{
+  if(key.length>=16)localStorage.setItem('yn_key',key);
+  else{const r=JSON.parse(localStorage.getItem('yn_reg')||'null');key=localStorage.getItem('yn_key')||(r&&r.key)||'';}
+}catch(_){}
+if(key.length>=16){const m=document.getElementById('manifest');if(m)m.href='/manifest.webmanifest?k='+encodeURIComponent(key)}
 const $=id=>document.getElementById(id);
 const H={authorization:'Bearer '+key,'content-type':'application/json'};
 let paused=false,busy=false;
@@ -88,7 +102,76 @@ $('pauseBtn').onclick=async()=>{
   try{await api('/inbox/pause',{method:'POST',headers:H,body:JSON.stringify({paused:!paused})});}catch(_){}
   busy=false;$('pauseBtn').disabled=false;load();
 };
-if(key.length>=16){load();setInterval(load,8000)}else $('msgs').innerHTML='<div class="warn">ما في مفتاح بالرابط. افتح الرابط اللي حفظته عند التسجيل.</div>';
+
+/* ---------- notifications card ---------- */
+const nEl=$('notif');
+const inboxUrl=()=>new URL('inbox.html',location.href).href+'#'+key;
+function li(n,html){return '<li><span class="num">'+n+'</span><div class="tx">'+html+'</div></li>'}
+function ico(name){return '<span class="ico">'+ICON[name]+'</span>'}
+function pcWarn(){
+  if(Push.isMobile||Push.demo==='ios'||Push.demo==='android')return '';
+  return '<div class="pc-warn">'+ICON.alert+'<div>إنت هلأ على الكمبيوتر، فالتنبيه رح يوصل لهالكمبيوتر بس. عشان يوصلك على موبايلك، افتح الصندوق من موبايلك. <button class="chip" id="copyLink" type="button" style="margin-top:8px">انسخ الرابط وابعته لنفسك</button></div></div>';
+}
+function head(icon,title,sub){return '<div class="n-head"><span class="n-ic">'+ICON[icon]+'</span><div><b>'+title+'</b><small>'+sub+'</small></div></div>'}
+async function renderNotif(){
+  const st=await Push.state();
+  nEl.hidden=false;nEl.className='notif '+(st==='enabled'?'enabled':st==='denied'?'denied':'');
+  const platform=Push.demo?(Push.demo==='ios'||Push.demo==='ios-install'?'ios':'android'):(Push.isIOS?'ios':'android');
+  let h='';
+  if(st==='enabled'){
+    h=head('bell','التنبيهات شغّالة على هالجهاز','أي رسالة بتوصل لسيارتك بتطلع لك فوراً كتنبيه، حتى لو الموقع مسكّر.')
+     +'<div class="n-body"><div class="btn-row"><button class="cta alt" id="nTest" type="button">جرّب تنبيه</button><button class="cta alt" id="nOff" type="button">أوقفها</button></div><p class="n-msg" id="nMsg" role="status"></p><p class="n-note">لو بتستخدم أكثر من جهاز، فعّلها على كل واحد.</p></div>';
+  }else if(st==='ios-install'){
+    h=head('bell','فعّل التنبيهات على الآيفون','آبل بتطلب خطوة إضافية مرة وحدة: إضافة الموقع للشاشة الرئيسية. بعدها بتظهر لك الإشعارات زي أي تطبيق.')
+     +'<div class="n-body"><ol class="how">'
+     +li(1,'افتح هالصفحة من <b>Safari</b> (مش من تطبيق ثاني).')
+     +li(2,'اضغط زر <b>المشاركة</b> '+ico('share')+' (المربع اللي فيه سهم لفوق، بأسفل الشاشة).')
+     +li(3,'اختر <b>«إضافة إلى الشاشة الرئيسية»</b> '+ico('plus')+' ثم اضغط <b>«إضافة»</b>.')
+     +li(4,'افتح <b>«يا نشمي»</b> من الشاشة الرئيسية '+ico('phone')+'، بتظهر لك هالصفحة نفسها.')
+     +li(5,'اضغط <b>«فعّل التنبيهات»</b> واختر <b>«السماح»</b>.')
+     +'</ol><p class="n-note">بدون هالخطوة آبل ما بتسمح للمواقع بإرسال تنبيهات.</p></div>';
+  }else if(st==='denied'){
+    h=head('alert','التنبيهات محظورة','حظرتها من المتصفح، فلازم تفتحها من الإعدادات.')
+     +'<div class="n-body"><ol class="how">'
+     +(platform==='ios'
+        ?li(1,'افتح <b>الإعدادات</b> بالآيفون.')+li(2,'اختر <b>الإشعارات</b>، وبعدها <b>يا نشمي</b>.')+li(3,'فعّل <b>السماح بالإشعارات</b>، وارجع لهالصفحة.')
+        :li(1,'اضغط أيقونة <b>القفل</b> (أو ⓘ) جنب عنوان الموقع، فوق.')+li(2,'اختر <b>الأذونات</b> ثم <b>الإشعارات</b>.')+li(3,'غيّرها لـ <b>السماح</b>، وحدّث الصفحة.'))
+     +'</ol></div>';
+  }else if(st==='unsupported'){
+    h=head('alert','هالمتصفح ما بيدعم التنبيهات','استخدم Chrome على الأندرويد، أو Safari على الآيفون (بعد إضافة الموقع للشاشة الرئيسية).')
+     +'<div class="n-body"><p class="n-note">لحد ما تفعّلها، افتح الصندوق من وقت لوقت. الرسائل بتضل محفوظة هون.</p></div>';
+  }else{
+    h=head('bell','فعّل التنبيهات عشان توصلك الرسائل فوراً','بدونها لازم تفتح الصفحة بنفسك. فعّلها مرة وحدة، وبتوصلك الرسالة حتى لو الموقع مسكّر.')
+     +'<div class="n-body">'+pcWarn()
+     +'<div class="perm" aria-hidden="true"><div class="t"><i>'+location.host+'</i><br>بدو يرسل لك إشعارات</div><div class="b"><span>حظر</span><span class="allow">السماح</span></div></div>'
+     +'<p class="perm-cap">بعد ما تضغط الزر تحت، رح يطلع لك هالسؤال من المتصفح. اضغط <b>السماح</b>.</p>'
+     +'<button class="btn-big" id="nOn" type="button">'+ICON.bell+'فعّل التنبيهات</button><p class="n-msg" id="nMsg" role="status"></p></div>';
+  }
+  nEl.innerHTML=h;
+  const msg=(t,c)=>{const m=$('nMsg');if(m){m.textContent=t;m.className='n-msg '+(c||'')}};
+  if($('copyLink'))$('copyLink').onclick=async()=>{try{await navigator.clipboard.writeText(inboxUrl());$('copyLink').textContent='انتسخ. الصقه برسالة لنفسك'}catch(_){$('copyLink').textContent=inboxUrl()}};
+  if($('nOn'))$('nOn').onclick=async()=>{
+    if(Push.demo){msg('هاي نسخة تجريبية للشرح فقط.','');return}
+    $('nOn').disabled=true;msg('جاري التفعيل…','');
+    try{
+      const r=await Push.enable(H);
+      if(!r.ok){
+        $('nOn').disabled=false;
+        if(r.reason==='denied'){await renderNotif();return}
+        msg(r.reason==='not_configured'?'التنبيهات لسا قيد الإعداد عندنا. جرب بعد شوي.':r.reason==='default'?'ما اخترت شي. اضغط الزر وبعدين «السماح».':'ما قدرنا نفعّل التنبيهات. حدّث الصفحة وجرب كمان مرة.','bad');return;
+      }
+      await renderNotif();
+      try{const t=await Push.test(H);const m=$('nMsg');if(m){m.textContent=t.sent?'فعّلناها وأرسلنا لك تنبيه تجريبي. شفته؟':'فعّلناها. جرّب زر «جرّب تنبيه».';m.className='n-msg ok'}}catch(_){}
+    }catch(e){$('nOn')&&($('nOn').disabled=false);msg('صار خطأ أثناء التفعيل (' + (e.code||e.message||'') + ').','bad')}
+  };
+  if($('nTest'))$('nTest').onclick=async()=>{
+    if(Push.demo){msg('هاي نسخة تجريبية للشرح فقط.','');return}
+    msg('جاري الإرسال…','');
+    try{const t=await Push.test(H);msg(t.sent?'أرسلنا تنبيه لجهازك. إذا ما طلع خلال ثواني، شوف إعدادات الإشعارات بالموبايل.':'ما في جهاز مسجّل. أوقفها وفعّلها من جديد.',t.sent?'ok':'bad')}catch(e){msg('ما قدرنا نرسل التنبيه ('+(e.code||e.message)+').','bad')}
+  };
+  if($('nOff'))$('nOff').onclick=async()=>{if(Push.demo){return}await Push.disable(H);renderNotif()};
+}
+if(key.length>=16){load();setInterval(load,8000);renderNotif();Push.resync(H)}else $('msgs').innerHTML='<div class="warn">ما في مفتاح بالرابط. افتح الرابط اللي حفظته عند التسجيل.</div>';
 </script>
 </body>
 </html>

@@ -24,3 +24,13 @@ CREATE TABLE IF NOT EXISTS messages (
   replied_at INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_msg_car ON messages(car_id, created_at);
+
+CREATE TABLE IF NOT EXISTS push_subs (
+  id TEXT PRIMARY KEY,
+  car_id TEXT NOT NULL,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
+CREATE INDEX IF NOT EXISTS idx_push_car ON push_subs(car_id);

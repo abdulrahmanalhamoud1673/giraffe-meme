@@ -45,3 +45,14 @@ export async function carByKey(env, request) {
   if (key.length < 16) return null;
   return env.DB.prepare('SELECT * FROM cars WHERE owner_key = ?').bind(key).first();
 }
+
+// Text shown in the push notification (kept in sync with MSG in shared.js)
+export const MSG_TEXT = {
+  block: 'سيارتك مسكّرة عليّ، ممكن تحرّكها؟',
+  urgent: 'أنا مستعجل، رجاءً بأسرع وقت',
+  lights: 'الأضواء شغالة',
+  open: 'الشباك أو الصندوق مفتوح',
+  fault: 'في إشي غلط بسيارتك (دولاب منفّس / تسريب)',
+  hit: 'سيارتك تتحرك أو تعرضت لضربة',
+  thanks: 'شكراً، حرّكتها',
+};
