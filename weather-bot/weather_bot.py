@@ -75,6 +75,37 @@ def fetch_weather(lat: float, lon: float) -> dict:
     })
 
 
+MODELS = {"ecmwf_ifs025": "الأوروبي ECMWF", "icon_seamless": "الألماني ICON", "gfs_seamless": "الأمريكي GFS"}
+
+
+def fetch_models_rain(lat: float, lon: float) -> dict | None:
+    """رأي ثاني للمطر: نفس اليوم من 3 نماذج جوية منفصلة. ثانوي، لو فشل ما بنوقف الرسالة."""
+    try:
+        return _get_json(FORECAST_URL, {
+            "latitude": lat, "longitude": lon, "timezone": TZ, "forecast_days": 1,
+            "hourly": "precipitation", "models": ",".join(MODELS),
+        })
+    except Exception as exc:  # noqa: BLE001
+        print(f"تحذير: ما قدرت أجيب رأي النماذج التانية: {exc}", file=sys.stderr)
+        return None
+
+
+def models_rain_hours(mdata: dict | None, from_hour: int) -> dict[str, list[int]]:
+    """لكل نموذج: الساعات القادمة اللي بتوقع فيها مطر (>= 0.3 ملم)."""
+    if not mdata:
+        return {}
+    h = mdata["hourly"]
+    today = mdata["hourly"]["time"][0][:10]
+    out: dict[str, list[int]] = {}
+    for key, label in MODELS.items():
+        vals = h.get(f"precipitation_{key}")
+        if vals is None:
+            continue
+        out[label] = [int(t[11:13]) for t, v in zip(h["time"], vals)
+                      if t[:10] == today and int(t[11:13]) >= from_hour and _num(v) >= 0.3]
+    return out
+
+
 def fetch_air(lat: float, lon: float) -> dict | None:
     """الغبار/التلوث: ثانوي، لو فشل ما بنوقف الرسالة."""
     try:
@@ -245,21 +276,80 @@ def rain_line(rs: dict) -> str:
     return "☔ " + " · ".join(parts)
 
 
-def build_message(data: dict, air: dict | None, place: str = DEFAULT_PLACE) -> str:
+PERIODS = [("الصبح", 7, 12), ("الظهر", 12, 15), ("العصر", 15, 18), ("المسا", 18, 22)]
+
+
+def feel_word(f: float) -> str:
+    for limit, word in ((3, "🥶 برد قارس"), (9, "🧊 برد"), (15, "🧥 بارد شوي"), (21, "🙂 معتدل"),
+                        (27, "☀️ دافي"), (32, "🥵 حر")):
+        if f <= limit:
+            return word
+    return "🥵 حر شديد"
+
+
+def period_lines(data: dict) -> list[str]:
+    """سطر لكل فترة (الصبح/الظهر/العصر/المسا) لسا ما خلصت، مع وقتها."""
+    nh = now_hour(data)
+    rows = _hourly_rows(data)
+    out = []
+    for name, a, b in PERIODS:
+        seg = [r for r in rows if a <= r["hour"] < b and r["hour"] >= nh]
+        if not seg:
+            continue
+        start = max(a, nh)
+        t_lo, t_hi = min(r["temp"] for r in seg), max(r["temp"] for r in seg)
+        temp = f"{t_lo:.0f}°" if round(t_lo) == round(t_hi) else f"{t_lo:.0f}–{t_hi:.0f}°"
+        feels = sum(r["feels"] for r in seg) / len(seg)
+        codes = [r["code"] for r in seg]
+        cond = describe(max(set(codes), key=lambda c: (codes.count(c), c)))[0]
+        extra = ""
+        if any(_is_rainy(r) for r in seg):
+            extra += " · ☔ مطر"
+        gust = max(r["gust"] for r in seg)
+        if gust >= 40:
+            extra += f" · 💨 {gust:.0f}"
+        out.append(f"• <b>{name}</b> {fmt_hour(start)}–{fmt_hour(b)}: {temp} {feel_word(feels)} · {cond}{extra}")
+    return out
+
+
+def second_opinion(rs: dict, models: dict[str, list[int]]) -> str | None:
+    """بنقارن توقع المطر الأساسي مع النماذج التانية، وبنحكي بس إذا في اختلاف."""
+    if not models:
+        return None
+    wet = {k: v for k, v in models.items() if v}
+    if rs["ahead_from"] is None and not rs["raining_now"] and wet:
+        names = " و".join(wet)
+        first = min(v[0] for v in wet.values())
+        return f"⚠️ {names} بتوقع مطر خفيف حوالي {fmt_hour(first)} (التوقع الأساسي ما بيشوف مطر)"
+    if rs["ahead_from"] is not None and not wet:
+        return "ℹ️ النماذج التانية (الأوروبي والألماني والأمريكي) ما بتشوف مطر، فاحتمال أقل"
+    return None
+
+
+def build_message(data: dict, air: dict | None, place: str = DEFAULT_PLACE,
+                  models: dict | None = None) -> str:
     cur, daily = data["current"], data["daily"]
     today = cur["time"][:10]
     rows = day_window(data)
     tips = outfit_advice(rows, daily, air_summary(air, today))
     desc, icon = describe(int(_num(cur["weather_code"])))
+    rs = rain_status(data)
 
     lines = [
         f"<b>{html.escape(tips[0])}</b>",
         "",
         f"{icon} هلأ <b>{cur['temperature_2m']:.0f}°</b> (محسوسة {cur['apparent_temperature']:.0f}°) · {desc}",
-        f"📊 اليوم {daily['temperature_2m_min'][0]:.0f}° – {daily['temperature_2m_max'][0]:.0f}°",
-        rain_line(rain_status(data)),
+        rain_line(rs),
     ]
-    lines += [html.escape(t) for t in tips[1:]]
+    opinion = second_opinion(rs, models_rain_hours(models, now_hour(data)))
+    if opinion:
+        lines.append(html.escape(opinion))
+    periods = period_lines(data)
+    if periods:
+        lines += ["", "⏰ <b>خلال اليوم:</b>", *periods]
+    if tips[1:]:
+        lines.append("")
+        lines += [html.escape(t) for t in tips[1:]]
     lines += ["", f"<i>{html.escape(place)} · Open-Meteo</i>"]
     return "\n".join(lines)
 
@@ -306,16 +396,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.from_json:
         with open(args.from_json, encoding="utf-8") as f:
             data = json.load(f)
-        air = None
+        air, models = None, None
     else:
         data = fetch_weather(lat, lon)
         air = fetch_air(lat, lon)
+        models = fetch_models_rain(lat, lon)
 
     if args.raw:
         print(raw_dump(data))
+        print("نماذج المطر (الساعات القادمة):", models_rain_hours(models, now_hour(data)))
         print()
 
-    message = build_message(data, air, place)
+    message = build_message(data, air, place, models)
     if args.dry_run:
         print(message)
         return 0

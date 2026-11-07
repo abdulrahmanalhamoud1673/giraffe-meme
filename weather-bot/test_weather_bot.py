@@ -114,12 +114,60 @@ class RainTests(unittest.TestCase):
     def test_current_condition_single_source(self):
         d = make_data(curve(9, 14), now_hour=11, code=2)
         d["current"]["weather_code"] = 3
-        msg = wb.build_message(d, None)
-        self.assertIn("غائم", msg)
-        self.assertNotIn("غائم جزئياً", msg)  # ما في تناقض بين "هلأ" وغيره
+        now_line = next(l for l in wb.build_message(d, None).splitlines() if "هلأ" in l)
+        self.assertIn("غائم", now_line)  # "هلأ" بيعتمد على القراءة الحالية بس
+        self.assertNotIn("جزئياً", now_line)
 
     def test_raw_dump(self):
         self.assertIn("daily:", wb.raw_dump(make_data(curve(9, 14))))
+
+
+class PeriodTests(unittest.TestCase):
+    def test_periods_with_times(self):
+        msg = wb.build_message(make_data(curve(9, 18), now_hour=6), None)
+        for label in ("الصبح</b> 7ص–12م", "الظهر</b> 12م–3م", "العصر</b> 3م–6م", "المسا</b> 6م–10م"):
+            self.assertIn(label, msg)
+
+    def test_finished_periods_hidden(self):
+        msg = wb.build_message(make_data(curve(9, 18), now_hour=16), None)
+        self.assertNotIn("الصبح", msg)
+        self.assertNotIn("الظهر", msg)
+        self.assertIn("العصر</b> 4م–6م", msg)
+
+    def test_feel_word(self):
+        self.assertIn("بارد", wb.feel_word(12))
+        self.assertIn("حر", wb.feel_word(30))
+
+
+def mmodels(**hours):
+    """بيانات نماذج تجريبية: اسم النموذج -> الساعات اللي فيها مطر."""
+    times = [f"2026-11-07T{h:02d}:00" for h in range(24)]
+    hourly = {"time": times}
+    for key in wb.MODELS:
+        wet = hours.get(key, [])
+        hourly[f"precipitation_{key}"] = [1.0 if h in wet else 0.0 for h in range(24)]
+    return {"hourly": hourly}
+
+
+class SecondOpinionTests(unittest.TestCase):
+    def test_models_disagree_with_dry_forecast(self):
+        d = make_data(curve(9, 14), now_hour=6)
+        msg = wb.build_message(d, None, models=mmodels(icon_seamless=[9, 10]))
+        self.assertIn("الألماني ICON بتوقع مطر خفيف حوالي 9ص", msg)
+
+    def test_models_all_dry_nothing_said(self):
+        msg = wb.build_message(make_data(curve(9, 14), now_hour=6), None, models=mmodels())
+        self.assertNotIn("⚠️", msg)
+        self.assertNotIn("ℹ️", msg)
+
+    def test_forecast_rain_but_models_dry(self):
+        d = make_data(curve(9, 14), now_hour=6)
+        for h in (15, 16):
+            d["hourly"]["precipitation_probability"][h] = 70
+        self.assertIn("احتمال أقل", wb.build_message(d, None, models=mmodels()))
+
+    def test_models_missing_is_fine(self):
+        wb.build_message(make_data(curve(9, 14)), None, models=None)
 
 
 if __name__ == "__main__":
