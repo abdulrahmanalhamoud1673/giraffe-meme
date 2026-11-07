@@ -70,8 +70,8 @@ class MessageTests(unittest.TestCase):
     def test_message_builds_and_escapes(self):
         msg = wb.build_message(make_data(curve(9, 18), pop=10, code=2), None, "الرابية & عمان")
         self.assertIn("الرابية &amp; عمان", msg)
-        self.assertIn("شو تلبس", msg)
-        self.assertIn("خلال اليوم", msg)
+        self.assertTrue(msg.startswith("<b>"))  # الجواب الرئيسي أول سطر
+        self.assertIn("ما في مطر متوقع", msg)
         self.assertLessEqual(len(msg), 4096)  # حد تيليغرام
 
     def test_late_run_skips_past_hours(self):
@@ -80,13 +80,46 @@ class MessageTests(unittest.TestCase):
 
     def test_after_hours_still_builds(self):
         msg = wb.build_message(make_data(curve(9, 18), now_hour=23), None)
-        self.assertIn("شو تلبس", msg)
+        self.assertTrue(msg.startswith("<b>"))
 
     def test_null_values_dont_crash(self):
         d = make_data(curve(9, 18))
         d["hourly"]["precipitation_probability"][10] = None
         d["daily"]["precipitation_sum"] = [None]
         wb.build_message(d, None)
+
+
+class RainTests(unittest.TestCase):
+    def test_rained_this_morning_is_reported(self):
+        d = make_data(curve(9, 14), now_hour=11)
+        d["hourly"]["precipitation"][8] = 0.6   # شتّت الساعة 8
+        d["daily"]["precipitation_sum"] = [0.6]
+        msg = wb.build_message(d, None)
+        self.assertIn("شتّت اليوم", msg)
+        self.assertIn("وما في مطر كمان", msg)
+
+    def test_raining_now(self):
+        d = make_data(curve(9, 14), now_hour=11)
+        d["current"]["precipitation"] = 0.4
+        self.assertIn("عم تشتي هلأ", wb.build_message(d, None))
+
+    def test_rain_ahead_shows_hours(self):
+        d = make_data(curve(9, 14), now_hour=11)
+        for h in (15, 16, 17):
+            d["hourly"]["precipitation_probability"][h] = 70
+            d["hourly"]["precipitation"][h] = 0.5
+        msg = wb.build_message(d, None)
+        self.assertIn("مطر متوقع 3م لـ 5م (احتمال 70%)", msg)
+
+    def test_current_condition_single_source(self):
+        d = make_data(curve(9, 14), now_hour=11, code=2)
+        d["current"]["weather_code"] = 3
+        msg = wb.build_message(d, None)
+        self.assertIn("غائم", msg)
+        self.assertNotIn("غائم جزئياً", msg)  # ما في تناقض بين "هلأ" وغيره
+
+    def test_raw_dump(self):
+        self.assertIn("daily:", wb.raw_dump(make_data(curve(9, 14))))
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@
 
 الاستخدام:
     python weather_bot.py --dry-run        # يطبع الرسالة بس
+    python weather_bot.py --dry-run --raw  # ويطبع كمان البيانات الخام ساعة بساعة (للتأكد من الدقة)
     python weather_bot.py                  # يبعتها على تيليغرام
 
 المتغيرات (environment):
@@ -34,6 +35,9 @@ AIR_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 # ساعات النهار اللي بنحسب عليها اللبس (لما تكون برا البيت)
 DAY_START, DAY_END = 7, 22
 
+# مطر "حقيقي" بالساعة: احتمال >= 40% أو كمية >= 0.2 ملم
+RAIN_POP, RAIN_MM = 40, 0.2
+
 WEATHER_AR = {
     0: ("صافي", "☀️"), 1: ("صافي غالباً", "🌤"), 2: ("غائم جزئياً", "⛅"), 3: ("غائم", "☁️"),
     45: ("ضباب", "🌫"), 48: ("ضباب متجمد", "🌫"),
@@ -48,7 +52,6 @@ WEATHER_AR = {
 }
 SNOW_CODES = {71, 73, 75, 77, 85, 86}
 STORM_CODES = {95, 96, 99}
-RAIN_CODES = {51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82} | STORM_CODES
 
 
 # --------------------------------------------------------------------------- جلب البيانات
@@ -66,7 +69,7 @@ def fetch_weather(lat: float, lon: float) -> dict:
         "current": "temperature_2m,apparent_temperature,relative_humidity_2m,"
                    "precipitation,weather_code,wind_speed_10m,wind_gusts_10m",
         "hourly": "temperature_2m,apparent_temperature,precipitation_probability,"
-                  "precipitation,weather_code,wind_gusts_10m,uv_index",
+                  "precipitation,weather_code,wind_gusts_10m,uv_index,cloud_cover",
         "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,"
                  "precipitation_probability_max,uv_index_max,wind_gusts_10m_max,weather_code",
     })
@@ -90,21 +93,16 @@ def _num(x, default=0.0) -> float:
     return default if x is None else float(x)
 
 
-def day_window(data: dict) -> list[dict]:
-    """ساعات اليوم القادمة (من الآن أو من DAY_START، لحد DAY_END)."""
-    now = data["current"]["time"]  # بتوقيت عمان لأننا طلبنا timezone
-    today, now_hour = now[:10], int(now[11:13])
-    start = max(DAY_START, now_hour)
+def _hourly_rows(data: dict) -> list[dict]:
+    """كل ساعات اليوم (00-23) كقائمة."""
+    today = data["current"]["time"][:10]  # بتوقيت عمان لأننا طلبنا timezone
     h = data["hourly"]
     rows = []
     for i, t in enumerate(h["time"]):
         if t[:10] != today:
             continue
-        hour = int(t[11:13])
-        if not (start <= hour <= DAY_END):
-            continue
         rows.append({
-            "hour": hour,
+            "hour": int(t[11:13]),
             "temp": _num(h["temperature_2m"][i]),
             "feels": _num(h["apparent_temperature"][i]),
             "pop": _num(h["precipitation_probability"][i]),
@@ -112,8 +110,39 @@ def day_window(data: dict) -> list[dict]:
             "code": int(_num(h["weather_code"][i])),
             "gust": _num(h["wind_gusts_10m"][i]),
             "uv": _num(h["uv_index"][i]),
+            "cloud": _num(h["cloud_cover"][i]) if "cloud_cover" in h else 0.0,
         })
     return rows
+
+
+def now_hour(data: dict) -> int:
+    return int(data["current"]["time"][11:13])
+
+
+def day_window(data: dict) -> list[dict]:
+    """ساعات اليوم القادمة (من الآن أو من DAY_START، لحد DAY_END)."""
+    start = max(DAY_START, now_hour(data))
+    return [r for r in _hourly_rows(data) if start <= r["hour"] <= DAY_END]
+
+
+def _is_rainy(r: dict) -> bool:
+    return r["pop"] >= RAIN_POP or r["rain"] >= RAIN_MM or r["code"] in (SNOW_CODES | STORM_CODES)
+
+
+def rain_status(data: dict) -> dict:
+    """شو صار وشو رح يصير بالمطر اليوم."""
+    rows = _hourly_rows(data)
+    nh = now_hour(data)
+    past_mm = sum(r["rain"] for r in rows if r["hour"] < nh)
+    ahead = [r for r in rows if r["hour"] >= nh and _is_rainy(r)]
+    return {
+        "raining_now": _num(data["current"].get("precipitation")) > 0,
+        "past_mm": past_mm,
+        "ahead_from": ahead[0]["hour"] if ahead else None,
+        "ahead_to": ahead[-1]["hour"] if ahead else None,
+        "ahead_pop": max((r["pop"] for r in ahead), default=0.0),
+        "ahead_mm": sum(r["rain"] for r in ahead),
+    }
 
 
 def air_summary(air: dict | None, today: str) -> dict:
@@ -129,20 +158,14 @@ def describe(code: int) -> tuple[str, str]:
     return WEATHER_AR.get(code, ("غير معروف", "🌡"))
 
 
-def worst_code(rows: list[dict]) -> int:
-    """أسوأ حالة بالفترة (عواصف > ثلج > مطر > غيره)."""
-    codes = [r["code"] for r in rows]
-    for group in (STORM_CODES, SNOW_CODES, RAIN_CODES):
-        hit = [c for c in codes if c in group]
-        if hit:
-            return max(hit)
-    return max(set(codes), key=codes.count)
+def fmt_hour(h: int) -> str:
+    return f"{h % 12 or 12}{'ص' if h < 12 else 'م'}"
 
 
 # --------------------------------------------------------------------------- اللبس
 
 def outfit_advice(rows: list[dict], daily: dict, air: dict) -> list[str]:
-    """بترجع قائمة نصايح لبس مرتبة حسب الأهمية."""
+    """أول عنصر = الجواب الرئيسي (شو تلبس)، والباقي ملاحظات قصيرة بتظهر بس إذا لازمة."""
     if not rows:
         return ["ما في ساعات كافية بالتوقع لليوم."]
     lo = min(r["feels"] for r in rows)
@@ -153,111 +176,106 @@ def outfit_advice(rows: list[dict], daily: dict, air: dict) -> list[str]:
     uv = max(r["uv"] for r in rows)
     codes = {r["code"] for r in rows}
 
-    tips: list[str] = []
-
-    # --- الأساس حسب الحرارة المحسوسة
+    # --- الجواب الرئيسي حسب الحرارة المحسوسة
     if hi >= 36:
-        tips.append("🥵 حر شديد: البس أخف وأفتح اللبس (قطن/كتان)، وخذ مي وايد وتجنب الشمس 12-4.")
+        tips = ["🥵 حر شديد: ملابس خفيفة فاتحة، مي وايد، وتجنب الشمس 12-4."]
     elif hi >= 30:
-        tips.append("👕 حر: تيشيرت وبنطلون/شورت خفيف، ألوان فاتحة، وكاب أو نظارة شمس.")
+        tips = ["👕 حر: تيشيرت وبنطلون خفيف + كاب."]
     elif lo >= 22:
-        tips.append("👕 دافي: تيشيرت وبنطلون خفيف بيكفّوا.")
+        tips = ["👕 تيشيرت بيكفي."]
     elif lo >= 17:
-        tips.append("👕 تيشيرت أو قميص كم طويل خفيف، وخذ كوفتة خفيفة للمسا.")
+        tips = ["👕 تيشيرت أو قميص كم طويل، وكوفتة خفيفة للمسا."]
     elif lo >= 12:
-        tips.append("🧥 جاكيت خفيف أو هودي فوق تيشيرت/قميص كم طويل.")
+        tips = ["🧥 جاكيت خفيف أو هودي."]
     elif lo >= 7:
-        tips.append("🧥 جاكيت تقيل شوي + كنزة تحته، وبنطلون طويل.")
+        tips = ["🧥 جاكيت تقيل شوي + كنزة تحته."]
     elif lo >= 2:
-        tips.append("🧥 برد: جاكيت تقيل أو معطف + كنزة صوف، وشال.")
+        tips = ["🧥 برد: جاكيت تقيل أو معطف + كنزة صوف + شال."]
     else:
-        tips.append("🥶 برد قارس: معطف تقيل، كنزة صوف، شال، قفازات وطاقية، وجرابات دافية.")
+        tips = ["🥶 برد قارس: معطف تقيل + كنزة صوف + شال وقفازات وطاقية."]
 
-    # --- فرق الحرارة خلال النهار
+    # --- ملاحظات (بس إذا لازمة)
     if hi - lo >= 7 and lo < 22:
-        tips.append(f"🧅 الجو بيتغير ({lo:.0f}° ← {hi:.0f}° محسوسة): البس طبقات بتقدر تقلعها وقت الظهر.")
+        tips.append(f"🧅 الجو بيتغير ({lo:.0f}° ← {hi:.0f}°): البس طبقات بتقدر تقلعها.")
 
-    # --- المطر / الثلج / العواصف
     if codes & SNOW_CODES:
-        tips.append("❄️ في ثلج: جزمة مقاومة للمي، قفازات، واحذر الطريق الزلق.")
+        tips.append("❄️ ثلج: جزمة مقاومة للمي وقفازات، واحذر الطريق الزلق.")
     if codes & STORM_CODES:
-        tips.append("⛈ عواصف رعدية: ابعد عن الأماكن المفتوحة، وخذ جاكيت مقاوم للمي.")
-    if max_pop >= 40 or rain_mm >= 1:
-        if rain_mm >= 10:
-            tips.append(f"☔ مطر غزير متوقع (~{rain_mm:.0f} ملم): جاكيت مقاوم للمي + حذاء ما بيتبلل، "
-                        "وانتبه من السيول وتجمّع المي بالشوارع.")
-        else:
-            tips.append(f"☔ خذ مظلة أو جاكيت مقاوم للمي (احتمال المطر {max_pop:.0f}%)، وحذاء ما بيتبلل.")
+        tips.append("⛈ عواصف رعدية: ابعد عن الأماكن المفتوحة.")
+    if rain_mm >= 10:
+        tips.append(f"☔ مطر غزير (~{rain_mm:.0f} ملم): جاكيت مقاوم للمي، وانتبه من السيول.")
+    elif max_pop >= RAIN_POP or rain_mm >= 1:
+        tips.append(f"☔ خذ مظلة (احتمال {max_pop:.0f}%).")
     elif max_pop >= 20:
-        tips.append(f"🌂 احتمال مطر خفيف ({max_pop:.0f}%): مظلة صغيرة بالشنطة ما بتضر.")
+        tips.append(f"🌂 احتمال مطر خفيف ({max_pop:.0f}%): مظلة صغيرة بالشنطة.")
 
-    # --- الهوا
     if gust >= 60:
-        tips.append(f"🌪 رياح قوية جداً (هبّات {gust:.0f} كم/س): البس جاكيت ثابت وابعد عن الأشياء الطايرة.")
+        tips.append(f"🌪 رياح قوية جداً (هبّات {gust:.0f} كم/س): جاكيت ثابت وابعد عن الأشياء الطايرة.")
     elif gust >= 40:
-        tips.append(f"💨 رياح قوية (هبّات {gust:.0f} كم/س): جاكيت بيصد الهوا بيفرق معك.")
+        tips.append(f"💨 رياح قوية (هبّات {gust:.0f} كم/س): جاكيت بيصد الهوا.")
 
-    # --- الشمس
     if uv >= 8:
-        tips.append(f"🕶 أشعة فوق بنفسجية عالية جداً ({uv:.0f}): واقي شمس ونظارة وكاب.")
+        tips.append(f"🕶 شمس قوية جداً ({uv:.0f}): واقي شمس + نظارة + كاب.")
     elif uv >= 6:
-        tips.append(f"🕶 أشعة قوية ({uv:.0f}): نظارة شمس وواقي شمس لو رح تكون برا كتير.")
+        tips.append(f"🕶 شمس قوية ({uv:.0f}): نظارة وواقي شمس.")
 
-    # --- الغبار
     if air["dust"] >= 100 or air["pm10"] >= 150:
-        tips.append("😷 غبار عالي بالجو: كمامة، وسكّر الشبابيك، وخفف الجهد برا لو عندك حساسية.")
+        tips.append("😷 غبار عالي: كمامة، وسكّر الشبابيك.")
 
     return tips
 
 
 # --------------------------------------------------------------------------- الرسالة
 
-def _segment(rows: list[dict], lo_h: int, hi_h: int, name: str) -> str | None:
-    seg = [r for r in rows if lo_h <= r["hour"] < hi_h]
-    if not seg:
-        return None
-    desc, icon = describe(worst_code(seg))
-    t = sum(r["temp"] for r in seg) / len(seg)
-    f = sum(r["feels"] for r in seg) / len(seg)
-    pop = max(r["pop"] for r in seg)
-    rain = f" · ☔ {pop:.0f}%" if pop >= 20 else ""
-    return f"• {name}: {t:.0f}° (محسوسة {f:.0f}°) {icon} {desc}{rain}"
+def rain_line(rs: dict) -> str:
+    parts = []
+    if rs["raining_now"]:
+        parts.append("عم تشتي هلأ")
+    elif rs["past_mm"] >= 0.2:
+        parts.append(f"شتّت اليوم (~{rs['past_mm']:.1f} ملم)")
+    if rs["ahead_from"] is not None:
+        span = fmt_hour(rs["ahead_from"])
+        if rs["ahead_to"] != rs["ahead_from"]:
+            span = f"{fmt_hour(rs['ahead_from'])} لـ {fmt_hour(rs['ahead_to'])}"
+        parts.append(f"مطر متوقع {span} (احتمال {rs['ahead_pop']:.0f}%)")
+    elif parts:
+        parts.append("وما في مطر كمان")
+    else:
+        parts.append("ما في مطر متوقع")
+    return "☔ " + " · ".join(parts)
 
 
 def build_message(data: dict, air: dict | None, place: str = DEFAULT_PLACE) -> str:
     cur, daily = data["current"], data["daily"]
     today = cur["time"][:10]
     rows = day_window(data)
-    air_s = air_summary(air, today)
-
+    tips = outfit_advice(rows, daily, air_summary(air, today))
     desc, icon = describe(int(_num(cur["weather_code"])))
+
     lines = [
-        f"{icon} <b>طقس {html.escape(place)}</b>",
+        f"<b>{html.escape(tips[0])}</b>",
         "",
-        f"🌡 هلأ: <b>{cur['temperature_2m']:.0f}°</b> (محسوسة {cur['apparent_temperature']:.0f}°) · {desc}",
-        f"📊 اليوم: من <b>{daily['temperature_2m_min'][0]:.0f}°</b> لـ <b>{daily['temperature_2m_max'][0]:.0f}°</b>",
-        f"💧 رطوبة {cur['relative_humidity_2m']:.0f}% · 💨 رياح {cur['wind_speed_10m']:.0f} كم/س "
-        f"(هبّات لحد {daily['wind_gusts_10m_max'][0]:.0f})",
+        f"{icon} هلأ <b>{cur['temperature_2m']:.0f}°</b> (محسوسة {cur['apparent_temperature']:.0f}°) · {desc}",
+        f"📊 اليوم {daily['temperature_2m_min'][0]:.0f}° – {daily['temperature_2m_max'][0]:.0f}°",
+        rain_line(rain_status(data)),
     ]
-    pop_max = _num(daily["precipitation_probability_max"][0])
-    rain_sum = _num(daily["precipitation_sum"][0])
-    if pop_max >= 20 or rain_sum >= 0.2:
-        lines.append(f"☔ احتمال المطر {pop_max:.0f}% (حوالي {rain_sum:.1f} ملم)")
-    else:
-        lines.append("☔ ما في مطر متوقع")
-
-    segs = [s for s in (
-        _segment(rows, 7, 12, "الصبح"),
-        _segment(rows, 12, 17, "الظهر والعصر"),
-        _segment(rows, 17, DAY_END + 1, "المسا"),
-    ) if s]
-    if segs:
-        lines += ["", "⏰ <b>خلال اليوم:</b>", *segs]
-
-    lines += ["", "👔 <b>شو تلبس؟</b>"]
-    lines += [html.escape(t) for t in outfit_advice(rows, daily, air_s)]
-    lines += ["", "<i>المصدر: Open-Meteo</i>"]
+    lines += [html.escape(t) for t in tips[1:]]
+    lines += ["", f"<i>{html.escape(place)} · Open-Meteo</i>"]
     return "\n".join(lines)
+
+
+def raw_dump(data: dict) -> str:
+    """ساعة بساعة، للتأكد إذا الأرقام منطقية."""
+    cur = data["current"]
+    out = [f"الآن {cur['time']}: temp={cur['temperature_2m']} feels={cur['apparent_temperature']} "
+           f"precip={cur['precipitation']} code={cur['weather_code']} wind={cur['wind_speed_10m']} "
+           f"gust={cur['wind_gusts_10m']}",
+           "hr  temp feels pop%  mm  code cloud% gust  uv"]
+    for r in _hourly_rows(data):
+        out.append(f"{r['hour']:02d} {r['temp']:5.1f} {r['feels']:5.1f} {r['pop']:4.0f} {r['rain']:4.1f} "
+                   f"{r['code']:4d} {r['cloud']:5.0f} {r['gust']:5.0f} {r['uv']:4.1f}")
+    out.append(f"daily: {json.dumps(data['daily'], ensure_ascii=False)}")
+    return "\n".join(out)
 
 
 # --------------------------------------------------------------------------- تيليغرام
@@ -277,6 +295,7 @@ def send_telegram(token: str, chat_id: str, text: str) -> None:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true", help="اطبع الرسالة بدون إرسال")
+    ap.add_argument("--raw", action="store_true", help="اطبع البيانات الخام ساعة بساعة")
     ap.add_argument("--from-json", help="اقرأ بيانات الطقس من ملف بدل الإنترنت (للتجربة)")
     args = ap.parse_args(argv)
 
@@ -291,6 +310,10 @@ def main(argv: list[str] | None = None) -> int:
     else:
         data = fetch_weather(lat, lon)
         air = fetch_air(lat, lon)
+
+    if args.raw:
+        print(raw_dump(data))
+        print()
 
     message = build_message(data, air, place)
     if args.dry_run:
