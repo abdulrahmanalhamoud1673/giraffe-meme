@@ -180,30 +180,6 @@ summary::after{content:"+";font-size:1.6rem;color:var(--green);font-weight:400;l
 details[open] summary::after{content:"–"}
 details p{color:var(--muted);padding:0 0 22px;max-width:62ch}
 
-.survey{background:var(--surface);border-block:1px solid var(--line)}
-.sv{display:grid;grid-template-columns:.8fr 1.2fr;gap:64px;align-items:start}
-.sv .side{position:sticky;top:24px}
-.sv .side h2{margin-bottom:14px}
-.sv .side p{color:var(--muted)}
-.prog{margin-top:26px;font-size:.9rem;color:var(--muted)}
-.prog div{height:4px;background:var(--line);margin-top:8px;border-radius:4px;overflow:hidden}
-.prog i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
-form,#qs{display:grid;gap:30px}
-fieldset{border:0;padding:0;margin:0;min-width:0}
-legend{font-weight:600;margin-bottom:10px;padding:0;font-size:1.04rem}
-.opts{display:flex;flex-wrap:wrap;gap:8px}
-.opts label{position:relative}
-.opts input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0;width:100%;height:100%}
-.opts span{display:inline-block;padding:10px 18px;border:1px solid var(--line);border-radius:6px;background:var(--bg);transition:.15s}
-.opts input:hover+span{border-color:var(--green)}
-.opts input:checked+span{background:var(--green);color:var(--on-green);border-color:var(--green)}
-.opts input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px}
-input[type=text]{width:100%;font:inherit;padding:14px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
-input[type=text].hp{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0;padding:0;border:0}
-.note{color:var(--muted);font-size:.9rem;margin-top:8px}
-.msg{min-height:1.5em;color:var(--red);font-weight:500}
-.done{border:1px solid var(--green);border-radius:10px;padding:30px}
-.done h3{font-size:1.6rem;margin-bottom:8px}
 
 .final{position:relative;overflow:hidden;text-align:center;color:#f4efe6;background:linear-gradient(180deg,#0c1311,#26140e);padding-block:110px}
 .final .band{position:absolute;inset-inline:0;top:0}
@@ -254,7 +230,7 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   <div class="wrap">
     <div class="nav">
       <a class="logo" href="#top" id="top"><svg><use href="#star"/></svg>يا نشمي</a>
-      <nav><a href="register.html">سجّل سيارتك</a><a href="#how">كيف بتشتغل</a><a href="#safe">الحماية</a><a href="#faq">أسئلة</a><a href="#survey">شاركنا رأيك</a></nav>
+      <nav><a href="register.html">سجّل سيارتك</a><a href="#how">كيف بتشتغل</a><a href="#safe">الحماية</a><a href="#faq">أسئلة</a></nav>
     </div>
     <div class="heroGrid">
       <div>
@@ -265,7 +241,7 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
           <a class="cta" href="register.html">احصل على ستيكرك
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
           </a>
-          <a class="cta ghost" href="#survey">شاركنا رأيك</a>
+          <a class="cta ghost" href="#how">كيف بتشتغل</a>
         </div>
         <ul class="trust">
           <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>بدون تطبيق</li>
@@ -362,7 +338,6 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <div><b>الجامعات والمولات</b><span>آلاف السيارات بمكان واحد.</span></div>
     <div><b>الشركات والأساطيل</b><span>سيارات كثيرة، وكل وحدة إلها رمز.</span></div>
   </div>
-  <p class="note" style="margin-top:22px">عندك مجمع أو شركة وبدك رموز لسياراتكم؟ اترك بياناتك آخر الاستبيان تحت.</p>
 </div></section>
 
 <section id="faq" style="padding-top:0"><div class="wrap">
@@ -375,29 +350,6 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <details><summary>كم بيكلّف؟</summary><p>التجربة هلأ مجانية. إذا صار في اشتراك أو سعر للستيكر بنعلمك قبل، وما بتدفع شي بدون ما توافق.</p></details>
     <details><summary>إذا ضاع رابط صندوق الرسائل؟</summary><p>الرابط هو مفتاحك، فاحفظه. إذا ضاع بتسجّل من جديد وبتاخذ رمز جديد. بنشتغل على طريقة أسهل لاسترجاعه.</p></details>
     <details><summary>هاي خدمة طوارئ؟</summary><p>لا. هي للتنبيه بين الناس فقط. للطوارئ الرسمية اتصل بالنجدة 911.</p></details>
-  </div>
-</div></section>
-
-<section class="survey" id="survey"><div class="wrap sv">
-  <div class="side">
-    <div class="eyebrow"><i></i>شاركنا رأيك</div>
-    <h2>تسع أسئلة، بدون اسم</h2>
-    <p>هاي فكرة جديدة بالأردن وبدنا نسمع منك. إجاباتك بتحدد إذا بنكمل وكيف.</p>
-    <div class="prog"><span id="ptxt">0 من 9</span><div><i id="pbar"></i></div></div>
-  </div>
-  <div>
-    <form id="f" novalidate>
-      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <div id="qs"></div>
-      <fieldset>
-        <legend>بدك تجرب أول ستيكرات مجاناً؟ اترك واتساب أو إيميل (اختياري)</legend>
-        <input type="text" id="contact" maxlength="120" inputmode="email" autocomplete="off">
-        <p class="note">نستخدمه فقط للتواصل معك عن التجربة، ونحذفه إذا طلبت.</p>
-      </fieldset>
-      <p class="msg" id="msg" role="alert"></p>
-      <button class="cta" type="submit" id="btn" style="justify-self:start;min-width:160px">إرسال</button>
-    </form>
-    <div class="done" id="done" hidden><h3>يعطيك العافية</h3><p>وصلت إجابتك. شارك الرابط مع أصحابك اللي معهم سيارات.</p></div>
   </div>
 </div></section>
 
@@ -416,49 +368,5 @@ footer .row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <footer><div class="wrap"><div class="row"><span>يا نشمي — صُنع في عمّان</span><span>yanashmi.com</span></div></div></footer>
 
-<script>
-const Q=[
- ['age','عمرك؟',[['under25','أقل من 25'],['25-34','25-34'],['35-44','35-44'],['45+','45+']]],
- ['city','وين ساكن؟',[['amman','عمّان'],['irbid','إربد'],['zarqa','الزرقاء'],['other','غيرها']]],
- ['has_car','معك سيارة؟',[['yes','نعم'],['no','لا']]],
- ['freq','كم مرة مسكّر عليك أحد أو مسكّرت على أحد؟',[['weekly','أسبوعياً'],['monthly','شهرياً'],['rarely','نادراً'],['never','ولا مرة']]],
- ['habit','إيش بتعمل عادة؟',[['honk','أزمّر'],['ask','أسأل بالمحل أو العمارة'],['note','أترك ورقة'],['wait','أنتظر'],['other','غير ذلك']]],
- ['would_use','لو في ستيكر QR يمسحه الشخص ويبعتلك رسالة جاهزة بدون ما يعرف رقمك، تستخدمه؟',[['sure','أكيد'],['probably','غالباً'],['maybe','ممكن'],['no','لا']]],
- ['sticker_price','كم مستعد تدفع للستيكر؟',[['0','ما بدفع'],['1-2','1-2 دينار'],['3-5','3-5 دنانير'],['5+','أكثر من 5']]],
- ['sub_price','كم مستعد تدفع سنوياً للإشعارات؟',[['0','ما بدفع'],['3-5','3-5 دنانير'],['5-10','5-10 دنانير'],['10+','أكثر من 10']]],
- ['worry','أكثر شي بيقلقك؟',[['privacy','خصوصية الرقم'],['spam','الإزعاج'],['adoption','الناس ما رح تستخدمه'],['other','غير ذلك']]],
-];
-const qs=document.getElementById('qs');
-for(const [k,t,o] of Q){
-  const fs=document.createElement('fieldset');
-  const lg=document.createElement('legend');lg.textContent=t;fs.appendChild(lg);
-  const d=document.createElement('div');d.className='opts';
-  for(const [v,l] of o){
-    const lab=document.createElement('label');
-    const i=document.createElement('input');i.type='radio';i.name=k;i.value=v;
-    const s=document.createElement('span');s.textContent=l;
-    lab.append(i,s);d.appendChild(lab);
-  }
-  fs.appendChild(d);qs.appendChild(fs);
-}
-const f=document.getElementById('f'),msg=document.getElementById('msg'),btn=document.getElementById('btn');
-function progress(){
-  const n=Q.filter(([k])=>f.querySelector('input[name='+k+']:checked')).length;
-  document.getElementById('ptxt').textContent=n+' من '+Q.length;
-  document.getElementById('pbar').style.width=(100*n/Q.length)+'%';
-}
-f.addEventListener('change',progress);
-f.addEventListener('submit',async e=>{
-  e.preventDefault();msg.textContent='';
-  const body={website:f.website.value,contact:document.getElementById('contact').value};
-  for(const [k] of Q){const c=f.querySelector('input[name='+k+']:checked');if(!c){msg.textContent='لسا في سؤال ما جاوبته.';return}body[k]=c.value}
-  btn.disabled=true;
-  try{
-    const r=await fetch('/api/survey',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
-    if(!r.ok)throw 0;
-    f.hidden=true;document.getElementById('done').hidden=false;
-  }catch(_){msg.textContent='صار خطأ، جرب كمان مرة.';btn.disabled=false}
-});
-</script>
 </body>
 </html>

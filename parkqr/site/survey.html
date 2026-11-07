@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<title>استبيان — يا نشمي</title>
+<meta name="robots" content="noindex">
+<style>
+#qs{display:grid;gap:28px}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{font-weight:600;margin-bottom:10px;padding:0;font-size:1.04rem}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{position:relative}
+.opts input{position:absolute;inset:0;opacity:0;cursor:pointer;margin:0;width:100%;height:100%}
+.opts span{display:inline-block;padding:10px 18px;border:1px solid var(--line);border-radius:8px;background:var(--surface);transition:.15s}
+.opts input:hover+span{border-color:var(--green)}
+.opts input:checked+span{background:var(--green);color:var(--on-green);border-color:var(--green)}
+.opts input:focus-visible+span{outline:2px solid var(--green);outline-offset:2px}
+.prog{margin:0 0 26px;font-size:.9rem;color:var(--muted)}
+.prog div{height:4px;background:var(--line);margin-top:8px;border-radius:4px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--green);transition:width .3s}
+.done{border:1px solid var(--green);background:var(--soft-green);border-radius:12px;padding:28px}
+.done h2{margin-bottom:8px}
+</style>
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><a class="logo" href="index.html">يا نشمي</a><a class="back" href="index.html">الرئيسية</a></header>
+  <main>
+    <h1>تسع أسئلة، بدون اسم</h1>
+    <p class="lead">فكرة جديدة بالأردن وبدنا نسمع منك. إجاباتك بتحدد إذا بنكمل وكيف.</p>
+    <div class="prog"><span id="ptxt">0 من 9</span><div><i id="pbar"></i></div></div>
+    <form id="f" novalidate>
+      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div id="qs"></div>
+      <fieldset>
+        <legend>بدك تجرب أول ستيكرات مجاناً؟ اترك واتساب أو إيميل (اختياري)</legend>
+        <input type="text" id="contact" maxlength="120" inputmode="email" autocomplete="off">
+        <p class="note" style="margin-top:8px">نستخدمه فقط للتواصل معك عن التجربة، ونحذفه إذا طلبت.</p>
+      </fieldset>
+      <p class="err" id="msg" role="alert"></p>
+      <button class="cta" type="submit" id="btn" style="justify-self:start;min-width:160px">إرسال</button>
+    </form>
+    <div class="done" id="done" hidden><h2>يعطيك العافية</h2><p>وصلت إجابتك. شارك الرابط مع أصحابك اللي معهم سيارات.</p></div>
+  </main>
+</div>
+<script>
+const Q=[
+ ['age','عمرك؟',[['under25','أقل من 25'],['25-34','25-34'],['35-44','35-44'],['45+','45+']]],
+ ['city','وين ساكن؟',[['amman','عمّان'],['irbid','إربد'],['zarqa','الزرقاء'],['other','غيرها']]],
+ ['has_car','معك سيارة؟',[['yes','نعم'],['no','لا']]],
+ ['freq','كم مرة مسكّر عليك أحد أو مسكّرت على أحد؟',[['weekly','أسبوعياً'],['monthly','شهرياً'],['rarely','نادراً'],['never','ولا مرة']]],
+ ['habit','إيش بتعمل عادة؟',[['honk','أزمّر'],['ask','أسأل بالمحل أو العمارة'],['note','أترك ورقة'],['wait','أنتظر'],['other','غير ذلك']]],
+ ['would_use','لو في ستيكر QR يمسحه الشخص ويبعتلك رسالة جاهزة بدون ما يعرف رقمك، تستخدمه؟',[['sure','أكيد'],['probably','غالباً'],['maybe','ممكن'],['no','لا']]],
+ ['sticker_price','كم مستعد تدفع للستيكر؟',[['0','ما بدفع'],['1-2','1-2 دينار'],['3-5','3-5 دنانير'],['5+','أكثر من 5']]],
+ ['sub_price','كم مستعد تدفع سنوياً للإشعارات؟',[['0','ما بدفع'],['3-5','3-5 دنانير'],['5-10','5-10 دنانير'],['10+','أكثر من 10']]],
+ ['worry','أكثر شي بيقلقك؟',[['privacy','خصوصية الرقم'],['spam','الإزعاج'],['adoption','الناس ما رح تستخدمه'],['other','غير ذلك']]],
+];
+const qs=document.getElementById('qs');
+for(const [k,t,o] of Q){
+  const fs=document.createElement('fieldset');
+  const lg=document.createElement('legend');lg.textContent=t;fs.appendChild(lg);
+  const d=document.createElement('div');d.className='opts';
+  for(const [v,l] of o){
+    const lab=document.createElement('label');
+    const i=document.createElement('input');i.type='radio';i.name=k;i.value=v;
+    const s=document.createElement('span');s.textContent=l;
+    lab.append(i,s);d.appendChild(lab);
+  }
+  fs.appendChild(d);qs.appendChild(fs);
+}
+const f=document.getElementById('f'),msg=document.getElementById('msg'),btn=document.getElementById('btn');
+function progress(){
+  const n=Q.filter(([k])=>f.querySelector('input[name='+k+']:checked')).length;
+  document.getElementById('ptxt').textContent=n+' من '+Q.length;
+  document.getElementById('pbar').style.width=(100*n/Q.length)+'%';
+}
+f.addEventListener('change',progress);
+f.addEventListener('submit',async e=>{
+  e.preventDefault();msg.textContent='';
+  const body={website:f.website.value,contact:document.getElementById('contact').value};
+  for(const [k] of Q){const c=f.querySelector('input[name='+k+']:checked');if(!c){msg.textContent='لسا في سؤال ما جاوبته.';return}body[k]=c.value}
+  btn.disabled=true;
+  try{
+    const r=await fetch('/api/survey',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok)throw 0;
+    f.hidden=true;document.querySelector('.prog').hidden=true;document.getElementById('done').hidden=false;
+  }catch(_){msg.textContent='صار خطأ، جرب كمان مرة.';btn.disabled=false}
+});
+</script>
+</body>
+</html>

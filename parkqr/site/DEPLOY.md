@@ -20,7 +20,8 @@
 المشروع ← **Custom domains** ← **Set up a domain** ← `yanashmi.com`. (الدومين عندك على Cloudflare فبيربط تلقائياً.)
 
 ## 5) نتائج الاستبيان
-افتح `https://yanashmi.com/results.html` وأدخل `ADMIN_KEY`. الهدف: أكثر من 40% "أكيد/غالباً".
+الاستبيان بصفحة منفصلة غير مربوطة بالموقع: `https://yanashmi.com/survey.html` (ابعت رابطه لمين بدك).
+النتائج: افتح `https://yanashmi.com/results.html` وأدخل `ADMIN_KEY`. الهدف: أكثر من 40% "أكيد/غالباً".
 
 ## 6) تجربة الرحلة كاملة (بعد النشر)
 1. افتح `yanashmi.com/register.html` من موبايلك وسجّل. بيطلعلك رمز QR وصندوق رسائل.
