@@ -1,0 +1,29 @@
+name: Weather bot
+
+on:
+  schedule:
+    # 06:30 بتوقيت عمان (UTC+3 ثابت). GitHub ممكن يأخّره كم دقيقة.
+    - cron: "30 3 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tests
+        working-directory: weather-bot
+        run: python -m unittest
+      - name: Send weather message
+        working-directory: weather-bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          LAT: ${{ vars.LAT }}
+          LON: ${{ vars.LON }}
+          PLACE_NAME: ${{ vars.PLACE_NAME }}
+        run: python weather_bot.py
