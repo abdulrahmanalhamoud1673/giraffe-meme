@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>يا نشمي</title>
+<meta name="description" content="ستيكر QR على سيارتك: اللي مسكّر عليك يرسلك رسالة جاهزة بدون ما يعرف رقمك.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;600&family=Readex+Pro:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* Concept: a calm, road-sign-clear page. Dark asphalt + one Jordanian green, red only for the call to action. */
+:root{
+  --bg:#f6f7f5; --card:#ffffff; --fg:#16201b; --muted:#5d6b63; --line:#dde3de;
+  --accent:#0a6b46; --accent-fg:#ffffff; --alert:#c8102e; --chip:#eef2ee;
+  --display:'Readex Pro','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --body:'IBM Plex Sans Arabic',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1512; --card:#171f1b; --fg:#eaf1ec; --muted:#9bada3; --line:#27332d;
+  --accent:#3ecf8e; --accent-fg:#06281a; --alert:#ff5a70; --chip:#1f2a24; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1512; --card:#171f1b; --fg:#eaf1ec; --muted:#9bada3; --line:#27332d;
+  --accent:#3ecf8e; --accent-fg:#06281a; --alert:#ff5a70; --chip:#1f2a24; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);line-height:1.75;font-size:17px}
+main{max-width:620px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+h1,h2{font-family:var(--display);line-height:1.35;text-wrap:balance;margin:0}
+h1{font-size:2rem}
+h2{font-size:1.35rem;margin-bottom:12px}
+.brand{font-family:var(--display);font-weight:700;color:var(--accent);margin-bottom:20px}
+.lead{color:var(--muted);margin:10px 0 24px}
+.demo{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.demo svg{width:84px;height:84px;display:block}
+.bubble{background:var(--chip);border-radius:14px;padding:10px 14px;font-size:.95rem}
+.bubble small{display:block;color:var(--muted);margin-top:2px}
+.steps{display:grid;gap:12px;margin:28px 0 36px;padding:0;list-style:none}
+.steps li{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.steps b{display:block;font-family:var(--display)}
+form,#qs{display:grid;gap:22px;margin-top:8px}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+legend{font-weight:600;margin-bottom:8px;padding:0}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts label{position:relative}
+.opts input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.opts span{display:inline-block;padding:8px 14px;border-radius:99px;background:var(--chip);border:1px solid var(--line)}
+.opts input:checked+span{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.opts input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+input[type=text]{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+input[type=text].hp{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);opacity:0}
+button.send{font:inherit;font-weight:600;background:var(--alert);color:#fff;border:0;border-radius:14px;padding:14px;cursor:pointer}
+button.send:disabled{opacity:.6}
+.msg{min-height:1.5em;color:var(--alert)}
+.done{background:var(--card);border:1px solid var(--accent);border-radius:16px;padding:20px}
+.note{color:var(--muted);font-size:.9rem}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">يا نشمي</div>
+  <h1>مسكّر عليك أحد؟ أو مسكّرت على أحد؟</h1>
+  <p class="lead">ستيكر QR على زجاج السيارة. اللي مسكّر عليك بيمسحه ويختار رسالة جاهزة، وبتوصلك فوراً. رقمك ما بيظهر لأي حدا، ومافي كتابة حرّة، فما في مسبّات ولا إزعاج.</p>
+
+  <div class="demo" aria-label="مثال على الرسالة">
+    <svg viewBox="0 0 21 21" role="img" aria-label="رمز QR تجريبي" shape-rendering="crispEdges">
+      <rect width="21" height="21" fill="#fff"/>
+      <g fill="#16201b">
+        <path d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"/>
+      </g>
+      <g fill="#fff"><path d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"/></g>
+      <g fill="#16201b"><path d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM9 1h2v2H9zM9 5h3v2H9zM8 9h2v2H8zM12 9h3v2h-3zM16 11h3v2h-3zM9 13h3v2H9zM13 14h2v3h-2zM17 15h3v2h-3zM9 18h4v2H9zM17 19h3v1h-3z"/></g>
+    </svg>
+    <div class="bubble">🚗 سيارتك مسكّرة عليّ، ممكن تحرّكها؟<small>رد صاحب السيارة: جاي خلال دقيقتين</small></div>
+  </div>
+
+  <ol class="steps">
+    <li><b>مسح</b>اللي مسكّر عليك يمسح الـ QR، بدون تسجيل.</li>
+    <li><b>رسالة جاهزة</b>يختار من قائمة ثابتة. ما بيقدر يكتب شي.</li>
+    <li><b>رد سريع</b>بتوصلك على واتساب وبتردّ بضغطة، وهو بيشوف ردّك.</li>
+  </ol>
+
+  <section id="survey">
+    <h2>ساعدنا بدقيقتين</h2>
+    <p class="lead">هاي فكرة جديدة بالأردن وبدنا نعرف رأيك قبل ما نطلقها. الإجابات بدون اسم.</p>
+    <form id="f" novalidate>
+      <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <div id="qs"></div>
+      <fieldset>
+        <legend>بدك تجرب أول ستيكرات مجاناً؟ اترك واتساب أو إيميل (اختياري)</legend>
+        <input type="text" id="contact" maxlength="120" inputmode="email" autocomplete="off">
+        <p class="note">بنستخدمه بس لنتواصل معك عن التجربة، وبنحذفه إذا طلبت.</p>
+      </fieldset>
+      <p class="msg" id="msg" role="alert"></p>
+      <button class="send" type="submit" id="btn">إرسال</button>
+    </form>
+    <div class="done" id="done" hidden><h2>يعطيك العافية 🙏</h2><p>وصلت إجابتك. شارك الرابط مع أصحابك اللي معهم سيارات.</p></div>
+  </section>
+</main>
+<script>
+const Q=[
+ ['age','عمرك؟',[['under25','أقل من 25'],['25-34','25-34'],['35-44','35-44'],['45+','45+']]],
+ ['city','وين ساكن؟',[['amman','عمّان'],['irbid','إربد'],['zarqa','الزرقاء'],['other','غيرها']]],
+ ['has_car','معك سيارة؟',[['yes','نعم'],['no','لا']]],
+ ['freq','كم مرة مسكّر عليك أحد أو مسكّرت على أحد؟',[['weekly','أسبوعياً'],['monthly','شهرياً'],['rarely','نادراً'],['never','ولا مرة']]],
+ ['habit','إيش بتعمل عادة؟',[['honk','أزمّر'],['ask','أسأل بالمحل أو العمارة'],['note','أترك ورقة'],['wait','أنتظر'],['other','غير ذلك']]],
+ ['would_use','لو في ستيكر QR يمسحه الشخص ويبعتلك رسالة جاهزة بدون ما يعرف رقمك، تستخدمه؟',[['sure','أكيد'],['probably','غالباً'],['maybe','ممكن'],['no','لا']]],
+ ['sticker_price','كم مستعد تدفع للستيكر؟',[['0','ما بدفع'],['1-2','1-2 دينار'],['3-5','3-5 دنانير'],['5+','أكثر من 5']]],
+ ['sub_price','كم مستعد تدفع سنوياً للإشعارات؟',[['0','ما بدفع'],['3-5','3-5 دنانير'],['5-10','5-10 دنانير'],['10+','أكثر من 10']]],
+ ['worry','أكثر شي بيقلقك؟',[['privacy','خصوصية الرقم'],['spam','الإزعاج'],['adoption','الناس ما رح تستخدمه'],['other','غير ذلك']]],
+];
+const qs=document.getElementById('qs');
+for(const [k,t,o] of Q){
+  const fs=document.createElement('fieldset');
+  const lg=document.createElement('legend');lg.textContent=t;fs.appendChild(lg);
+  const d=document.createElement('div');d.className='opts';
+  for(const [v,l] of o){
+    const lab=document.createElement('label');
+    const i=document.createElement('input');i.type='radio';i.name=k;i.value=v;
+    const s=document.createElement('span');s.textContent=l;
+    lab.append(i,s);d.appendChild(lab);
+  }
+  fs.appendChild(d);qs.appendChild(fs);
+}
+const f=document.getElementById('f'),msg=document.getElementById('msg'),btn=document.getElementById('btn');
+f.addEventListener('submit',async e=>{
+  e.preventDefault();msg.textContent='';
+  const body={website:f.website.value,contact:document.getElementById('contact').value};
+  for(const [k] of Q){const c=f.querySelector('input[name='+k+']:checked');if(!c){msg.textContent='لسا في سؤال ما جاوبته.';return}body[k]=c.value}
+  btn.disabled=true;
+  try{
+    const r=await fetch('/api/survey',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok)throw 0;
+    f.hidden=true;document.getElementById('done').hidden=false;
+  }catch(_){msg.textContent='صار خطأ، جرب كمان مرة.';btn.disabled=false}
+});
+</script>
+</body>
+</html>
