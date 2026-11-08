@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=20261108b">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <meta name="theme-color" content="#0b0d0c">
 <title>سجّل سيارتك — يا نشمي</title>
@@ -119,8 +119,8 @@ body{background:
     <button class="x" id="saveClose" type="button">إغلاق</button>
   </div>
 </div>
-<script src="qr.js"></script>
-<script src="shared.js"></script>
+<script src="qr.js?v=20261108b"></script>
+<script src="shared.js?v=20261108b"></script>
 <script>
 const $=id=>document.getElementById(id);
 const f=$('f'),err=$('err'),btn=$('btn');
@@ -178,32 +178,39 @@ $('saveClose').onclick=closeSheet;
 $('saveSheet').addEventListener('click',e=>{if(e.target.id==='saveSheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('saveSheet').hidden)closeSheet()});
 // Builds the 800x1000 sticker picture, then shows it with a real download link (a plain tap is the most reliable way to save on phones).
-async function makeStickerPng(token){
+async function makeStickerPng(token,step){
   const W=800,H=1000,c=document.createElement('canvas');c.width=W;c.height=H;
-  const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
+  step.v='canvas';const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
   for(let i=0;i<W/20;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?'#b3122a':'#fff';x.fillRect(i*20,j*20,20,20)}
-  const img=new Image();const url=URL.createObjectURL(new Blob([qrSvg(scanUrl(token))],{type:'image/svg+xml'}));
-  await new Promise((ok,no)=>{img.onload=ok;img.onerror=()=>no(new Error('qr image'));img.src=url});
-  x.drawImage(img,80,90,640,640);URL.revokeObjectURL(url);
-  try{await document.fonts.load('700 64px "Reem Kufi"')}catch(_){}
-  x.fillStyle='#15120f';x.textAlign='center';x.direction='rtl';
+  // QR drawn module by module (no SVG image decoding, which is what failed on some phones)
+  step.v='qr';const rows=qrMatrix(scanUrl(token)),n=rows.length,m=2,total=n+2*m,size=640,ox=80,oy=90;
+  x.fillStyle='#fff';x.fillRect(ox,oy,size,size);x.fillStyle='#15120f';
+  for(let r=0;r<n;r++)for(let q=0;q<n;q++)if(rows[r][q]){
+    const x0=Math.floor(ox+(q+m)*size/total),x1=Math.floor(ox+(q+m+1)*size/total),y0=Math.floor(oy+(r+m)*size/total),y1=Math.floor(oy+(r+m+1)*size/total);
+    x.fillRect(x0,y0,x1-x0,y1-y0);
+  }
+  step.v='font';
+  try{await Promise.race([document.fonts.load('700 64px "Reem Kufi"'),new Promise(r=>setTimeout(r,1500))])}catch(_){}
+  step.v='text';x.fillStyle='#15120f';x.textAlign='center';x.direction='rtl';
   x.font='700 72px "Reem Kufi",sans-serif';x.fillText('يا نشمي',W/2,840);
   x.fillStyle='#625b51';x.font='400 34px "IBM Plex Sans Arabic",sans-serif';x.fillText('مسكّر عليّ؟ امسح الرمز',W/2,910);
-  return await new Promise((ok,no)=>c.toBlob(b=>b?ok(b):no(new Error('png')),'image/png'));
+  step.v='export';
+  const blob=await new Promise(ok=>{try{c.toBlob(b=>ok(b),'image/png')}catch(_){ok(null)}});
+  if(blob)return {url:URL.createObjectURL(blob),revoke:true};
+  return {url:c.toDataURL('image/png'),revoke:false};   // fallback when toBlob gives nothing
 }
 $('pngBtn').onclick=async()=>{
-  const b=$('pngBtn');b.disabled=true;
+  const btn=$('pngBtn');btn.disabled=true;const step={v:'start'};
   try{
-    const blob=await makeStickerPng(window.__reg.token);
-    const u=URL.createObjectURL(blob);
-    $('saveImg').src=u;$('saveImg').dataset.url=u;$('saveLink').href=u;
+    const r=await makeStickerPng(window.__reg.token,step);
+    $('saveImg').src=r.url;$('saveImg').dataset.url=r.revoke?r.url:'';$('saveLink').href=r.url;
     $('saveNote').textContent='إذا ما نزلت، اضغط مطوّلاً على الصورة واختر «حفظ».';
     $('saveLink').hidden=false;$('saveSheet').hidden=false;
-  }catch(_){
+  }catch(e){
     $('saveImg').removeAttribute('src');$('saveLink').hidden=true;
-    $('saveNote').textContent='ما قدرنا نجهز الصورة. استخدم زر «اطبع»، أو صوّر الشاشة.';$('saveSheet').hidden=false;
+    $('saveNote').textContent='ما قدرنا نجهز الصورة ('+step.v+(e&&e.message?': '+e.message:'')+'). استخدم زر «اطبع»، أو صوّر الشاشة.';$('saveSheet').hidden=false;
   }
-  b.disabled=false;
+  btn.disabled=false;
 };
 </script>
 </body>

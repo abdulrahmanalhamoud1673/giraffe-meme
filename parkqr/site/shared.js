@@ -128,6 +128,12 @@ function ago(ts) {
 function scanUrl(token) {
   return window.SCAN_URL ? window.SCAN_URL(token) : location.origin + '/c?t=' + token;
 }
+function qrMatrix(text) {
+  const q = qrcode(0, 'M'); q.addData(text); q.make();
+  const n = q.getModuleCount(), rows = [];
+  for (let r = 0; r < n; r++) { const row = []; for (let c = 0; c < n; c++) row.push(q.isDark(r, c)); rows.push(row); }
+  return rows;
+}
 function qrSvg(text) {
   const q = qrcode(0, 'M'); q.addData(text); q.make();
   const n = q.getModuleCount(), m = 2; let d = '';
