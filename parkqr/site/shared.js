@@ -70,8 +70,13 @@ function validateName(raw) {
   return null;
 }
 
+// Arabic keyboards type ٠١٢٣٤٥٦٧٨٩ (and Persian ۰۱۲۳۴۵۶۷۸۹): turn them into 0-9.
+function toAsciiDigits(s) {
+  return String(s == null ? '' : s).replace(/[\u0660-\u0669\u06F0-\u06F9]/g, (d) => String(d.charCodeAt(0) & 15));
+}
+
 function normalizeJoPhone(input) {
-  const digits = String(input || '').replace(/[\s\-()]/g, '');
+  const digits = toAsciiDigits(input).replace(/[\s\-()]/g, '');
   const m = digits.match(/^(?:\+?962|0)?(7[789]\d{7})$/);   // Zain 077, Orange 078, Umniah 079
   return m ? '+962' + m[1] : null;
 }

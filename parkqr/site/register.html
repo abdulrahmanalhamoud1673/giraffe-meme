@@ -139,9 +139,11 @@ function showError(code,fallback){
   else if(field==='phone'){$('e-phone').textContent=msg;$('phoneBox').setAttribute('aria-invalid','true');$('phone').focus()}
   else err.textContent=msg;
 }
-// "0795586668", "795586668", "+962 79 558 6668" all become 795586668
-function nationalDigits(s){let d=String(s||'').replace(/\D/g,'');if(d.startsWith('962'))d=d.slice(3);return d.replace(/^0+/,'')}
+// "0795586668", "٠٧٩٥٥٨٦٦٦٨" (Arabic keyboard), "795586668", "+962 79 558 6668" all become 795586668
+function nationalDigits(s){let d=toAsciiDigits(s).replace(/\D/g,'');if(d.startsWith('962'))d=d.slice(3);return d.replace(/^0+/,'')}
 
+// Arabic keyboards type Arabic-Indic digits: show them as 0-9 while typing (same length, so the cursor stays put)
+$('phone').addEventListener('input',e=>{const el=e.target,v=el.value,w=toAsciiDigits(v);if(v!==w){const i=el.selectionStart;el.value=w;try{el.setSelectionRange(i,i)}catch(_){}}});
 function show(token,key){
   $('formView').hidden=true;$('doneView').hidden=false;window.scrollTo(0,0);
   $('qr').innerHTML=qrSvg(scanUrl(token));

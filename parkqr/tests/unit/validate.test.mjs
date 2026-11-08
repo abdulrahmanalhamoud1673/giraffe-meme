@@ -16,12 +16,14 @@ const badNames = {
 for (const [bad, code] of Object.entries(badNames)) check('reject name "' + bad.slice(0, 20) + '" -> ' + code, V.validateName(bad) === code);
 
 // ---- phones
-for (const good of ['0795551234', '+962795551234', '962 79 555 1234', '0777123987', '078-612-3987', '(079) 4412 906'])
+for (const good of ['0795551234', '+962795551234', '962 79 555 1234', '0777123987', '078-612-3987', '(079) 4412 906', '٠٧٩٥٥٨٦٦٦٥', '+٩٦٢٧٩٥٥٨٦٦٦٥', '۰۷۹۵۵۸۶۶۶۵', '٠٧٩ ٥٥٨ ٦٦٦٥', '079٥٥٨٦٦٦٥'])
   check('accept phone ' + good, !!V.validatePhone(good).phone);
-const badPhones = { '12345': 'bad_phone', '0701234567': 'bad_phone', '0651234567': 'bad_phone', '079555123': 'bad_phone', '07955512345': 'bad_phone', 'abc': 'bad_phone', '': 'bad_phone',
+const badPhones = { '٠٧٧٧٧٧٧٧٧٧': 'fake_phone', '٠٧٠١٢٣٤٥٦٧': 'bad_phone', '12345': 'bad_phone', '0701234567': 'bad_phone', '0651234567': 'bad_phone', '079555123': 'bad_phone', '07955512345': 'bad_phone', 'abc': 'bad_phone', '': 'bad_phone',
   '0777777777': 'fake_phone', '0799999999': 'fake_phone', '0797979797': 'fake_phone', '0791234567': 'fake_phone', '0797654321': 'fake_phone', '0790000000': 'fake_phone', '0781111112': 'fake_phone' };
 for (const [bad, code] of Object.entries(badPhones)) check('reject phone ' + bad + ' -> ' + code, V.validatePhone(bad).error === code);
 check('phone normalised to +962', V.validatePhone('0795551234').phone === '+962795551234');
+check('Arabic-Indic digits give the same number', V.validatePhone('٠٧٩٥٥٨٦٦٦٥').phone === V.validatePhone('0795586665').phone && V.validatePhone('0795586665').phone === '+962795586665');
+check('toAsciiDigits converts both digit sets', V.toAsciiDigits('٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹ab12') === '01234567890123456789ab12');
 
 // ---- parity: the browser copy in shared.js must be exactly the server rules
 const shared = fs.readFileSync(SITE + 'shared.js', 'utf8');
