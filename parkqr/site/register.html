@@ -8,111 +8,159 @@
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
 <link rel="icon" type="image/png" href="/icon-192.png">
+<meta name="theme-color" content="#0b0d0c">
 <title>سجّل سيارتك — يا نشمي</title>
 <meta name="robots" content="noindex">
+<style>
+/* Registration: one short card. The same page turns into the "your code" view after submitting. */
+body{background:
+  radial-gradient(70% 40% at 80% 0%,color-mix(in srgb,var(--green) 14%,transparent),transparent 70%),
+  radial-gradient(60% 40% at 0% 100%,color-mix(in srgb,var(--red) 10%,transparent),transparent 70%),var(--bg)}
+.reg{max-width:460px;margin:0 auto;padding-inline:max(18px,env(safe-area-inset-right,0px)) max(18px,env(safe-area-inset-left,0px))}
+.reg main{padding-block:6px 56px}
+.reg h1{font-size:clamp(1.9rem,7vw,2.4rem);margin-top:6px}
+.reg .sub{color:var(--muted);margin:6px 0 20px;font-size:1.02rem}
+.card-form{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 24px 50px -30px rgba(0,0,0,.45)}
+.card-form form{gap:14px}
+.fld{display:grid;gap:6px;min-width:0}
+.fld>label{font-size:.88rem;font-weight:600;color:var(--muted)}
+.fld input{height:52px;padding:0 14px;border-radius:12px;font-size:1.05rem}
+.fld input::placeholder{color:color-mix(in srgb,var(--muted) 65%,transparent)}
+.fld input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--soft-green)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.phone{display:flex;direction:ltr;border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.phone:focus-within{border-color:var(--green);box-shadow:0 0 0 3px var(--soft-green)}
+.phone[aria-invalid="true"]{border-color:var(--red);box-shadow:0 0 0 3px var(--soft-red)}
+.phone .cc{display:grid;place-items:center;padding:0 14px;background:var(--bubble);color:var(--ink);font-weight:600;border-inline-end:1px solid var(--line)}
+.phone input{border:0;border-radius:0;flex:1;min-width:0;height:52px;letter-spacing:.04em;box-shadow:none!important;background:transparent}
+.ferr{min-height:0;margin:0;color:var(--red);font-size:.86rem;font-weight:500}
+.ferr:empty{display:none}
+.cons{display:flex;gap:10px;align-items:center;font-size:.92rem;color:var(--muted);cursor:pointer;line-height:1.5}
+.cons input{width:20px;height:20px;accent-color:var(--green);flex:none}
+.go{height:56px;border-radius:14px;font-size:1.1rem;width:100%}
+.trust{display:flex;align-items:center;justify-content:center;gap:8px;color:var(--muted);font-size:.85rem;margin-top:12px}
+.trust svg{width:15px;height:15px;color:var(--green)}
+/* done view */
+.done-head{display:flex;align-items:center;gap:10px;margin:4px 0 4px}
+.done-head .tick{width:34px;height:34px;border-radius:50%;background:var(--green);color:var(--on-green);display:grid;place-items:center;flex:none}
+.done-head .tick svg{width:20px;height:20px}
+.done-card{display:grid;gap:14px;justify-items:stretch}
+.done-card .sticker{width:min(230px,70%)}
+.bell-cta{display:flex;align-items:center;gap:12px;background:var(--red);color:#fff;text-decoration:none;border-radius:16px;padding:14px 16px}
+.bell-cta .bi{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+.bell-cta .bi svg{width:24px;height:24px}
+.bell-cta b{display:block;font-size:1.08rem;line-height:1.4}
+.bell-cta small{display:block;opacity:.88;font-size:.84rem;line-height:1.4}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.acts button{display:grid;justify-items:center;gap:4px;padding:12px 6px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.88rem;cursor:pointer}
+.acts button svg{width:22px;height:22px;color:var(--green)}
+.acts button:hover{border-color:var(--green)}
+.keynote{display:flex;gap:10px;align-items:flex-start;font-size:.85rem;color:var(--muted);line-height:1.55;padding:12px 14px;border:1px dashed var(--line);border-radius:14px}
+.keynote svg{width:18px;height:18px;flex:none;margin-top:3px;color:var(--gold)}
+@media (max-width:360px){.row2{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 <div class="band" aria-hidden="true"></div>
-<div class="wrap">
+<div class="reg">
   <header class="top"><a class="logo" href="index.html">يا نشمي</a><a class="back" href="index.html">الرئيسية</a></header>
   <main>
-    <ol class="crumbs" id="crumbs"><li class="on" id="c1"><b>1</b>بياناتك</li><li id="c2"><b>2</b>رمزك</li><li id="c3"><b>3</b>اطبعه</li></ol>
-
     <section id="formView">
-      <h1>احصل على ستيكرك</h1>
-      <p class="lead">ثلاث خانات وبيطلعلك رمز QR خاص بسيارتك. إذا حدا احتاجك، بتوصلك رسالته بدون ما يعرف رقمك.</p>
-      <form id="f" novalidate>
-        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <fieldset class="f2">
-          <legend>اسمك الحقيقي</legend>
-          <small>اسمك الأول واسم العائلة، مثل: أحمد الخطيب. بنحفظه بس لنتأكد إنك صاحب السيارة، وما بيظهر لأي حدا.</small>
-          <div class="pair">
-            <input type="text" id="first" maxlength="30" autocomplete="given-name" placeholder="الاسم الأول" aria-label="الاسم الأول" required>
-            <input type="text" id="last" maxlength="30" autocomplete="family-name" placeholder="اسم العائلة" aria-label="اسم العائلة" required>
+      <h1>سجّل سيارتك</h1>
+      <p class="sub">دقيقة وبتاخذ رمزك الخاص.</p>
+      <div class="card-form">
+        <form id="f" novalidate>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="row2">
+            <div class="fld"><label for="first">الاسم الأول</label><input type="text" id="first" maxlength="30" autocomplete="given-name" placeholder="أحمد" required><p class="ferr" id="e-first" role="alert"></p></div>
+            <div class="fld"><label for="last">اسم العائلة</label><input type="text" id="last" maxlength="30" autocomplete="family-name" placeholder="الخطيب" required></div>
           </div>
-        </fieldset>
-        <label class="f">وصف السيارة (اختياري)
-          <small>مثلاً: تويوتا بيضاء. بيظهر للي بيمسح الرمز عشان يتأكد إنها السيارة الصح.</small>
-          <input type="text" id="nickname" maxlength="60">
-        </label>
-        <label class="f">رقم الموبايل
-          <small>رقم أردني حقيقي (077 أو 078 أو 079). ما بيظهر أبداً.</small>
-          <input type="tel" id="phone" inputmode="tel" autocomplete="tel" placeholder="079xxxxxxx" dir="ltr" style="text-align:right" required>
-        </label>
-        <label class="consent"><input type="checkbox" id="consent"><span>موافق إنكم تحفظوا اسمي ورقمي لغرض إرسال التنبيهات فقط، وبقدر أطلب حذفهم بأي وقت.</span></label>
-        <p class="err" id="err" role="alert"></p>
-        <button class="cta" type="submit" id="btn" style="justify-self:start;min-width:180px">احصل على الرمز</button>
-      </form>
+          <div class="fld"><label for="phone">رقم الموبايل</label>
+            <div class="phone" id="phoneBox"><span class="cc">+962</span><input type="tel" id="phone" inputmode="numeric" autocomplete="tel-national" placeholder="7X XXX XXXX" maxlength="22" required></div>
+            <p class="ferr" id="e-phone" role="alert"></p></div>
+          <div class="fld"><label for="nickname">وصف السيارة <span style="font-weight:400">(اختياري)</span></label><input type="text" id="nickname" maxlength="40" placeholder="تويوتا بيضاء"></div>
+          <label class="cons"><input type="checkbox" id="consent"><span>أوافق على حفظ اسمي ورقمي لإرسال التنبيهات فقط.</span></label>
+          <p class="ferr" id="err" role="alert"></p>
+          <button class="cta go" type="submit" id="btn">احصل على الرمز</button>
+        </form>
+      </div>
+      <p class="trust" id="trust"></p>
     </section>
 
     <section id="doneView" hidden>
-      <h1>جاهز يا نشمي</h1>
-      <p class="lead">سجّلناك. باقي خطوتين: فعّل التنبيهات، واطبع رمزك.</p>
-
-      <div class="notif" style="border-color:var(--red)">
-        <div class="n-head"><span class="n-ic" id="bellIc"></span><div><b>الخطوة الأهم: فعّل التنبيهات</b><small>عشان توصلك الرسائل على موبايلك فوراً، حتى لو الموقع مسكّر. بدونها لازم تفتح الصندوق بنفسك.</small></div></div>
-        <div class="n-body">
-          <a class="btn-big" id="inboxLink" href="inbox.html" style="text-decoration:none"></a>
-          <p class="n-note">افتحها من <b>موبايلك</b> (الجهاز اللي بدك التنبيهات توصله). رح نوريك الخطوات بالضبط.</p>
+      <div class="done-head"><span class="tick" id="tick"></span><h1 style="margin:0">جاهز يا نشمي</h1></div>
+      <p class="sub" style="margin-bottom:16px">هاد رمزك. فعّل التنبيهات عشان توصلك الرسائل فوراً.</p>
+      <div class="card-form done-card">
+        <div id="print-area"><div class="sticker">
+          <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
+          <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
+        </div></div>
+        <a class="bell-cta" id="inboxLink" href="inbox.html"><span class="bi" id="bellIc"></span><span><b>فعّل التنبيهات</b><small>خطوتين وتوصلك كل رسالة على موبايلك</small></span></a>
+        <div class="acts">
+          <button type="button" id="printBtn"><span id="icPrint"></span>اطبع</button>
+          <button type="button" id="pngBtn"><span id="icSave"></span>احفظ صورة</button>
+          <button type="button" id="copyKey"><span id="icCopy"></span><span id="copyTxt">انسخ رابطي</span></button>
         </div>
+        <div class="keynote" id="keynote"></div>
       </div>
-
-      <h2 style="margin:30px 0 14px;font-size:1.25rem">رمزك للطباعة</h2>
-      <div id="print-area"><div class="sticker">
-        <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
-        <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
-      </div></div>
-      <ul class="tips" id="tips"></ul>
-      <div class="stack" style="margin-top:22px">
-        <button class="cta" id="printBtn" type="button">اطبع الرمز</button>
-        <button class="cta alt" id="pngBtn" type="button">احفظه كصورة</button>
-      </div>
-      <div class="warn" style="margin-top:22px"><b>مهم:</b> رابط صندوق الرسائل هو مفتاحك. احفظه وما تشاركه مع حدا. إذا ضاع ما بنقدر نرجعه لك.
-        <p class="note" id="keyLink" dir="ltr" style="word-break:break-all;margin-top:8px"></p></div>
     </section>
   </main>
 </div>
 <script src="qr.js"></script>
 <script src="shared.js"></script>
 <script>
-const f=document.getElementById('f'),err=document.getElementById('err'),btn=document.getElementById('btn');
-const ERR=ERR_TEXT;
-document.getElementById('tips').innerHTML=[
-  'حطه على الزجاج الأمامي من جوا، بمكان ظاهر ومش مغطى.',
-  'الأفضل يكون ملصق مقاوم للشمس. للتجربة تكفي ورقة عادية.',
-  'اختبره بنفسك: امسحه بموبايل ثاني وتأكد إنه الرسالة بتوصل.'
-].map(t=>'<li>'+ICON.check+'<span>'+t+'</span></li>').join('');
-function step(n){for(let i=1;i<=3;i++)document.getElementById('c'+i).classList.toggle('on',i<=n)}
+const $=id=>document.getElementById(id);
+const f=$('f'),err=$('err'),btn=$('btn');
+$('trust').innerHTML=ICON.lock+'<span>رقمك وهويتك ما بيظهروا لأي حدا.</span>';
+$('tick').innerHTML=ICON.check;$('bellIc').innerHTML=ICON.bell;$('icPrint').innerHTML=ICON.print;
+$('icSave').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>';
+$('icCopy').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg>';
+$('keynote').innerHTML=ICON.lock+'<span>رابط صندوق رسائلك هو مفتاحك. احفظه (انسخه وابعته لنفسك) وما تشاركه. إذا ضاع ما بنقدر نرجعه.</span>';
+
+const FIELD_OF={name_required:'first',name_two_words:'first',name_chars:'first',name_short:'first',name_long:'first',name_fake:'first',bad_phone:'phone',fake_phone:'phone',phone_limit:'phone'};
+function clearErrors(){for(const id of ['e-first','e-phone','err'])$(id).textContent='';for(const id of ['first','last'])$(id).removeAttribute('aria-invalid');$('phoneBox').removeAttribute('aria-invalid');$('phone').removeAttribute('aria-invalid')}
+function showError(code,fallback){
+  const msg=ERR_TEXT[code]||fallback||'صار خطأ، جرب كمان مرة.';
+  const field=FIELD_OF[code];
+  if(field==='first'){$('e-first').textContent=msg;$('first').setAttribute('aria-invalid','true');$('last').setAttribute('aria-invalid','true');(($('first').value.trim())?$('last'):$('first')).focus()}
+  else if(field==='phone'){$('e-phone').textContent=msg;$('phoneBox').setAttribute('aria-invalid','true');$('phone').focus()}
+  else err.textContent=msg;
+}
+// "0795586668", "795586668", "+962 79 558 6668" all become 795586668
+function nationalDigits(s){let d=String(s||'').replace(/\D/g,'');if(d.startsWith('962'))d=d.slice(3);return d.replace(/^0+/,'')}
+
 function show(token,key){
-  document.getElementById('formView').hidden=true;
-  document.getElementById('doneView').hidden=false;
-  step(3);
-  document.getElementById('qr').innerHTML=qrSvg(scanUrl(token));
+  $('formView').hidden=true;$('doneView').hidden=false;window.scrollTo(0,0);
+  $('qr').innerHTML=qrSvg(scanUrl(token));
   const link=new URL('inbox.html',location.href).href+'#'+key;
-  const il=document.getElementById('inboxLink');il.href='inbox.html#'+key;il.innerHTML=ICON.bell+'فعّل التنبيهات الآن';document.getElementById('bellIc').innerHTML=ICON.bell;
-  document.getElementById('keyLink').textContent=link;
-  window.__reg={token,key};
+  $('inboxLink').href='inbox.html#'+key;
+  window.__reg={token,key,link};
 }
 try{const s=JSON.parse(localStorage.getItem('yn_reg')||'null');if(s&&s.token&&s.key)show(s.token,s.key)}catch(_){}
-function mark(ids,on){for(const id of ids){const el=document.getElementById(id);if(el)el.setAttribute('aria-invalid',on?'true':'false')}}
+
 f.addEventListener('submit',async e=>{
-  e.preventDefault();err.textContent='';mark(['first','last','phone'],false);
+  e.preventDefault();clearErrors();
   const fullName=normalizeName(f.first.value+' '+f.last.value);
-  const ne=validateName(fullName);
-  if(ne){err.textContent=ERR[ne];mark(['first','last'],true);(f.first.value.trim()?f.last:f.first).focus();return}
-  const pv=validatePhone(f.phone.value);
-  if(pv.error){err.textContent=ERR[pv.error];mark(['phone'],true);f.phone.focus();return}
-  if(!f.consent.checked){err.textContent=ERR.consent_required;return}
-  btn.disabled=true;
+  const ne=validateName(fullName);if(ne){showError(ne);return}
+  const phone='+962'+nationalDigits(f.phone.value);
+  const pv=validatePhone(phone);if(pv.error){showError(pv.error);return}
+  if(!f.consent.checked){err.textContent=ERR_TEXT.consent_required;return}
+  btn.disabled=true;btn.textContent='جاري التسجيل…';
   try{
     const r=await api('/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
-      name:fullName,nickname:f.nickname.value,phone:f.phone.value,consent:f.consent.checked,website:f.website.value})});
+      name:fullName,nickname:f.nickname.value,phone,consent:true,website:f.website.value})});
     try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
     show(r.token,r.owner_key);
-  }catch(x){err.textContent=ERR[x.code]||'صار خطأ، جرب كمان مرة.';btn.disabled=false}
+  }catch(x){showError(x.code);btn.disabled=false;btn.textContent='احصل على الرمز'}
 });
-document.getElementById('printBtn').onclick=()=>window.print();
-document.getElementById('pngBtn').onclick=async()=>{
+
+$('printBtn').onclick=()=>window.print();
+$('copyKey').onclick=async()=>{
+  const link=window.__reg.link;const t=$('copyTxt');
+  try{await navigator.clipboard.writeText(link);t.textContent='انتسخ. ابعته لنفسك'}
+  catch(_){t.textContent='انسخه من الأسفل';const p=document.createElement('p');p.className='note';p.dir='ltr';p.style.cssText='word-break:break-all;margin:0';p.textContent=link;$('keynote').after(p)}
+};
+$('pngBtn').onclick=async()=>{
   const {token}=window.__reg;const W=800,H=1000,c=document.createElement('canvas');c.width=W;c.height=H;
   const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
   for(let i=0;i<W/20;i++)for(let j=0;j<2;j++){x.fillStyle=(i+j)%2?'#b3122a':'#fff';x.fillRect(i*20,j*20,20,20)}

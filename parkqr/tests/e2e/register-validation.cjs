@@ -2,7 +2,7 @@ const OUT=process.argv[2]||require('os').tmpdir();
 const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const errs=[];
 const c=await b.newContext({viewport:{width:400,height:900}});const p=await c.newPage();p.on('pageerror',e=>errs.push(e.message));
 await p.goto('http://localhost:8788/register.html');
-const msg=async()=>(await p.textContent('#err')).trim();
+const msg=async()=>((await p.textContent('#e-first'))+(await p.textContent('#e-phone'))+(await p.textContent('#err'))).trim();
 const tryIt=async(first,last,phone,consent=true)=>{await p.fill('#first',first);await p.fill('#last',last);await p.fill('#phone',phone);await p.setChecked('#consent',consent);await p.click('#btn');await p.waitForTimeout(250);return msg()};
 console.log('1 only first name  :',await tryIt('أحمد','','0795551234'));
 console.log('2 digits in name   :',await tryIt('أحمد','الخطيب2','0795551234'));
