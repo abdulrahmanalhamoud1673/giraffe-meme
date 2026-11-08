@@ -15,6 +15,7 @@ NODE_PATH=$(npm root -g) node e2e/register-validation.cjs
 NODE_PATH=$(npm root -g) node e2e/survey.cjs
 NODE_PATH=$(npm root -g) node e2e/chat.cjs
 NODE_PATH=$(npm root -g) node e2e/notification-states.cjs
+NODE_PATH=$(npm root -g) node e2e/save-image.cjs        # حفظ صورة الستيكر (PNG سليم 800x1000)
 ```
 
 **ما بتغطيه:** منطق السيرفر على SQL حقيقي، وتشفير الإشعارات مقابل مكتبة مستقلة، وصفحات الموقع بمتصفح حقيقي.
