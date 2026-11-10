@@ -75,6 +75,16 @@ function render(d){
     tile('متوسط وقت الرد',m.avgReplyMinutes==null?'—':m.avgReplyMinutes+' د','بالدقائق')
   );
   o.append(g);
+  const it=u.interest||{};
+  if(it.total){
+    o.append(el('h2','sec','مهتمين بالستيكر الجاهز'));
+    const gi=el('div','tiles');
+    const AREA={amman:'عمّان',irbid:'إربد',zarqa:'الزرقاء',other:'غيرها'},PRICE={'2':'2 دينار','3':'3 دنانير','5':'5 دنانير',more:'أكثر من 5'};
+    gi.append(tile('مهتمين',it.total,'من '+(c.total||0)+' مسجّل ('+pct(it.total,c.total||0)+')'));
+    const pr=el('div','tile');pr.append(el('small',null,'السعر اللي بيدفعوه'));for(const k of Object.keys(PRICE))pr.append(el('span',null,PRICE[k]+': '+(it.byPrice&&it.byPrice[k]||0)));
+    const ar=el('div','tile wide');ar.append(el('small',null,'المنطقة'));for(const k of Object.keys(AREA))ar.append(el('span',null,AREA[k]+': '+(it.byArea&&it.byArea[k]||0)));
+    gi.append(pr,ar);o.append(gi);
+  }
   const days=(c.perDay||[]);
   if(days.length){
     const max=Math.max(...days.map(x=>x.n),1);

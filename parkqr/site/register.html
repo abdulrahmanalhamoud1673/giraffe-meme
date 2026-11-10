@@ -64,6 +64,14 @@ body{background:
 .sheet-card .x{background:none;border:0;color:var(--muted);font:inherit;padding:6px;cursor:pointer}
 .share{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;color:var(--ink);border:1px solid var(--green);background:var(--soft-green);border-radius:14px;padding:12px;font-size:.95rem;font-weight:500}
 .share svg{width:20px;height:20px;color:var(--green)}
+.want{border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:8px;background:var(--bg)}
+.want b{font-size:1.05rem}
+.want p{margin:0;color:var(--muted);font-size:.9rem;line-height:1.55}
+.want .cta:not(:disabled){background:var(--green);color:var(--on-green);border-color:var(--green)}
+.wq{font-size:.85rem;font-weight:600;color:var(--muted);margin-top:4px}
+.wchips{display:flex;flex-wrap:wrap;gap:8px}
+.wchips button{font:inherit;font-size:.92rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 14px;cursor:pointer}
+.wchips button[aria-checked="true"]{background:var(--green);color:var(--on-green);border-color:var(--green)}
 @media (max-width:360px){.row2{grid-template-columns:1fr}}
 </style>
 </head>
@@ -109,6 +117,16 @@ body{background:
           <button type="button" id="copyKey"><span id="icCopy"></span><span id="copyTxt">انسخ رابطي</span></button>
         </div>
         <a class="share" id="shareBtn" href="#" target="_blank" rel="noopener"><span id="icShare"></span>ادعُ جيرانك على واتساب</a>
+        <div class="want" id="want">
+          <b>بدك ستيكر جاهز؟</b>
+          <p>مقاوم للشمس وأحسن من ورقة المكتبة. قلّنا إذا مهتم، وإحنا بنجهز حسب الطلب.</p>
+          <div class="wq">وين ساكن؟</div>
+          <div class="wchips" id="wArea" role="radiogroup" aria-label="المنطقة"></div>
+          <div class="wq">كم مستعد تدفع للستيكر؟</div>
+          <div class="wchips" id="wPrice" role="radiogroup" aria-label="السعر"></div>
+          <button class="cta alt" id="wGo" type="button" disabled style="width:100%">أنا مهتم</button>
+          <p class="note" id="wMsg" style="margin:0;text-align:center"></p>
+        </div>
         <div class="keynote" id="keynote"></div>
       </div>
     </section>
@@ -154,6 +172,7 @@ function show(token,key){
   const link=new URL('inbox.html',location.href).href+'#'+key;
   $('inboxLink').href='inbox.html#'+key;
   window.__reg={token,key,link};
+  api('/interest',{headers:{authorization:'Bearer '+key}}).then(r=>{if(r.interest)wDone()}).catch(()=>{});
   const msg='سيارتي صار عليها ستيكر "يا نشمي": لو سكّروا عليك أو سكّرت على حدا، بتوصل رسالة جاهزة بدون ما حدا يعرف رقمك. سجّل سيارتك ببلاش: https://yanashmi.com/register?s=share';
   $('shareBtn').href='https://wa.me/?text='+encodeURIComponent(msg);
 }
@@ -175,6 +194,23 @@ f.addEventListener('submit',async e=>{
   }catch(x){showError(x.code);btn.disabled=false;btn.textContent='احصل على الرمز'}
 });
 
+
+/* ---- "I want a ready-made sticker": area + the price they would pay ---- */
+const W_AREA=[['amman','عمّان'],['irbid','إربد'],['zarqa','الزرقاء'],['other','غيرها']];
+const W_PRICE=[['2','2 دينار'],['3','3 دنانير'],['5','5 دنانير'],['more','أكثر من 5']];
+const wSel={area:null,price:null};
+function wBuild(id,list,field){
+  const box=$(id);
+  for(const [v,l] of list){const b=document.createElement('button');b.type='button';b.setAttribute('role','radio');b.setAttribute('aria-checked','false');b.textContent=l;
+    b.onclick=()=>{wSel[field]=v;for(const x of box.children)x.setAttribute('aria-checked',String(x===b));$('wGo').disabled=!(wSel.area&&wSel.price)};box.appendChild(b)}
+}
+wBuild('wArea',W_AREA,'area');wBuild('wPrice',W_PRICE,'price');
+function wDone(){$('wGo').hidden=true;$('wArea').parentNode.querySelectorAll('.wq,.wchips').forEach(e=>e.hidden=true);$('wMsg').textContent='سجّلنا اهتمامك. شكراً.'}
+$('wGo').onclick=async()=>{
+  const {key}=window.__reg;$('wGo').disabled=true;
+  try{await api('/interest',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify({area:wSel.area,price:wSel.price,qty:1})});wDone()}
+  catch(_){$('wGo').disabled=false;$('wMsg').textContent='ما قدرنا نسجّل. جرب كمان مرة.'}
+};
 $('printBtn').onclick=()=>window.print();
 $('copyKey').onclick=async()=>{
   const link=window.__reg.link;const t=$('copyTxt');

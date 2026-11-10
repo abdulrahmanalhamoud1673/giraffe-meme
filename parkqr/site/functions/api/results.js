@@ -21,8 +21,16 @@ export async function onRequestGet({ request, env }) {
   const withMsg = await one(env, "SELECT COUNT(DISTINCT car_id) AS n FROM messages WHERE kind NOT LIKE 'nudge:%'");
   const push = await one(env, 'SELECT COUNT(*) AS devices, COUNT(DISTINCT car_id) AS cars FROM push_subs');
   const { results: perDay } = await env.DB.prepare("SELECT strftime('%Y-%m-%d', created_at, 'unixepoch') AS day, COUNT(*) AS n FROM cars WHERE created_at > unixepoch() - " + 7 * day + ' GROUP BY day ORDER BY day').all();
+  let interest = { total: 0, bySizeUnits: 0, byArea: {}, byPrice: {} };
+  try {
+    const t = await one(env, 'SELECT COUNT(*) AS n, COALESCE(SUM(qty), 0) AS units FROM interests');
+    const { results: areas } = await env.DB.prepare('SELECT area AS k, COUNT(*) AS n FROM interests GROUP BY area').all();
+    const { results: prices } = await env.DB.prepare('SELECT price AS k, COUNT(*) AS n FROM interests GROUP BY price').all();
+    interest = { total: t.n || 0, units: t.units || 0, byArea: Object.fromEntries(areas.map((r) => [r.k, r.n])), byPrice: Object.fromEntries(prices.map((r) => [r.k, r.n])) };
+  } catch (_) { /* table not created yet */ }
   const usage = {
     cars: { total: cars.n || 0, last24h: cars.d1 || 0, last7d: cars.d7 || 0, perDay },
+    interest,
     pushCars: push.cars || 0,
     pushDevices: push.devices || 0,
     carsWithMessages: withMsg.n || 0,

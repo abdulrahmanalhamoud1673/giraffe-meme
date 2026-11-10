@@ -34,3 +34,9 @@ CREATE TABLE IF NOT EXISTS push_subs (
   created_at INTEGER NOT NULL DEFAULT (unixepoch())
 );
 CREATE INDEX IF NOT EXISTS idx_push_car ON push_subs(car_id);
+
+CREATE TABLE IF NOT EXISTS interests (
+  car_id TEXT PRIMARY KEY,
+  area TEXT, qty INTEGER, price TEXT,
+  created_at INTEGER NOT NULL DEFAULT (unixepoch())
+);
