@@ -12,6 +12,9 @@ export async function onRequestPost({ request, env }) {
     if (!allowed.includes(body[key])) return json({ error: 'invalid_' + key }, 400);
     row[key] = body[key];
   }
+  // flood guard: a bot cannot fill the database (a real campaign stays far below this)
+  const flood = await env.DB.prepare("SELECT COUNT(*) AS n FROM responses WHERE created_at > datetime('now','-1 hour')").first();
+  if (flood.n >= 300) return json({ error: 'busy' }, 429);
   row.contact = typeof body.contact === 'string' ? body.contact.trim().slice(0, 120) : '';
   await env.DB.prepare(
     'INSERT INTO responses (age,city,has_car,freq,habit,would_use,sticker_price,sub_price,worry,contact) VALUES (?,?,?,?,?,?,?,?,?,?)'
