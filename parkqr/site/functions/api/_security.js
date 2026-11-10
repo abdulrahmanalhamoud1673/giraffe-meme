@@ -1,7 +1,7 @@
 // Admin protection. Fails closed: a weak or already-exposed key switches the dashboard off instead of leaving it open.
 
 // SHA-256 of secrets that were pasted into a chat. Only the hashes are stored, never the secrets.
-const EXPOSED = {
+export const EXPOSED = {
   ADMIN_KEY: ['9f528ac2359a8edb61428f597e2ba250dd9fc339d78777c65d09c87659aefa2a'],
   SALT: ['de790b4c8fc2be4754a085eb628e59b919315fd7a64df476be414cff30b2caf7'],
   VAPID_PRIVATE: ['0681e72ef1c8ca2a4b214c2a0b47f1d3ad811fc5875b4dc2c5b1074449b5e503'],
