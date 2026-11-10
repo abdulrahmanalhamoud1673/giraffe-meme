@@ -1,12 +1,11 @@
-import { OPTIONS } from './_shared.js';
+import { OPTIONS, json } from './_shared.js';
+import { adminCheck, exposedSecrets } from './_security.js';
 
 const one = async (env, sql) => (await env.DB.prepare(sql).first()) || {};
 
 export async function onRequestGet({ request, env }) {
-  const auth = request.headers.get('authorization') || '';
-  if (!env.ADMIN_KEY || auth !== 'Bearer ' + env.ADMIN_KEY) {
-    return new Response('unauthorized', { status: 401 });
-  }
+  const check = await adminCheck(request, env);
+  if (!check.ok) return json({ error: check.error }, check.status);
   const total = (await env.DB.prepare('SELECT COUNT(*) AS n FROM responses').first()).n;
   const counts = {};
   for (const key of Object.keys(OPTIONS)) {
@@ -36,7 +35,7 @@ export async function onRequestGet({ request, env }) {
     carsWithMessages: withMsg.n || 0,
     messages: { total: msgs.n || 0, replied: msgs.replied || 0, last24h: msgs.d1 || 0, last7d: msgs.d7 || 0, avgReplyMinutes: msgs.avg_reply == null ? null : Math.round(msgs.avg_reply / 6) / 10 },
   };
-  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact), usage }), {
+  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact), usage, exposed: await exposedSecrets(env) }), {
     headers: { 'content-type': 'application/json; charset=utf-8' },
   });
 }

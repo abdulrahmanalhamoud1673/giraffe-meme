@@ -39,6 +39,22 @@ table.dist caption{text-align:start;font-weight:600;padding:12px 0 4px}
   <main>
     <h1>لوحة الأرقام</h1>
     <p class="lead">أرقام استخدام المنتج ونتائج الاستبيان. أعداد بس، بدون أسماء ولا أرقام هواتف.</p>
+    <div class="warn" id="setup" hidden>
+      <b id="setupTitle">لازم تبدّل مفتاح الإدارة</b>
+      <p id="setupWhy" style="margin:6px 0 10px"></p>
+      <button class="cta" id="gen" type="button">ولّد مفتاح جديد</button>
+      <div id="genOut" hidden style="margin-top:14px">
+        <p class="note" style="margin:0 0 6px">مفتاحك الجديد (انولد بمتصفحك ومحدا شافه):</p>
+        <div class="keyrow" style="margin:0"><input id="newKey" readonly dir="ltr" style="text-align:left;font-family:monospace"><button class="cta alt" id="copyNew" type="button">انسخ</button></div>
+        <ol class="how compact" style="margin-top:12px">
+          <li><span class="num">1</span><div class="tx">انسخ المفتاح واحفظه بمكان آمن (مدير كلمات السر بموبايلك).</div></li>
+          <li><span class="num">2</span><div class="tx">افتح <a href="https://dash.cloudflare.com/?to=/:account/pages/view/yanashmi/settings" target="_blank" rel="noopener" style="color:var(--green)"><b>إعدادات Cloudflare</b></a> ← <b>Variables and secrets</b> ← عدّل <b>ADMIN_KEY</b> (النوع Secret) والصق المفتاح الجديد.</div></li>
+          <li><span class="num">3</span><div class="tx"><b>Deployments</b> ← النقط الثلاث ← <b>Retry deployment</b>.</div></li>
+          <li><span class="num">4</span><div class="tx">ارجع لهالصفحة واكتب المفتاح الجديد.</div></li>
+        </ol>
+      </div>
+    </div>
+    <div class="warn" id="exposed" hidden style="margin:12px 0"></div>
     <form class="keyrow" id="kf"><input id="k" type="password" placeholder="مفتاح الإدارة" autocomplete="off"><button class="cta" type="submit">عرض</button></form>
     <p class="err" id="err" role="alert"></p>
     <div id="out"></div>
@@ -109,12 +125,32 @@ function render(d){
     const pre=el('pre');pre.style.cssText='white-space:pre-wrap;direction:ltr;text-align:left;font-size:.9rem;padding-bottom:12px';pre.textContent=d.contacts.join('\n');det.append(pre);o.append(det);
   }
 }
+
+const SETUP_WHY={
+  leaked_key:'المفتاح القديم انكشف (انكتب بدردشة)، فالسيرفر وقّف اللوحة لحد ما تحط مفتاح جديد. هاد بيحمي أرقامك من أي حدا شاف المفتاح القديم.',
+  weak_key:'المفتاح الحالي قصير أو ضعيف (أقل من 20 حرف). لازم مفتاح أطول.',
+  no_key:'ما في مفتاح إدارة مضبوط على الموقع. لازم تضيف واحد.',
+};
+function genKey(){
+  const A='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789',out=[];
+  while(out.length<32){const buf=new Uint8Array(64);crypto.getRandomValues(buf);for(const b of buf){if(b<256-(256%A.length)&&out.length<32)out.push(A[b%A.length])}}
+  return out.join('');
+}
+$('gen').onclick=()=>{$('newKey').value=genKey();$('genOut').hidden=false;$('gen').textContent='ولّد مفتاح ثاني'};
+$('copyNew').onclick=async()=>{try{await navigator.clipboard.writeText($('newKey').value);$('copyNew').textContent='انتسخ'}catch(_){$('newKey').select();$('copyNew').textContent='حدّده وانسخه'}};
+function showSetup(code){$('setupWhy').textContent=SETUP_WHY[code]||'لازم تبدّل مفتاح الإدارة.';$('setup').hidden=false;$('kf').hidden=true}
+// The server answers 503 (before checking any key) when the admin key is missing, weak, or was exposed: show the fix right away.
+fetch('/api/results').then(async r=>{if(r.status===503){let j={};try{j=await r.json()}catch(_){}showSetup(j.error)}}).catch(()=>{});
 async function load(key){
   $('err').textContent='';
   const r=await fetch('/api/results',{headers:{authorization:'Bearer '+key}});
+  if(r.status===503){let j={};try{j=await r.json()}catch(_){}showSetup(j.error);return}
   if(!r.ok){$('err').textContent=r.status===401?'مفتاح غلط.':'صار خطأ ('+r.status+').';return}
   try{sessionStorage.setItem('yn_admin',key)}catch(_){}
-  render(await r.json());
+  const data=await r.json();
+  const ex=data.exposed||[];
+  if(ex.length){const b=$('exposed');b.hidden=false;b.textContent='تنبيه أمني: '+ex.join('، ')+' لسا بقيمة انكشفت بدردشة. بدّلها قبل الإطلاق للناس (الأسرار بإعدادات Cloudflare).'}
+  render(data);
 }
 $('kf').addEventListener('submit',e=>{e.preventDefault();load($('k').value)});
 try{const k=sessionStorage.getItem('yn_admin');if(k){$('k').value=k;load(k)}}catch(_){}

@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
   await p.locator('#want').scrollIntoViewIfNeeded(); await p.screenshot({ path: OUT + '/interest_card.png', fullPage: true });
   await p.click('#wGo'); await p.waitForFunction(() => document.getElementById('wMsg').textContent.includes('سجّلنا'));
   console.log('confirmation:', (await p.textContent('#wMsg')).trim());
-  const stats = await (await fetch('http://localhost:8788/api/results', { headers: { authorization: 'Bearer dev-admin-key' } })).json();
+  const stats = await (await fetch('http://localhost:8788/api/results', { headers: { authorization: 'Bearer dev-admin-key-for-local-tests-0001' } })).json();
   console.log('admin numbers: interested =', stats.usage.interest.total, '| price 3:', stats.usage.interest.byPrice['3'], '| amman:', stats.usage.interest.byArea.amman);
   await p.reload(); await p.waitForSelector('#doneView:not([hidden])'); await p.waitForTimeout(500);
   console.log('after reload the choices are hidden (already answered):', await p.evaluate(() => document.getElementById('wGo').hidden));

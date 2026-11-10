@@ -57,7 +57,7 @@ await PAUSE.onRequestPost({ request: req('/', 'POST', { paused: false }, auth), 
 // ---- reminders are stored as messages: they must not distort the numbers
 const inbox = await (await INBOX.onRequestGet({ request: req('/', 'GET', null, auth), env })).json();
 check('inbox returns the reminder row for the page to attach', inbox.messages.some((x) => x.kind === 'nudge:' + lightsId));
-const stats = await (await RES.onRequestGet({ request: new Request('http://x/', { headers: { authorization: 'Bearer adm' } }), env: { ...env, ADMIN_KEY: 'adm' } })).json();
+const stats = await (await RES.onRequestGet({ request: new Request('http://x/', { headers: { authorization: 'Bearer features-test-admin-key-0001' } }), env: { ...env, ADMIN_KEY: 'features-test-admin-key-0001' } })).json();
 check('stats count 4 real messages, not the reminder', stats.usage.messages.total === 4);
 
 // ---- the daily limit ignores reminders
