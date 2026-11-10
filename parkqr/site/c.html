@@ -22,7 +22,7 @@
     <section id="pick" hidden>
       <div class="who">
         <span class="ic" id="whoIc"></span>
-        <div><b id="whoName">صاحب السيارة</b><small>رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div>
+        <div><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div>
       </div>
       <h1>شو بدك تقوله؟</h1>
       <div id="list"></div>
@@ -37,6 +37,10 @@
         <li class="done"><span class="dot" id="dotSent"></span><div><b>وصلت رسالتك</b><div class="note">لصاحب السيارة.</div></div></li>
         <li class="wait" id="stepReply"><span class="dot" id="dotReply"></span><div><b id="replyTitle">بانتظار ردّه</b><div class="note" id="replyBox">خلّي هالصفحة مفتوحة، الرد بيظهر هون لحاله.</div></div></li>
       </ol>
+      <div id="nudgeBox" style="margin-top:18px" hidden>
+        <button class="cta alt" id="nudgeBtn" type="button" disabled style="width:100%"></button>
+        <p class="note" id="nudgeMsg" style="margin-top:8px;text-align:center"></p>
+      </div>
       <div class="reply" id="replyCard" hidden><span class="note">ردّ صاحب السيارة</span><b id="replyText"></b></div>
     </section>
 
@@ -73,6 +77,7 @@ async function init(){
     const car=await api('/car?t='+encodeURIComponent(token));
     if(car.paused){$('badTitle').textContent='صاحب السيارة مش متاح حالياً';$('badText').textContent='أوقف استقبال الرسائل مؤقتاً. جرب بعد شوي.';view('bad');return}
     if(car.nickname)$('whoName').textContent=car.nickname;
+    if(car.replyMinutes)$('whoSub').textContent='بيرد غالباً خلال حوالي '+car.replyMinutes+(car.replyMinutes<=2?' دقيقة':' دقائق')+'. رقمه مخفي.';
     build();view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
@@ -81,12 +86,33 @@ async function send(kind){
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
     const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind})});
-    $('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());
+    $('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());startNudge(r.id);
   }catch(e){
     const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة مش متاح حالياً.'};
     $('err').textContent=m[e.code]||('صار خطأ، جرب كمان مرة. (رمز: '+(e.status||'شبكة')+' '+(e.code||'')+' '+(e.detail||'')+')');
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
   }
+}
+// "Remind him": allowed once, 3 minutes after sending, only while there is no reply.
+const NUDGE_AFTER=180;let nudgeTimer=null,sentAt=0;
+function mmss(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+function stopNudge(){clearInterval(nudgeTimer);nudgeTimer=null;$('nudgeBox').hidden=true}
+function startNudge(id){
+  sentAt=Date.now();$('nudgeBox').hidden=false;$('nudgeMsg').textContent='';
+  const btn=$('nudgeBtn');
+  const tick=()=>{const left=Math.max(0,NUDGE_AFTER-Math.floor((Date.now()-sentAt)/1000));
+    if(left>0){btn.disabled=true;btn.textContent='ذكّره بعد '+mmss(left)}else{btn.disabled=false;btn.textContent='ذكّره (بنبعتله تنبيه ثاني)'}};
+  tick();nudgeTimer=setInterval(tick,1000);
+  btn.onclick=async()=>{
+    btn.disabled=true;
+    try{await api('/nudge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id})});
+      clearInterval(nudgeTimer);btn.hidden=true;$('nudgeMsg').textContent='ذكّرناه. استنى شوي.'}
+    catch(e){
+      const m={already_nudged:'ذكّرته قبل. استنى شوي.',already_replied:'',paused:'صاحب السيارة مش متاح حالياً.',too_soon:'بعد شوي.'};
+      const w=e.data&&e.data.wait;if(e.code==='too_soon'&&w){sentAt=Date.now()-(NUDGE_AFTER-w)*1000;tick();return}
+      clearInterval(nudgeTimer);btn.hidden=e.code!=='server'&&e.code!=='network';$('nudgeMsg').textContent=m[e.code]!==undefined?m[e.code]:'ما قدرنا نرسل التذكير. جرب كمان مرة.';if(!btn.hidden){btn.disabled=false;btn.textContent='ذكّره'}
+    }
+  };
 }
 async function poll(id,t0){
   try{
@@ -94,7 +120,7 @@ async function poll(id,t0){
     if(r.reply){
       $('replyText').textContent=REPLY[r.reply];$('replyCard').hidden=false;
       $('replyTitle').textContent='رد عليك';$('replyBox').textContent='';
-      const li=$('stepReply');li.className='done';$('dotReply').innerHTML=ICON.check;return;
+      const li=$('stepReply');li.className='done';$('dotReply').innerHTML=ICON.check;stopNudge();return;
     }
   }catch(_){}
   if(Date.now()-t0<20*60*1000)setTimeout(()=>poll(id,t0),4000);

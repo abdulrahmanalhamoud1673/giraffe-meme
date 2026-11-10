@@ -52,3 +52,9 @@ export const MSG_TEXT = {
   hit: 'سيارتك تتحرك أو تعرضت لضربة',
   thanks: 'شكراً، حرّكتها',
 };
+
+// Messages that should look and feel urgent on the owner's phone.
+export const URGENT_KINDS = ['hit', 'urgent'];
+// A reminder is stored as a row whose kind is "nudge:<original message id>" (no schema change needed).
+export const NUDGE_PREFIX = 'nudge:';
+export const NUDGE_AFTER_SECONDS = 180;

@@ -87,7 +87,8 @@ function render(d){
   $('pauseBtn').setAttribute('aria-checked',String(!paused));
   $('dot').className='dot'+(paused?' off':'');
   $('recTitle').textContent=paused?'استقبال الرسائل متوقف':'استقبال الرسائل شغّال';
-  const list=d.messages.slice().sort((a,b)=>a.created_at-b.created_at);
+  const nudges={};for(const m of d.messages){if(m.kind.indexOf('nudge:')===0){const o=m.kind.slice(6);nudges[o]=(nudges[o]||0)+1}}
+  const list=d.messages.filter(m=>m.kind.indexOf('nudge:')!==0).sort((a,b)=>a.created_at-b.created_at);
   const waiting=list.filter(m=>!m.reply).length;
   document.title=(waiting?'('+waiting+') ':'')+'صندوق الرسائل — يا نشمي';
   const box=$('msgs');box.textContent='';
@@ -103,7 +104,7 @@ function render(d){
     if(dk!==lastDay){lastDay=dk;const s=document.createElement('div');s.className='day';s.textContent=dayLabel(m.created_at);box.appendChild(s)}
     const th=document.createElement('div');th.className='thread';
     const inb=document.createElement('div');inb.className='bub in'+(m.reply?'':' new');
-    inb.innerHTML='<div class="who">شخص مسكّر عليك'+(m.reply?'':'<span class="badge-new">جديدة</span>')+'</div>'
+    inb.innerHTML='<div class="who">شخص مسكّر عليك'+(m.reply?'':'<span class="badge-new">جديدة</span>')+((!m.reply&&nudges[m.id])?'<span class="badge-new" style="background:var(--red);color:#fff">تذكير</span>':'')+'</div>'
       +'<div class="line"><span class="mic">'+(ICON[m.kind]||'')+'</span><div class="tx"></div></div>'
       +'<div class="meta"><span></span></div>';
     inb.querySelector('.tx').textContent=MSG[m.kind]||'';

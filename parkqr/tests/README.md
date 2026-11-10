@@ -15,6 +15,7 @@ NODE_PATH=$(npm root -g) node e2e/register-validation.cjs
 NODE_PATH=$(npm root -g) node e2e/survey.cjs
 NODE_PATH=$(npm root -g) node e2e/chat.cjs
 NODE_PATH=$(npm root -g) node e2e/notification-states.cjs
+NODE_PATH=$(npm root -g) node e2e/nudge.cjs              # زر "ذكّره" والعدّاد وشارة التذكير ومتوسط الرد
 NODE_PATH=$(npm root -g) node e2e/arabic-digits.cjs      # رقم مكتوب بلوحة مفاتيح عربية (٠٧٩...)
 NODE_PATH=$(npm root -g) node e2e/save-image.cjs        # حفظ صورة الستيكر (PNG سليم 800x1000)
 ```

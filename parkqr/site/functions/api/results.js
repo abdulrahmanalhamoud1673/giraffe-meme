@@ -17,8 +17,8 @@ export async function onRequestGet({ request, env }) {
   // Product usage numbers. Counts only: no names, no phone numbers.
   const day = 86400;
   const cars = await one(env, 'SELECT COUNT(*) AS n, SUM(created_at > unixepoch() - ' + day + ') AS d1, SUM(created_at > unixepoch() - ' + 7 * day + ') AS d7 FROM cars');
-  const msgs = await one(env, 'SELECT COUNT(*) AS n, SUM(reply IS NOT NULL) AS replied, SUM(created_at > unixepoch() - ' + day + ') AS d1, SUM(created_at > unixepoch() - ' + 7 * day + ') AS d7, AVG(CASE WHEN replied_at IS NOT NULL THEN replied_at - created_at END) AS avg_reply FROM messages');
-  const withMsg = await one(env, 'SELECT COUNT(DISTINCT car_id) AS n FROM messages');
+  const msgs = await one(env, 'SELECT COUNT(*) AS n, SUM(reply IS NOT NULL) AS replied, SUM(created_at > unixepoch() - ' + day + ') AS d1, SUM(created_at > unixepoch() - ' + 7 * day + ') AS d7, AVG(CASE WHEN replied_at IS NOT NULL THEN replied_at - created_at END) AS avg_reply FROM messages WHERE kind NOT LIKE \'nudge:%\'');
+  const withMsg = await one(env, "SELECT COUNT(DISTINCT car_id) AS n FROM messages WHERE kind NOT LIKE 'nudge:%'");
   const push = await one(env, 'SELECT COUNT(*) AS devices, COUNT(DISTINCT car_id) AS cars FROM push_subs');
   const { results: perDay } = await env.DB.prepare("SELECT strftime('%Y-%m-%d', created_at, 'unixepoch') AS day, COUNT(*) AS n FROM cars WHERE created_at > unixepoch() - " + 7 * day + ' GROUP BY day ORDER BY day').all();
   const usage = {

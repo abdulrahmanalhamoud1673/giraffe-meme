@@ -17,7 +17,7 @@ self.addEventListener('push', (event) => {
       tag: d.tag || 'yn-msg',
       renotify: true,
       requireInteraction: true,       // stays until you act on it (where the device supports it)
-      vibrate: [250, 120, 250, 120, 500],
+      vibrate: d.urgent ? [500, 150, 500, 150, 500, 150, 800] : [250, 120, 250, 120, 500],
       dir: 'rtl',
       lang: 'ar',
       data: { url: d.url || '/inbox.html' },

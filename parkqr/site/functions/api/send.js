@@ -1,4 +1,4 @@
-import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT } from './_shared.js';
+import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
 import { notifyOwner } from './_push.js';
 
 export async function onRequestPost(ctx) {
@@ -17,13 +17,14 @@ async function handle({ request, env, waitUntil }) {
   const dev = await deviceHash(request, env);
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND device_hash = ? AND created_at > unixepoch() - 300').bind(car.id, dev).first();
   if (recent.n >= 1) return json({ error: 'wait' }, 429);
-  const today = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND created_at > unixepoch() - 86400').bind(car.id).first();
+  const today = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND created_at > unixepoch() - 86400 AND kind NOT LIKE \'nudge:%\'').bind(car.id).first();
   if (today.n >= 20) return json({ error: 'daily_limit' }, 429);
 
   const id = rid(14);
   await env.DB.prepare('INSERT INTO messages (id, car_id, kind, device_hash) VALUES (?,?,?,?)').bind(id, car.id, b.kind, dev).run();
   // Tell the owner right away. Never let a notification problem fail the sender's request.
-  const tell = notifyOwner(env, car.id, { title: 'يا نشمي', body: MSG_TEXT[b.kind], url: '/inbox.html', tag: 'yn-' + id }).catch(() => {});
+  const urgent = URGENT_KINDS.includes(b.kind);
+  const tell = notifyOwner(env, car.id, { title: urgent ? 'عاجل: يا نشمي' : 'يا نشمي', body: MSG_TEXT[b.kind], url: '/inbox.html', tag: 'yn-' + id, urgent }).catch(() => {});
   if (waitUntil) waitUntil(tell); else await tell;
   return json({ ok: true, id });
 }
