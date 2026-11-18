@@ -93,15 +93,15 @@ async function send(kind){
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
   }
 }
-// "Remind him": allowed once, 3 minutes after sending, only while there is no reply.
-const NUDGE_AFTER=180;let nudgeTimer=null,sentAt=0;
+// Automatic second alert: if there is no reply 2 minutes after sending, we alert him again (once). The button stays as a manual fallback.
+const NUDGE_AFTER=120;let nudgeTimer=null,sentAt=0,auto=false;
 function mmss(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
 function stopNudge(){clearInterval(nudgeTimer);nudgeTimer=null;$('nudgeBox').hidden=true}
 function startNudge(id){
   sentAt=Date.now();$('nudgeBox').hidden=false;$('nudgeMsg').textContent='';
   const btn=$('nudgeBtn');
   const tick=()=>{const left=Math.max(0,NUDGE_AFTER-Math.floor((Date.now()-sentAt)/1000));
-    if(left>0){btn.disabled=true;btn.textContent='ذكّره بعد '+mmss(left)}else{btn.disabled=false;btn.textContent='ذكّره (بنبعتله تنبيه ثاني)'}};
+    if(left>0){btn.disabled=true;btn.textContent='بنذكّره تلقائياً بعد '+mmss(left)}else{btn.disabled=false;btn.textContent='ذكّره (بنبعتله تنبيه ثاني)';if(!auto){auto=true;btn.click()}}};
   tick();nudgeTimer=setInterval(tick,1000);
   btn.onclick=async()=>{
     btn.disabled=true;
@@ -109,7 +109,7 @@ function startNudge(id){
       clearInterval(nudgeTimer);btn.hidden=true;$('nudgeMsg').textContent='ذكّرناه. استنى شوي.'}
     catch(e){
       const m={already_nudged:'ذكّرته قبل. استنى شوي.',already_replied:'',paused:'صاحب السيارة مش متاح حالياً.',too_soon:'بعد شوي.'};
-      const w=e.data&&e.data.wait;if(e.code==='too_soon'&&w){sentAt=Date.now()-(NUDGE_AFTER-w)*1000;tick();return}
+      const w=e.data&&e.data.wait;if(e.code==='too_soon'&&w){auto=false;sentAt=Date.now()-(NUDGE_AFTER-w)*1000;tick();return}
       clearInterval(nudgeTimer);btn.hidden=e.code!=='server'&&e.code!=='network';$('nudgeMsg').textContent=m[e.code]!==undefined?m[e.code]:'ما قدرنا نرسل التذكير. جرب كمان مرة.';if(!btn.hidden){btn.disabled=false;btn.textContent='ذكّره'}
     }
   };

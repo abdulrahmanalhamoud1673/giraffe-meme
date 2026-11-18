@@ -33,7 +33,7 @@ check('"I am in a hurry": urgent too', pushes.at(-1).urgent === true);
 
 // ---- reminder
 let [s, j] = await nudge(lightsId);
-check('too early (just sent): refused with the wait time', s === 429 && j.error === 'too_soon' && j.wait > 170 && j.wait <= 180);
+check('too early (just sent): refused with the wait time', s === 429 && j.error === 'too_soon' && j.wait > 110 && j.wait <= 120);
 age(lightsId, 200); pushes = [];
 [s, j] = await nudge(lightsId);
 check('after 3 minutes: reminder accepted', s === 200 && j.ok);
