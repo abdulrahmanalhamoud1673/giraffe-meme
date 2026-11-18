@@ -15,3 +15,12 @@
 
 /survey.html
   X-Robots-Tag: noindex
+
+/shared.js
+  Cache-Control: no-cache
+
+/app.css
+  Cache-Control: no-cache
+
+/push.js
+  Cache-Control: no-cache

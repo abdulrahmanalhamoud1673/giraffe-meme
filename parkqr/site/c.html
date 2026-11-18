@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261118a">
+<link rel="stylesheet" href="/app.css?v=20261119a">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -65,7 +65,7 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261118a"></script>
+<script src="/shared.js?v=20261119a"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
@@ -93,7 +93,7 @@ async function init(){
     if(car.paused){$('badTitle').textContent='صاحب السيارة مش متاح حالياً';$('badText').textContent='أوقف استقبال الرسائل مؤقتاً. جرب بعد شوي.';view('bad');return}
     if(car.nickname)$('whoName').textContent=car.nickname;
     if(car.replyMinutes)$('whoSub').textContent='بيرد غالباً خلال حوالي '+car.replyMinutes+(car.replyMinutes<=2?' دقيقة':' دقائق')+'. رقمه مخفي.';
-    $('codeLine').textContent=shortCode(token);build();$('noteToggle').onclick=()=>{$('noteToggle').hidden=true;$('noteIn').hidden=false;$('noteIn').focus()};view('pick');
+    try{$('codeLine').textContent=shortCode(token)}catch(_){}build();$('noteToggle').onclick=()=>{$('noteToggle').hidden=true;$('noteIn').hidden=false;$('noteIn').focus()};view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
 async function send(kind,photo){
