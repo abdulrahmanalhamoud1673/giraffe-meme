@@ -259,8 +259,17 @@ input[aria-invalid="true"]{border-color:var(--red)!important;box-shadow:0 0 0 3p
 .how.compact .tx{font-size:.95rem;line-height:1.6}
 .pc-warn{margin-top:10px;padding:10px 12px;font-size:.88rem}
 
-.camBox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:3/4;margin:16px 0}
+#cam{display:flex;flex-direction:column;min-height:calc(100dvh - 80px)}
+.camTop{display:flex;align-items:center;gap:12px;font-family:var(--display);font-weight:700;font-size:1.3rem;margin-bottom:12px}
+.camX{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;padding:0}
+.camX svg{width:20px;height:20px}
+.camBox{position:relative;border-radius:22px;overflow:hidden;background:#0b0d0c;flex:1;min-height:380px;max-height:68dvh}
 .camBox video,.camBox img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.camBtns{display:grid;gap:10px}
-.cta.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.camMsg{position:absolute;inset:auto 14px 14px;color:#fff;background:#000a;border-radius:12px;padding:10px 14px;text-align:center;font-size:.95rem}
+.camMsg:empty{display:none}
+.camBar{display:flex;gap:12px;justify-content:center;align-items:center;padding:18px 0 6px}
+.camBar .cta{flex:1}
+.shutter{width:76px;height:76px;border-radius:50%;border:4px solid var(--ink);background:transparent;padding:5px;cursor:pointer}
+.shutter i{display:block;width:100%;height:100%;border-radius:50%;background:var(--red);transition:transform .08s}
+.shutter:active i{transform:scale(.88)}
 .shotThumb{display:block;width:100%;max-width:240px;max-height:200px;object-fit:cover;border-radius:10px;margin-top:8px;cursor:zoom-in;background:var(--bubble)}

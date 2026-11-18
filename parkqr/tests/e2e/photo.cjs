@@ -2,7 +2,7 @@
 const OUT = process.argv[2] || require('os').tmpdir();
 const { chromium } = require('playwright');
 (async () => {
-  const b = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] }); const errs = [];
+  const b = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', ...(process.env.FAKE_CAM ? ['--use-file-for-fake-video-capture=' + process.env.FAKE_CAM] : [])] }); const errs = [];
   const reg = await (await b.newContext()).newPage();
   await reg.goto('http://localhost:8788/register.html');
   await reg.fill('#first', 'خالد'); await reg.fill('#last', 'العمري'); await reg.fill('#phone', '0788' + String(Math.floor(100000 + Math.random() * 899999)));

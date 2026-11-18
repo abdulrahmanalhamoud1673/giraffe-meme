@@ -31,17 +31,14 @@
     </section>
 
     <section id="cam" hidden>
-      <h1>صوّر المشكلة</h1>
-      <p class="lead" id="camWhy">لازم الصورة تنصوّر هلأ بالكاميرا، مش من الألبوم، عشان صاحب السيارة يصدّق.</p>
-      <div class="camBox"><video id="vid" playsinline muted autoplay></video><img id="shot" alt="" hidden></div>
-      <div class="camBtns">
-        <button class="cta" id="snap" type="button">التقط الصورة</button>
-        <button class="cta alt" id="retake" type="button" hidden>أعد التصوير</button>
+      <div class="camTop"><button class="camX" id="camBack" type="button" aria-label="رجوع"></button><span id="camTitle">صوّر المشكلة</span></div>
+      <div class="camBox"><video id="vid" playsinline muted autoplay></video><img id="shot" alt="" hidden>
+        <div class="camMsg" id="camErr" role="alert"></div></div>
+      <div class="camBar">
+        <button class="shutter" id="snap" type="button" aria-label="التقط"><i></i></button>
+        <button class="cta alt" id="retake" type="button" hidden>إعادة</button>
         <button class="cta" id="sendPhoto" type="button" hidden>أرسل</button>
-        <button class="cta ghost" id="camBack" type="button">رجوع</button>
       </div>
-      <p class="err" id="camErr" role="alert" style="margin-top:12px"></p>
-      <p class="note" style="margin-top:10px">الصورة بتوصل لصاحب السيارة بس وبتنحذف بعد 7 أيام. صوّر المشكلة فقط، مش أشخاص.</p>
     </section>
 
     <section id="sent" hidden>
@@ -72,6 +69,7 @@ const $=id=>document.getElementById(id);
 $('lockPill').innerHTML=ICON.lock+'رقمه مخفي';
 $('whoIc').innerHTML=ICON.block;
 $('dotSent').innerHTML=ICON.check;
+$('camBack').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 function view(id){for(const v of ['pick','cam','sent','bad'])$(v).hidden=v!==id}
 function build(){
   const list=$('list');
@@ -120,7 +118,7 @@ async function openCam(kind){
     stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false});
     $('vid').srcObject=stream;
   }catch(e){
-    $('camErr').textContent=e&&e.name==='NotAllowedError'?'لازم تسمح للكاميرا عشان نتأكد إن الصورة حقيقية. فعّل الكاميرا من إعدادات المتصفح وجرّب كمان مرة.':'ما قدرنا نفتح الكاميرا على هالجهاز.';
+    $('camErr').textContent=e&&e.name==='NotAllowedError'?'فعّل الكاميرا من إعدادات المتصفح وجرّب كمان مرة.':'ما قدرنا نفتح الكاميرا.';
     $('snap').hidden=true;
   }
 }
