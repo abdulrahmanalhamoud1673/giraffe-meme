@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261119a">
+<link rel="stylesheet" href="/app.css?v=20261119b">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -22,13 +22,12 @@
     <section id="pick" hidden>
       <div class="who">
         <span class="ic" id="whoIc"></span>
-        <div><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div>
+        <div class="grow"><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div><span class="codeTag" id="codeLine" dir="ltr"></span>
       </div>
-      <h1>شو بدك تقوله؟</h1>
-      <button class="noteToggle" id="noteToggle" type="button">+ أضف ملاحظة (اختياري)</button>
+      <div class="askRow"><h1>شو بدك تقوله؟</h1></div>
+      <button class="noteToggle" id="noteToggle" type="button">+ ملاحظة <small>(اختياري)</small></button>
       <input class="noteIn" id="noteIn" maxlength="80" placeholder="مثلاً: عند مدخل العمارة" autocomplete="off" hidden>
       <div id="list"></div>
-      <p class="note" id="codeLine" dir="ltr" style="text-align:center;margin-top:14px"></p>
       <p class="err" id="err" role="alert" style="margin-top:14px"></p>
       <p class="note" style="margin-top:10px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
     </section>
@@ -65,7 +64,7 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261119a"></script>
+<script src="/shared.js?v=20261119b"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
@@ -81,7 +80,7 @@ function build(){
     const box=document.createElement('div');box.className='stack';
     keys.forEach((k,i)=>{
       const b=document.createElement('button');b.className='opt'+(k==='block'?' primary':'');
-      b.innerHTML='<span class="ic">'+ICON[k]+'</span><span></span>';b.lastChild.textContent=MSG[k]+(PHOTO_KINDS.includes(k)?'  · بصورة':'');
+      b.innerHTML='<span class="ic">'+ICON[k]+'</span><span></span>';b.lastChild.textContent=MSG[k];if(PHOTO_KINDS.includes(k)){const t=document.createElement('span');t.className='camTag';t.innerHTML=ICON.camera+'صورة';b.appendChild(t)}
       b.onclick=()=>PHOTO_KINDS.includes(k)?openCam(k):send(k);box.appendChild(b);
     });
     list.appendChild(box);
