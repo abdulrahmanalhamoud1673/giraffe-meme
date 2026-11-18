@@ -27,7 +27,13 @@ export async function onRequestGet({ request, env }) {
     const { results: prices } = await env.DB.prepare('SELECT price AS k, COUNT(*) AS n FROM interests GROUP BY price').all();
     interest = { total: t.n || 0, units: t.units || 0, byArea: Object.fromEntries(areas.map((r) => [r.k, r.n])), byPrice: Object.fromEntries(prices.map((r) => [r.k, r.n])) };
   } catch (_) { /* table not created yet */ }
+  let bySource = {};
+  try {
+    const { results: srcs } = await env.DB.prepare('SELECT src AS k, COUNT(*) AS n FROM sources GROUP BY src ORDER BY n DESC LIMIT 20').all();
+    bySource = Object.fromEntries(srcs.map((r) => [r.k, r.n]));
+  } catch (_) { /* table not created yet */ }
   const usage = {
+    bySource,
     cars: { total: cars.n || 0, last24h: cars.d1 || 0, last7d: cars.d7 || 0, perDay },
     interest,
     pushCars: push.cars || 0,

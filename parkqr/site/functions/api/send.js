@@ -1,5 +1,6 @@
 import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
 import { notifyOwner } from './_push.js';
+import { ensureBlocks } from './_extra.js';
 import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
 
 export async function onRequestPost(ctx) {
@@ -24,6 +25,9 @@ async function handle({ request, env, waitUntil }) {
   }
 
   const dev = await deviceHash(request, env);
+  await ensureBlocks(env);
+  const blocked = await env.DB.prepare('SELECT 1 AS x FROM blocks WHERE car_id = ? AND device_hash = ?').bind(car.id, dev).first();
+  if (blocked) return json({ ok: true, id: rid(14) }); // silent: the sender cannot tell
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND device_hash = ? AND created_at > unixepoch() - 300').bind(car.id, dev).first();
   if (recent.n >= 1) return json({ error: 'wait' }, 429);
   const today = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND created_at > unixepoch() - 86400 AND kind NOT LIKE \'nudge:%\'').bind(car.id).first();

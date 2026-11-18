@@ -117,6 +117,9 @@ function render(d){
     inb.querySelector('.tx').textContent=MSG[m.kind]||'';
     if(m.photo){const im=document.createElement('img');im.className='shotThumb';im.alt='صورة المشكلة';inb.querySelector('.line').after(im);loadPhoto(m.id,im)}
     inb.querySelector('.meta span').textContent=clock(m.created_at);
+    const bl=document.createElement('button');bl.type='button';bl.className='blockBtn';bl.textContent='حظر';
+    bl.onclick=async()=>{if(!confirm('بدك تحظر هالشخص؟ ما رح توصلك رسائله ولا بيعرف.'))return;bl.disabled=true;try{await api('/inbox/block',{method:'POST',headers:H,body:JSON.stringify({id:m.id})});bl.textContent='تم الحظر'}catch(_){bl.disabled=false}};
+    inb.querySelector('.meta').appendChild(bl);
     th.appendChild(inb);
     if(m.reply){
       const out=document.createElement('div');out.className='bub out';

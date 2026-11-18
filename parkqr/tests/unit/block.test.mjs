@@ -1,0 +1,28 @@
+// Blocking a sender, and recording where a registration came from.
+import { SITE, makeDb } from '../helpers.mjs';
+let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
+const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), BLOCK = await import(SITE + 'functions/api/inbox/block.js'), RES = await import(SITE + 'functions/api/results.js');
+const { DB, db } = makeDb();
+const env = { DB, SALT: 'test-salt', ADMIN_KEY: 'block-test-admin-key-000001' };
+const req = (body, ip, h = {}) => new Request('http://x/', { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, 'user-agent': 'ua', ...h }, body: JSON.stringify(body) });
+const reg = async (name, phone, src) => (await (await REG.onRequestPost({ request: req({ name, phone, consent: true, src }, '5.5.5.' + Math.floor(Math.random() * 200)), env })).json());
+const a = await reg('أحمد الخطيب', '0795551234', 'IG'); const b = await reg('سامي الحسن', '0788403917', 'bad src!'); const c = await reg('خالد العمري', '0777731905');
+check('registered', a.token && b.token && c.token);
+const rows = db.prepare('SELECT car_id, src FROM sources').all();
+check('source saved lower-case for a valid value', rows.find((r) => r.car_id === a.token)?.src === 'ig');
+check('invalid source ignored, missing source ignored', rows.length === 1);
+const send = async (token, ip, kind = 'block') => { const r = await SEND.onRequestPost({ request: req({ token, kind }, ip), env }); return [r.status, await r.json()]; };
+let [s, j] = await send(a.token, '7.7.7.7'); check('sender 1 delivers', s === 200 && db.prepare('SELECT COUNT(*) n FROM messages WHERE car_id=?').get(a.token).n === 1);
+const id = j.id;
+const block = async (key, mid) => { const r = await BLOCK.onRequestPost({ request: req({ id: mid }, '1.1.1.1', key ? { authorization: 'Bearer ' + key } : {}), env }); return r.status; };
+check('block needs the owner key', await block(null, id) === 401);
+check('another owner cannot block it', await block(b.owner_key, id) === 404);
+check('owner blocks', await block(a.owner_key, id) === 200);
+db.prepare('UPDATE messages SET created_at = created_at - 4000').run();
+[s, j] = await send(a.token, '7.7.7.7'); check('blocked sender: looks successful', s === 200 && j.ok);
+check('...but nothing is delivered', db.prepare('SELECT COUNT(*) n FROM messages WHERE car_id=?').get(a.token).n === 1);
+[s, j] = await send(a.token, '8.8.8.8'); check('a different sender still delivers', s === 200 && db.prepare('SELECT COUNT(*) n FROM messages WHERE car_id=?').get(a.token).n === 2);
+[s, j] = await send(b.token, '7.7.7.7'); check('the blocked sender can still reach other cars', s === 200 && db.prepare('SELECT COUNT(*) n FROM messages WHERE car_id=?').get(b.token).n === 1);
+const r = await RES.onRequestGet({ request: new Request('http://x/', { headers: { authorization: 'Bearer ' + env.ADMIN_KEY } }), env }); const d = await r.json();
+check('results show registrations by source', d.usage.bySource.ig === 1);
+console.log(ok + '/' + n); process.exit(ok === n ? 0 : 1);

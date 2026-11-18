@@ -91,6 +91,12 @@ function render(d){
     tile('متوسط وقت الرد',m.avgReplyMinutes==null?'—':m.avgReplyMinutes+' د','بالدقائق')
   );
   o.append(g);
+  const bs=u.bySource||{};
+  if(Object.keys(bs).length){
+    const src=el('div','tile');src.append(el('small',null,'من وين جاو (حسب الرابط)'));
+    for(const k of Object.keys(bs))src.append(el('span',null,k+': '+bs[k]));
+    o.append(src);
+  }
   const it=u.interest||{};
   if(it.total){
     o.append(el('h2','sec','مهتمين بالستيكر الجاهز'));

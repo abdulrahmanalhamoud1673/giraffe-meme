@@ -26,6 +26,7 @@
       </div>
       <h1>شو بدك تقوله؟</h1>
       <div id="list"></div>
+      <p class="note" id="codeLine" dir="ltr" style="text-align:center;margin-top:14px"></p>
       <p class="err" id="err" role="alert" style="margin-top:14px"></p>
       <p class="note" style="margin-top:10px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
     </section>
@@ -90,7 +91,7 @@ async function init(){
     if(car.paused){$('badTitle').textContent='صاحب السيارة مش متاح حالياً';$('badText').textContent='أوقف استقبال الرسائل مؤقتاً. جرب بعد شوي.';view('bad');return}
     if(car.nickname)$('whoName').textContent=car.nickname;
     if(car.replyMinutes)$('whoSub').textContent='بيرد غالباً خلال حوالي '+car.replyMinutes+(car.replyMinutes<=2?' دقيقة':' دقائق')+'. رقمه مخفي.';
-    build();view('pick');
+    $('codeLine').textContent=shortCode(token);build();view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
 async function send(kind,photo){

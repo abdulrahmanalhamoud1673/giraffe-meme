@@ -188,7 +188,7 @@ f.addEventListener('submit',async e=>{
   btn.disabled=true;btn.textContent='جاري التسجيل…';
   try{
     const r=await api('/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
-      name:fullName,nickname:f.nickname.value,phone,consent:true,website:f.website.value})});
+      name:fullName,nickname:f.nickname.value,phone,consent:true,website:f.website.value,src:source()})});
     try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
     show(r.token,r.owner_key);
   }catch(x){showError(x.code);btn.disabled=false;btn.textContent='احصل على الرمز'}
@@ -222,6 +222,7 @@ $('saveClose').onclick=closeSheet;
 $('saveSheet').addEventListener('click',e=>{if(e.target.id==='saveSheet')closeSheet()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('saveSheet').hidden)closeSheet()});
 // Builds the 800x1000 sticker picture, then shows it with a real download link (a plain tap is the most reliable way to save on phones).
+function source(){try{const q=new URLSearchParams(location.search).get('s');if(q&&/^[a-z0-9_-]{1,20}$/i.test(q)){localStorage.setItem('yn_src',q);return q}return localStorage.getItem('yn_src')||''}catch(_){return ''}}
 async function makeStickerPng(token,step){
   const W=800,H=1000,c=document.createElement('canvas');c.width=W;c.height=H;
   step.v='canvas';const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);
@@ -238,6 +239,7 @@ async function makeStickerPng(token,step){
   step.v='text';x.fillStyle='#15120f';x.textAlign='center';x.direction='rtl';
   x.font='700 72px "Reem Kufi",sans-serif';x.fillText('يا نشمي',W/2,840);
   x.fillStyle='#625b51';x.font='400 34px "IBM Plex Sans Arabic",sans-serif';x.fillText('مسكّر عليّ؟ امسح الرمز',W/2,910);
+  x.fillStyle='#8a8275';x.font='600 30px "IBM Plex Sans Arabic",sans-serif';x.direction='ltr';x.fillText(shortCode(token),W/2,965);x.direction='rtl';
   step.v='export';
   const blob=await new Promise(ok=>{try{c.toBlob(b=>ok(b),'image/png')}catch(_){ok(null)}});
   if(blob)return {url:URL.createObjectURL(blob),revoke:true};

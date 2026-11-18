@@ -1,5 +1,8 @@
 // Problem reports must come with a photo taken live with the camera (keep in sync with functions/api/_photo.js)
 const PHOTO_KINDS = ['hit', 'fault', 'open', 'lights'];
+// Short code printed under the QR (same text as the token, easier to type if the camera cannot read the code)
+const shortCode = (t) => 'YN-' + String(t || '').toUpperCase();
+const tokenFromCode = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9]/g, '').replace(/^yn/, '');
 const MSG = {
   block:  'سيارتك مسكّرة عليّ، ممكن تحرّكها؟',
   urgent: 'أنا مستعجل، رجاءً بأسرع وقت',

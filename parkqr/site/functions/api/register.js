@@ -1,4 +1,5 @@
 import { json, rid, deviceHash } from './_shared.js';
+import { ensureSources } from './_extra.js';
 import { validateName, normalizeName, validatePhone } from './_validate.js';
 
 export async function onRequestPost({ request, env }) {
@@ -24,5 +25,9 @@ export async function onRequestPost({ request, env }) {
   const id = rid(10), owner_key = rid(28);
   await env.DB.prepare('INSERT INTO cars (id, owner_key, name, nickname, phone, ip_hash) VALUES (?,?,?,?,?,?)')
     .bind(id, owner_key, name, nickname, phone, ip_hash).run();
+  const src = String(b.src || '').toLowerCase();
+  if (/^[a-z0-9_-]{1,20}$/.test(src)) {
+    try { await ensureSources(env); await env.DB.prepare('INSERT OR IGNORE INTO sources (car_id, src) VALUES (?,?)').bind(id, src).run(); } catch (_) { /* never block a registration */ }
+  }
   return json({ ok: true, token: id, owner_key });
 }
