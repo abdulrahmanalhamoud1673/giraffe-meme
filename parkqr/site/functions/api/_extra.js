@@ -10,3 +10,9 @@ export async function ensureBlocks(env) {
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS blocks (car_id TEXT NOT NULL, device_hash TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()), PRIMARY KEY (car_id, device_hash))').run();
   b = true;
 }
+let nt = false;
+export async function ensureNotes(env) {
+  if (nt) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS notes (msg_id TEXT PRIMARY KEY, car_id TEXT NOT NULL, text TEXT NOT NULL)').run();
+  nt = true;
+}

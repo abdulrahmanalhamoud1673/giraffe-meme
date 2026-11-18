@@ -115,6 +115,7 @@ function render(d){
       +'<div class="line"><span class="mic">'+(ICON[m.kind]||'')+'</span><div class="tx"></div></div>'
       +'<div class="meta"><span></span></div>';
     inb.querySelector('.tx').textContent=MSG[m.kind]||'';
+    if(m.note){const nt=document.createElement('div');nt.className='noteLine';nt.textContent=m.note;inb.querySelector('.line').after(nt)}
     if(m.photo){const im=document.createElement('img');im.className='shotThumb';im.alt='صورة المشكلة';inb.querySelector('.line').after(im);loadPhoto(m.id,im)}
     inb.querySelector('.meta span').textContent=clock(m.created_at);
     const bl=document.createElement('button');bl.type='button';bl.className='blockBtn';bl.textContent='حظر';

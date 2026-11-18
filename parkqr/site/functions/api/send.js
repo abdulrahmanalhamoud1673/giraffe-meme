@@ -1,6 +1,7 @@
 import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
 import { notifyOwner } from './_push.js';
-import { ensureBlocks } from './_extra.js';
+import { ensureBlocks, ensureNotes } from './_extra.js';
+import { checkNote } from './_notefilter.js';
 import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
 
 export async function onRequestPost(ctx) {
@@ -16,6 +17,9 @@ async function handle({ request, env, waitUntil }) {
   if (!car) return json({ error: 'not_found' }, 404);
   if (car.paused) return json({ error: 'paused' }, 423);
 
+  // Optional short note, filtered (no insults, flirting, contact details or links).
+  const nc = checkNote(b.note);
+  if (!nc.ok) return json({ error: 'note_rejected' }, 422);
   // Problem reports need a photo taken live with the camera.
   let photo = null;
   if (PHOTO_KINDS.includes(b.kind)) {
@@ -40,6 +44,7 @@ async function handle({ request, env, waitUntil }) {
   }
   const id = rid(14);
   await env.DB.prepare('INSERT INTO messages (id, car_id, kind, device_hash) VALUES (?,?,?,?)').bind(id, car.id, b.kind, dev).run();
+  if (nc.note) { await ensureNotes(env); await env.DB.prepare('INSERT INTO notes (msg_id, car_id, text) VALUES (?,?,?)').bind(id, car.id, nc.note).run(); }
   if (photo) {
     await ensurePhotoTable(env);
     await env.DB.prepare('DELETE FROM photos WHERE created_at < unixepoch() - ?').bind(PHOTO_KEEP_SECONDS).run();

@@ -25,6 +25,8 @@
         <div><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div>
       </div>
       <h1>شو بدك تقوله؟</h1>
+      <button class="noteToggle" id="noteToggle" type="button">+ أضف ملاحظة (اختياري)</button>
+      <input class="noteIn" id="noteIn" maxlength="80" placeholder="مثلاً: عند مدخل العمارة" autocomplete="off" hidden>
       <div id="list"></div>
       <p class="note" id="codeLine" dir="ltr" style="text-align:center;margin-top:14px"></p>
       <p class="err" id="err" role="alert" style="margin-top:14px"></p>
@@ -91,19 +93,19 @@ async function init(){
     if(car.paused){$('badTitle').textContent='صاحب السيارة مش متاح حالياً';$('badText').textContent='أوقف استقبال الرسائل مؤقتاً. جرب بعد شوي.';view('bad');return}
     if(car.nickname)$('whoName').textContent=car.nickname;
     if(car.replyMinutes)$('whoSub').textContent='بيرد غالباً خلال حوالي '+car.replyMinutes+(car.replyMinutes<=2?' دقيقة':' دقائق')+'. رقمه مخفي.';
-    $('codeLine').textContent=shortCode(token);build();view('pick');
+    $('codeLine').textContent=shortCode(token);build();$('noteToggle').onclick=()=>{$('noteToggle').hidden=true;$('noteIn').hidden=false;$('noteIn').focus()};view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
 async function send(kind,photo){
   $('err').textContent='';
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
-    const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind,photo})});
+    const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind,photo,note:$('noteIn').value.trim()})});
     stopCam();$('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());startNudge(r.id);
   }catch(e){
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
-    if(photo){view('cam');$('camErr').textContent=({photo_unrelated:'الصورة ما بتبيّن السيارة أو مشكلتها. صوّر المشكلة بوضوح وجرّب كمان مرة.',bad_photo:'الصورة مش صالحة. أعد التصوير.',wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق.'})[e.code]||'صار خطأ، جرّب كمان مرة.';$('retake').click();return}
-    const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة مش متاح حالياً.'};
+    if(photo){view('cam');$('camErr').textContent=({photo_unrelated:'الصورة ما بتبيّن السيارة أو مشكلتها. صوّر المشكلة بوضوح وجرّب كمان مرة.',bad_photo:'الصورة مش صالحة. أعد التصوير.',note_rejected:'الملاحظة ما انقبلت. ارجع وعدّلها أو شيلها.',wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق.'})[e.code]||'صار خطأ، جرّب كمان مرة.';$('retake').click();return}
+    const m={note_rejected:'الملاحظة ما انقبلت. اكتب شي بسيط عن السيارة أو المكان، أو شيلها.',wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة مش متاح حالياً.'};
     $('err').textContent=m[e.code]||('صار خطأ، جرب كمان مرة. (رمز: '+(e.status||'شبكة')+' '+(e.code||'')+' '+(e.detail||'')+')');
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
   }
