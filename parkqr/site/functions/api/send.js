@@ -1,6 +1,7 @@
 import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
 import { notifyOwner } from './_push.js';
 import { ensureBlocks, ensureNotes } from './_extra.js';
+import { whatsappConfigured, ownerContact, sendWhatsApp } from './_channels.js';
 import { checkNote } from './_notefilter.js';
 import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
 
@@ -53,6 +54,9 @@ async function handle({ request, env, waitUntil }) {
   // Tell the owner right away. Never let a notification problem fail the sender's request.
   const urgent = URGENT_KINDS.includes(b.kind);
   const tell = notifyOwner(env, car.id, { title: urgent ? 'عاجل: يا نشمي' : 'يا نشمي', body: MSG_TEXT[b.kind] + (photo ? ' (مع صورة)' : ''), url: '/inbox.html', tag: 'yn-' + id, urgent }).catch(() => {});
-  if (waitUntil) waitUntil(tell); else await tell;
+  const wa = whatsappConfigured(env)
+    ? ownerContact(env, car.id).then((c) => sendWhatsApp(env, c, MSG_TEXT[b.kind] + (photo ? ' (مع صورة)' : ''))).catch(() => {})
+    : Promise.resolve();
+  if (waitUntil) { waitUntil(tell); waitUntil(wa); } else { await tell; await wa; }
   return json({ ok: true, id });
 }

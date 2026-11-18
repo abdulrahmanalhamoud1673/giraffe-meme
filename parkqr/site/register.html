@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261119b">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=20261119c">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <meta name="theme-color" content="#0b0d0c">
 <title>سجّل سيارتك — يا نشمي</title>
@@ -140,8 +140,8 @@ body{background:
     <button class="x" id="saveClose" type="button">إغلاق</button>
   </div>
 </div>
-<script src="qr.js?v=20261119b"></script>
-<script src="shared.js?v=20261119b"></script>
+<script src="qr.js?v=20261119c"></script>
+<script src="shared.js?v=20261119c"></script>
 <script>
 const $=id=>document.getElementById(id);
 const f=$('f'),err=$('err'),btn=$('btn');
@@ -235,9 +235,9 @@ async function makeStickerPng(token,step){
     x.fillRect(x0,y0,x1-x0,y1-y0);
   }
   step.v='font';
-  try{await Promise.race([document.fonts.load('700 64px "Reem Kufi"'),new Promise(r=>setTimeout(r,1500))])}catch(_){}
+  try{await Promise.race([document.fonts.load('700 64px "Cairo"'),new Promise(r=>setTimeout(r,1500))])}catch(_){}
   step.v='text';x.fillStyle='#15120f';x.textAlign='center';x.direction='rtl';
-  x.font='700 72px "Reem Kufi",sans-serif';x.fillText('يا نشمي',W/2,840);
+  x.font='700 72px "Cairo",sans-serif';x.fillText('يا نشمي',W/2,840);
   x.fillStyle='#625b51';x.font='400 34px "IBM Plex Sans Arabic",sans-serif';x.fillText('مسكّر عليّ؟ امسح الرمز',W/2,910);
   x.fillStyle='#8a8275';x.font='600 30px "IBM Plex Sans Arabic",sans-serif';x.direction='ltr';x.fillText(shortCode(token),W/2,965);x.direction='rtl';
   step.v='export';

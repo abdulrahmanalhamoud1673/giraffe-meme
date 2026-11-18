@@ -3,7 +3,7 @@
   --bg:#f7f4ee; --surface:#ffffff; --ink:#15120f; --muted:#625b51; --line:#e4dccd;
   --red:#b3122a; --green:#0b6b43; --on-green:#ffffff; --bubble:#efe7d6; --band-bg:#ffffff;
   --gold:#a47a2e; --soft-green:#e3f1ea; --soft-red:#f8e3e6;
-  --display:'Reem Kufi','IBM Plex Sans Arabic',system-ui,sans-serif;
+  --display:'Cairo','IBM Plex Sans Arabic',system-ui,sans-serif;
   --body:'IBM Plex Sans Arabic',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){

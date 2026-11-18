@@ -1,5 +1,5 @@
-import { json, rid, MSG_TEXT, NUDGE_PREFIX, NUDGE_AFTER_SECONDS, URGENT_KINDS } from './_shared.js';
-import { notifyOwner } from './_push.js';
+import { json, NUDGE_PREFIX, NUDGE_AFTER_SECONDS } from './_shared.js';
+import { escalate } from './_escalate.js';
 
 // The sender (who holds the secret message id) can remind the owner once, after 3 minutes without a reply.
 export async function onRequestPost(ctx) {
@@ -19,8 +19,7 @@ async function handle({ request, env, waitUntil }) {
   const done = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE kind = ?').bind(NUDGE_PREFIX + id).first();
   if (done.n >= 1) return json({ error: 'already_nudged' }, 409);
 
-  await env.DB.prepare('INSERT INTO messages (id, car_id, kind) VALUES (?,?,?)').bind(rid(14), m.car_id, NUDGE_PREFIX + id).run();
-  const tell = notifyOwner(env, m.car_id, { title: 'تذكير: يا نشمي', body: (MSG_TEXT[m.kind] || '') + ' (تذكير)', url: '/inbox.html', tag: 'yn-' + id, urgent: URGENT_KINDS.includes(m.kind) }).catch(() => {});
-  if (waitUntil) waitUntil(tell); else await tell;
+  const jobs = await escalate(env, m);
+  if (waitUntil) jobs.forEach((j) => waitUntil(j)); else await Promise.all(jobs);
   return json({ ok: true });
 }

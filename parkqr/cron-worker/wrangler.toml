@@ -1,0 +1,10 @@
+name = "yanashmi-cron"
+main = "worker.js"
+compatibility_date = "2026-01-01"
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+SITE_URL = "https://yanashmi.com"
+# CRON_KEY is a secret: wrangler secret put CRON_KEY   (same value as the CRON_KEY secret on the Pages project)
