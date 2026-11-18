@@ -27,7 +27,9 @@ export async function sendWhatsApp(env, car, text) {
       headers: { authorization: 'Bearer ' + env.WA_TOKEN, 'content-type': 'application/json' },
       body: JSON.stringify({
         messaging_product: 'whatsapp', to, type: 'template',
-        template: { name: env.WA_TEMPLATE, language: { code: env.WA_LANG || 'ar' }, components: [{ type: 'body', parameters: [{ type: 'text', text: text.slice(0, 200) }, { type: 'text', text: base + '/inbox.html#' + car.owner_key }] }] },
+        template: env.WA_TEMPLATE === 'hello_world'    // Meta's built-in test template (no variables): only for trying the connection
+          ? { name: 'hello_world', language: { code: 'en_US' } }
+          : { name: env.WA_TEMPLATE, language: { code: env.WA_LANG || 'ar' }, components: [{ type: 'body', parameters: [{ type: 'text', text: text.slice(0, 200) }, { type: 'text', text: base + '/inbox.html#' + car.owner_key }] }] },
       }),
     });
     return r.ok;
