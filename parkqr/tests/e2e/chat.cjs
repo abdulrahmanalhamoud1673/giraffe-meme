@@ -14,7 +14,7 @@ await op.evaluate(()=>load());await op.waitForSelector('.thread');
 console.log('chime on first new message:',await op.evaluate(()=>window.__chimes));
 await op.evaluate(()=>load());console.log('no repeat chime:',await op.evaluate(()=>window.__chimes));
 await op.locator('.thread .chip',{hasText:'دقيقتين'}).click();await op.waitForSelector('.bub.out');
-await send(2,3);await send(3,5);
+await send(2,1);await send(3,6);
 await op.evaluate(()=>load());await op.waitForFunction(()=>document.querySelectorAll('.thread').length===3);
 console.log('chimes after 2 more:',await op.evaluate(()=>window.__chimes));
 await op.screenshot({path:OUT+'/c_chat.png',fullPage:true});

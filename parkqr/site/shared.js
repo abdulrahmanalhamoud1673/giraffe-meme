@@ -1,3 +1,5 @@
+// Problem reports must come with a photo taken live with the camera (keep in sync with functions/api/_photo.js)
+const PHOTO_KINDS = ['hit', 'fault', 'open', 'lights'];
 const MSG = {
   block:  'سيارتك مسكّرة عليّ، ممكن تحرّكها؟',
   urgent: 'أنا مستعجل، رجاءً بأسرع وقت',

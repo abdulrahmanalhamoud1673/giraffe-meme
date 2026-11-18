@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261108b">
+<link rel="stylesheet" href="/app.css?v=20261118a">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -30,6 +30,20 @@
       <p class="note" style="margin-top:10px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
     </section>
 
+    <section id="cam" hidden>
+      <h1>صوّر المشكلة</h1>
+      <p class="lead" id="camWhy">لازم الصورة تنصوّر هلأ بالكاميرا، مش من الألبوم، عشان صاحب السيارة يصدّق.</p>
+      <div class="camBox"><video id="vid" playsinline muted autoplay></video><img id="shot" alt="" hidden></div>
+      <div class="camBtns">
+        <button class="cta" id="snap" type="button">التقط الصورة</button>
+        <button class="cta alt" id="retake" type="button" hidden>أعد التصوير</button>
+        <button class="cta" id="sendPhoto" type="button" hidden>أرسل</button>
+        <button class="cta ghost" id="camBack" type="button">رجوع</button>
+      </div>
+      <p class="err" id="camErr" role="alert" style="margin-top:12px"></p>
+      <p class="note" style="margin-top:10px">الصورة بتوصل لصاحب السيارة بس وبتنحذف بعد 7 أيام. صوّر المشكلة فقط، مش أشخاص.</p>
+    </section>
+
     <section id="sent" hidden>
       <h1>تم الإرسال</h1>
       <p class="lead" id="sentMsg" style="margin-bottom:0"></p>
@@ -51,14 +65,14 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261108b"></script>
+<script src="/shared.js?v=20261118a"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
 $('lockPill').innerHTML=ICON.lock+'رقمه مخفي';
 $('whoIc').innerHTML=ICON.block;
 $('dotSent').innerHTML=ICON.check;
-function view(id){for(const v of ['pick','sent','bad'])$(v).hidden=v!==id}
+function view(id){for(const v of ['pick','cam','sent','bad'])$(v).hidden=v!==id}
 function build(){
   const list=$('list');
   for(const [title,keys] of GROUPS){
@@ -66,8 +80,8 @@ function build(){
     const box=document.createElement('div');box.className='stack';
     keys.forEach((k,i)=>{
       const b=document.createElement('button');b.className='opt'+(k==='block'?' primary':'');
-      b.innerHTML='<span class="ic">'+ICON[k]+'</span><span></span>';b.lastChild.textContent=MSG[k];
-      b.onclick=()=>send(k);box.appendChild(b);
+      b.innerHTML='<span class="ic">'+ICON[k]+'</span><span></span>';b.lastChild.textContent=MSG[k]+(PHOTO_KINDS.includes(k)?'  · بصورة':'');
+      b.onclick=()=>PHOTO_KINDS.includes(k)?openCam(k):send(k);box.appendChild(b);
     });
     list.appendChild(box);
   }
@@ -81,18 +95,46 @@ async function init(){
     build();view('pick');
   }catch(e){$('dbg').textContent='debug: token='+token+' | path='+location.pathname+' | '+(e.status||'network')+' '+(e.code||e.message||'');view('bad')}
 }
-async function send(kind){
+async function send(kind,photo){
   $('err').textContent='';
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
-    const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind})});
-    $('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());startNudge(r.id);
+    const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind,photo})});
+    stopCam();$('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());startNudge(r.id);
   }catch(e){
+    for(const b of document.querySelectorAll('.opt'))b.disabled=false;
+    if(photo){view('cam');$('camErr').textContent=({photo_unrelated:'الصورة ما بتبيّن السيارة أو مشكلتها. صوّر المشكلة بوضوح وجرّب كمان مرة.',bad_photo:'الصورة مش صالحة. أعد التصوير.',wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق.'})[e.code]||'صار خطأ، جرّب كمان مرة.';$('retake').click();return}
     const m={wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق قبل ما ترسل ثانية.',daily_limit:'وصلت صاحب السيارة رسائل كثيرة اليوم.',paused:'صاحب السيارة مش متاح حالياً.'};
     $('err').textContent=m[e.code]||('صار خطأ، جرب كمان مرة. (رمز: '+(e.status||'شبكة')+' '+(e.code||'')+' '+(e.detail||'')+')');
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
   }
 }
+
+// ---- live camera: no gallery. The picture is taken from the video stream, so it cannot be an old or edited file.
+let stream=null,pending=null;
+function stopCam(){if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}}
+async function openCam(kind){
+  pending=kind;view('cam');$('camErr').textContent='';$('shot').hidden=true;$('vid').hidden=false;
+  $('snap').hidden=false;$('retake').hidden=true;$('sendPhoto').hidden=true;$('sendPhoto').disabled=false;
+  try{
+    stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1280}},audio:false});
+    $('vid').srcObject=stream;
+  }catch(e){
+    $('camErr').textContent=e&&e.name==='NotAllowedError'?'لازم تسمح للكاميرا عشان نتأكد إن الصورة حقيقية. فعّل الكاميرا من إعدادات المتصفح وجرّب كمان مرة.':'ما قدرنا نفتح الكاميرا على هالجهاز.';
+    $('snap').hidden=true;
+  }
+}
+$('snap').onclick=()=>{
+  const v=$('vid');if(!v.videoWidth)return;
+  const w=Math.min(960,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);
+  const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(v,0,0,w,h);
+  let q=.72,d=c.toDataURL('image/jpeg',q);while(d.length>250000&&q>.3){q-=.1;d=c.toDataURL('image/jpeg',q)}
+  window.__photo=d;$('shot').src=d;$('shot').hidden=false;$('vid').hidden=true;
+  $('snap').hidden=true;$('retake').hidden=false;$('sendPhoto').hidden=false;
+};
+$('retake').onclick=()=>{window.__photo=null;if(stream){$('shot').hidden=true;$('vid').hidden=false;$('snap').hidden=false;$('retake').hidden=true;$('sendPhoto').hidden=true}else openCam(pending)};
+$('sendPhoto').onclick=()=>{$('sendPhoto').disabled=true;send(pending,window.__photo)};
+$('camBack').onclick=()=>{stopCam();view('pick')};
 // Automatic second alert: if there is no reply 2 minutes after sending, we alert him again (once). The button stays as a manual fallback.
 const NUDGE_AFTER=120;let nudgeTimer=null,sentAt=0,auto=false;
 function mmss(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}

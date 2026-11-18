@@ -1,5 +1,5 @@
 import http from 'node:http'; import crypto from 'node:crypto';
-import { SITE, makeKeys, makeDb } from '../helpers.mjs';
+import { SITE, makeKeys, makeDb, fakeJpeg } from '../helpers.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url); const ece = require('http_ece');
 const B = SITE + 'functions/';
@@ -40,7 +40,7 @@ const port = srv.address().port;
 const dev = mkSub('http://127.0.0.1:' + port + '/p1');
 db.prepare('INSERT INTO push_subs (id,car_id,endpoint,p256dh,auth) VALUES (?,?,?,?,?)').run('s1', reg.token, dev.sub.endpoint, dev.sub.keys.p256dh, dev.sub.keys.auth);
 const pending = [];
-const sendMsg = (kind, e = env) => SEND.onRequestPost({ request: req('/', 'POST', { token: reg.token, kind }), env: e, waitUntil: (p) => pending.push(p) });
+const sendMsg = (kind, e = env) => SEND.onRequestPost({ request: req('/', 'POST', { token: reg.token, kind, photo: fakeJpeg() }), env: e, waitUntil: (p) => pending.push(p) });
 let r = await sendMsg('block');
 await Promise.all(pending);
 check('sender gets 200', r.status === 200);

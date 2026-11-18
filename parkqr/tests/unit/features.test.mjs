@@ -1,7 +1,7 @@
 // Reminder ("nudge"), urgent notifications, and the owner's typical reply time.
 import http from 'node:http'; import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
-import { SITE, makeKeys, makeDb } from '../helpers.mjs';
+import { SITE, makeKeys, makeDb, fakeJpeg } from '../helpers.mjs';
 const require = createRequire(import.meta.url); const ece = require('http_ece');
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 const { db, DB } = makeDb(); const keys = makeKeys();
@@ -19,7 +19,7 @@ let pushes = []; const srv = http.createServer((rq, rs) => { const c = []; rq.on
 await new Promise((r) => srv.listen(0, r));
 db.prepare('INSERT INTO push_subs (id,car_id,endpoint,p256dh,auth) VALUES (?,?,?,?,?)').run('p1', reg.token, 'http://127.0.0.1:' + srv.address().port + '/p', ua.getPublicKey().toString('base64url'), authSecret.toString('base64url'));
 const pending = []; const wait = async () => { await Promise.all(pending.splice(0)); };
-const send = async (kind) => { const r = await SEND.onRequestPost({ request: req('/', 'POST', { token: reg.token, kind }), env, waitUntil: (p) => pending.push(p) }); await wait(); return r; };
+const send = async (kind) => { const r = await SEND.onRequestPost({ request: req('/', 'POST', { token: reg.token, kind, photo: fakeJpeg() }), env, waitUntil: (p) => pending.push(p) }); await wait(); return r; };
 const nudge = async (id) => { const r = await NUDGE.onRequestPost({ request: req('/', 'POST', { id }), env, waitUntil: (p) => pending.push(p) }); await wait(); return [r.status, await r.json()]; };
 const age = (id, seconds) => db.prepare('UPDATE messages SET created_at = unixepoch() - ? WHERE id = ?').run(seconds, id);
 

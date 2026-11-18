@@ -25,3 +25,9 @@ export function makeDb() {
   };
   return { db, DB };
 }
+
+// A tiny fake "camera" JPEG (right start/end markers, big enough to pass the size check) as a data URL.
+export function fakeJpeg(n = 3000) {
+  const b = Buffer.alloc(n, 7); b[0] = 0xff; b[1] = 0xd8; b[n - 2] = 0xff; b[n - 1] = 0xd9;
+  return 'data:image/jpeg;base64,' + b.toString('base64');
+}

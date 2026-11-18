@@ -15,7 +15,7 @@ const { chromium } = require('playwright');
   const c = await b.newContext({ viewport: { width: 400, height: 860 } }); const p = await c.newPage(); p.on('pageerror', (e) => errs.push(e.message));
   await p.clock.install();
   await p.goto('http://localhost:8788/c?t=' + token); await p.waitForSelector('#pick:not([hidden])');
-  await p.locator('.opt').nth(2).click(); await p.waitForSelector('#sent:not([hidden])');
+  await p.locator('.opt').nth(0).click(); await p.waitForSelector('#sent:not([hidden])');
   const t0 = (await p.textContent('#nudgeBtn')).trim();
   console.log('right after sending, button says:', t0, '| disabled:', await p.isDisabled('#nudgeBtn'));
   // success path first: the page calls the server by itself when 2 minutes pass without a reply

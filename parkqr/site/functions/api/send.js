@@ -1,5 +1,6 @@
 import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
 import { notifyOwner } from './_push.js';
+import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
 
 export async function onRequestPost(ctx) {
   try { return await handle({ request: ctx.request, env: ctx.env, waitUntil: ctx.waitUntil ? ctx.waitUntil.bind(ctx) : null }); }
@@ -14,17 +15,35 @@ async function handle({ request, env, waitUntil }) {
   if (!car) return json({ error: 'not_found' }, 404);
   if (car.paused) return json({ error: 'paused' }, 423);
 
+  // Problem reports need a photo taken live with the camera.
+  let photo = null;
+  if (PHOTO_KINDS.includes(b.kind)) {
+    const p = parsePhoto(b.photo);
+    if (!p.ok) return json({ error: b.photo ? 'bad_photo' : 'photo_required' }, 400);
+    photo = p;
+  }
+
   const dev = await deviceHash(request, env);
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND device_hash = ? AND created_at > unixepoch() - 300').bind(car.id, dev).first();
   if (recent.n >= 1) return json({ error: 'wait' }, 429);
   const today = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND created_at > unixepoch() - 86400 AND kind NOT LIKE \'nudge:%\'').bind(car.id).first();
   if (today.n >= 20) return json({ error: 'daily_limit' }, 429);
 
+  let verdict = null;
+  if (photo) {
+    verdict = await checkPhoto(env, photo.bytes);
+    if (verdict === 'unrelated') return json({ error: 'photo_unrelated' }, 422);
+  }
   const id = rid(14);
   await env.DB.prepare('INSERT INTO messages (id, car_id, kind, device_hash) VALUES (?,?,?,?)').bind(id, car.id, b.kind, dev).run();
+  if (photo) {
+    await ensurePhotoTable(env);
+    await env.DB.prepare('DELETE FROM photos WHERE created_at < unixepoch() - ?').bind(PHOTO_KEEP_SECONDS).run();
+    await env.DB.prepare('INSERT INTO photos (msg_id, car_id, data, verdict) VALUES (?,?,?,?)').bind(id, car.id, photo.b64, verdict).run();
+  }
   // Tell the owner right away. Never let a notification problem fail the sender's request.
   const urgent = URGENT_KINDS.includes(b.kind);
-  const tell = notifyOwner(env, car.id, { title: urgent ? 'عاجل: يا نشمي' : 'يا نشمي', body: MSG_TEXT[b.kind], url: '/inbox.html', tag: 'yn-' + id, urgent }).catch(() => {});
+  const tell = notifyOwner(env, car.id, { title: urgent ? 'عاجل: يا نشمي' : 'يا نشمي', body: MSG_TEXT[b.kind] + (photo ? ' (مع صورة)' : ''), url: '/inbox.html', tag: 'yn-' + id, urgent }).catch(() => {});
   if (waitUntil) waitUntil(tell); else await tell;
   return json({ ok: true, id });
 }
