@@ -37,9 +37,12 @@ const claims = JSON.parse(Buffer.from(jwt[1], 'base64url'));
 check('only the messaging permission is asked for', claims.scope === 'https://www.googleapis.com/auth/firebase.messaging' && claims.exp - claims.iat === 3600);
 const push = calls.find((c) => c.url.includes('fcm.googleapis.com'));
 const msg = JSON.parse(push.o.body).message;
-check('message goes to the project, urgent channel, high priority', push.url.includes('/projects/demo-project/') && msg.token === T(1) && msg.android.priority === 'HIGH' && msg.android.notification.channel_id === 'urgent' && /^yn-/.test(msg.android.notification.tag));
+check('message goes to the project, urgent channel, high priority', push.url.includes('/projects/demo-project/') && msg.token === T(1) && msg.android.priority === 'HIGH' && msg.android.notification.channel_id === 'urgent_nashmi' && /^yn-/.test(msg.android.notification.tag));
 check('no phone number or name leaves in the message', !push.o.body.includes('795551234') && !push.o.body.includes('الخطيب'));
 
+await add(T(1), reg.owner_key, env, { tone: 'bell' }); calls.length = 0; await F.notifyApp(env, reg.token, { title: 't', body: 'b', tag: 'x' });
+check('the chosen sound decides the channel', JSON.parse(calls.find((c) => c.url.includes('fcm.')).o.body).message.android.notification.channel_id === 'messages_bell');
+await add(T(1), reg.owner_key, env, { tone: '../x' }); check('an unknown sound falls back to the default', db.prepare('SELECT tone FROM fcm_tokens WHERE token = ?').get(T(1)).tone === 'nashmi');
 for (let i = 2; i <= 8; i++) await add(T(i));
 check('at most 5 phones per account, the newest kept', count() === 5 && db.prepare('SELECT 1 x FROM fcm_tokens WHERE token = ?').get(T(8)) && !db.prepare('SELECT 1 x FROM fcm_tokens WHERE token = ?').get(T(1)));
 gone = T(8); const r = await F.notifyApp(env, reg.token, { title: 't', body: 'b', tag: 'x' });

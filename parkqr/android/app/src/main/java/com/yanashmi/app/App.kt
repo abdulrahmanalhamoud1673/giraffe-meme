@@ -1,13 +1,10 @@
 package com.yanashmi.app
 
 import android.app.Application
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.media.AudioAttributes
-import android.media.RingtoneManager
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Constraints
@@ -18,22 +15,12 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import java.util.concurrent.TimeUnit
 
-const val CH_URGENT = "urgent"
-const val CH_NORMAL = "messages"
 const val CHECK_WORK = "yn_check"
 
 class App : Application() {
     override fun onCreate() {
         super.onCreate()
-        val nm = getSystemService(NotificationManager::class.java)
-        val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val attrs = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
-        nm.createNotificationChannel(NotificationChannel(CH_URGENT, "رسائل عاجلة", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "ضربة أو سيارتك بخطر أو شخص مستعجل"; enableVibration(true); vibrationPattern = longArrayOf(0, 300, 150, 300, 150, 300); setSound(sound, attrs)
-        })
-        nm.createNotificationChannel(NotificationChannel(CH_NORMAL, "الرسائل", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "كل رسالة بتوصلك على سيارتك"; setSound(sound, attrs)
-        })
+        Channels.ensure(this, Prefs.tone(this))
     }
 }
 
@@ -64,7 +51,7 @@ fun notifyMessage(ctx: Context, m: Msg) {
 /** One notification per conversation: the same tag the server uses, so a second delivery replaces the first. */
 fun show(ctx: Context, tag: String, title: String, body: String, urgent: Boolean) {
     val open = PendingIntent.getActivity(ctx, 0, Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-    val n = NotificationCompat.Builder(ctx, if (urgent) CH_URGENT else CH_NORMAL)
+    val n = NotificationCompat.Builder(ctx, Channels.id(Prefs.tone(ctx), urgent))
         .setSmallIcon(R.drawable.ic_notify).setColor(0xFFC8102E.toInt())
         .setContentTitle(title).setContentText(body)
         .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true).setContentIntent(open).build()

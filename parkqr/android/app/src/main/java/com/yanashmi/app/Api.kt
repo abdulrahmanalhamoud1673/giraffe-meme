@@ -82,8 +82,8 @@ object Api {
     suspend fun pause(key: String, paused: Boolean) { call("POST", "/api/inbox/pause", key, JSONObject().put("paused", paused)) }
     suspend fun block(key: String, id: String) { call("POST", "/api/inbox/block", key, JSONObject().put("id", id)) }
     /** Registers (or removes) this phone for instant notifications. True when the server can really send them. */
-    suspend fun pushDevice(key: String, token: String, remove: Boolean): Boolean =
-        call("POST", "/api/fcm-register", key, JSONObject().put("token", token).put("remove", remove)).optBoolean("active")
+    suspend fun pushDevice(key: String, token: String, remove: Boolean, tone: String): Boolean =
+        call("POST", "/api/fcm-register", key, JSONObject().put("token", token).put("remove", remove).put("tone", tone)).optBoolean("active")
 
     /** New secret link; the old one stops working everywhere. */
     suspend fun rotate(key: String): String = call("POST", "/api/inbox/rotate", key, JSONObject()).getString("owner_key")

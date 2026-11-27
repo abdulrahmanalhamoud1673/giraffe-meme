@@ -1,5 +1,5 @@
 import { json, carByKey, readJson } from './_shared.js';
-import { ensureFcmTable, fcmConfigured, MAX_APP_DEVICES } from './_fcm.js';
+import { ensureFcmTable, fcmConfigured, MAX_APP_DEVICES, TONES } from './_fcm.js';
 
 // Owner only: the app registers (or, with remove:true, forgets) the address Google gave this phone.
 // `active` tells the app whether instant notifications really work, so it knows if it still has to check by itself.
@@ -15,7 +15,8 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: true, active: false });
   }
   // a phone belongs to the account that registered it last
-  await env.DB.prepare('INSERT INTO fcm_tokens (token, car_id) VALUES (?,?) ON CONFLICT(token) DO UPDATE SET car_id = excluded.car_id, created_at = unixepoch()').bind(token, car.id).run();
+  const tone = TONES.includes(b.tone) ? b.tone : TONES[0];
+  await env.DB.prepare('INSERT INTO fcm_tokens (token, car_id, tone) VALUES (?,?,?) ON CONFLICT(token) DO UPDATE SET car_id = excluded.car_id, tone = excluded.tone, created_at = unixepoch()').bind(token, car.id, tone).run();
   await env.DB.prepare('DELETE FROM fcm_tokens WHERE car_id = ?1 AND token NOT IN (SELECT token FROM fcm_tokens WHERE car_id = ?1 ORDER BY created_at DESC, rowid DESC LIMIT ?2)').bind(car.id, MAX_APP_DEVICES).run();
   return json({ ok: true, active: fcmConfigured(env) });
 }

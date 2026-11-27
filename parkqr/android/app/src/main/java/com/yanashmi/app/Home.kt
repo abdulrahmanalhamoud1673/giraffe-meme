@@ -8,7 +8,9 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.PersistableBundle
+import android.provider.Settings
 import android.util.LruCache
+import androidx.core.app.NotificationManagerCompat
 import android.widget.Toast
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.Lifecycle
@@ -73,12 +75,18 @@ enum class Tab(val label: String, val icon: ImageVector) { Inbox("الرسائل
 fun HomeScreen(store: Store, onNewKey: (String) -> Unit, onLogout: () -> Unit) {
     val key = store.key
     val scope = rememberCoroutineScope()
+    val ctx = LocalContext.current
     var inbox by remember { mutableStateOf<Inbox?>(null) }
     var err by remember { mutableStateOf("") }
     var tab by rememberSaveable { mutableStateOf(Tab.Inbox) }
     var open by remember { mutableStateOf<Msg?>(null) }
     suspend fun load() {
-        try { val i = Api.inbox(key); inbox = i; err = "" }
+        try {
+            val i = Api.inbox(key); inbox = i; err = ""
+            val seen = store.seen.toMutableSet()
+            val fresh = i.messages.filter { it.reply == null && seen.add(it.id) }
+            if (fresh.isNotEmpty()) { store.seen = seen; fresh.filter { ringsNow(ctx, it) }.forEach { notifyMessage(ctx, it) } }
+        }
         catch (e: ApiError) { if (e.status == 401) onLogout() else err = errText(e) } catch (e: Exception) { err = errText(e) }
     }
     PollWhileVisible(key, 10000) { load() }
@@ -90,7 +98,7 @@ fun HomeScreen(store: Store, onNewKey: (String) -> Unit, onLogout: () -> Unit) {
             Tab.Inbox -> InboxTab(key, inbox, err, onPause = { paused -> scope.launch { try { Api.pause(key, paused); load() } catch (e: Exception) { err = errText(e) } } },
                 onOpen = { open = it }, onChanged = { scope.launch { load() } }, onSticker = { tab = Tab.Sticker })
             Tab.Sticker -> StickerTab(store.token)
-            Tab.Account -> AccountTab(key, inbox, onNewKey, onLogout)
+            Tab.Account -> AccountTab(key, inbox, onNewKey, onLogout, Prefs.tone(ctx)) { t -> Prefs.setTone(ctx, t); Channels.ensure(ctx, t); Push.register(ctx) }
         }
     }
 }
@@ -131,6 +139,7 @@ fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit
                 colors = SwitchDefaults.colors(checkedTrackColor = Accent, checkedThumbColor = Color.White, uncheckedTrackColor = Color(0x33FFFFFF), uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
         }
     }
+    NotificationsOff()
     if (err.isNotEmpty()) Banner(err, Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
     when {
         inbox == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { if (err.isEmpty()) CircularProgressIndicator(color = Brand) }
@@ -190,6 +199,17 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
     ask?.let { what -> ModerationDialog(what, key, m.id, onDone = { blocked = true }, onError = { err = it }) { ask = null } }
 }
 
+/** Shown only while the phone blocks this app's notifications; checked again whenever the app comes back. */
+@Composable
+fun NotificationsOff() {
+    val ctx = LocalContext.current
+    var off by remember { mutableStateOf(false) }
+    PollWhileVisible("notifications", 2000) { off = !NotificationManagerCompat.from(ctx).areNotificationsEnabled() }
+    if (off) YnButton("فعّل الإشعارات", Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp), icon = Icons.Filled.NotificationsOff, height = 50.dp) {
+        try { ctx.startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, ctx.packageName)) } catch (_: Exception) { }
+    }
+}
+
 // ---------- my sticker ----------
 
 @Composable
@@ -236,11 +256,13 @@ private fun SettingRow(icon: ImageVector, title: String, tint: Color = Ink, onCl
 private enum class Ask { Rotate, Logout, Delete }
 
 @Composable
-fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout: () -> Unit) {
+fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout: () -> Unit, tone: Tone = Tone.Nashmi, onTone: (Tone) -> Unit = {}) {
     val ctx = LocalContext.current; val scope = rememberCoroutineScope()
     var ask by remember { mutableStateOf<Ask?>(null) }
     var note by remember { mutableStateOf("") }
     var err by remember { mutableStateOf("") }
+    var chosen by remember(tone) { mutableStateOf(tone) }
+    var picking by remember { mutableStateOf(false) }
     fun link(k: String) = "https://yanashmi.com/inbox.html#$k"
     TabHeader {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -252,6 +274,9 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
     Column(Modifier.fillMaxSize().verticalScrollable().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         if (err.isNotEmpty()) Banner(err)
         if (note.isNotEmpty()) Banner(note, icon = Icons.Filled.CheckCircle, tint = Brand, back = BrandSoft)
+        YnCard(padding = 0.dp) {
+            SettingRow(Icons.Filled.MusicNote, "الصوت: ${chosen.label}") { picking = true }
+        }
         YnCard(padding = 0.dp) {
             SettingRow(Icons.Filled.Link, "انسخ رابطي") { copySecret(ctx, link(key)); err = ""; note = "انتسخ" }
             HorizontalDivider(color = Line)
@@ -267,6 +292,19 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
             SettingRow(Icons.Filled.DeleteForever, "حذف الحساب", Red) { ask = Ask.Delete }
         }
     }
+    if (picking) AlertDialog(
+        onDismissRequest = { picking = false }, containerColor = Color.White, title = { Text("صوت الإشعار") },
+        text = {
+            Column {
+                for (t in Tone.entries) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable { chosen = t; Channels.preview(ctx, t) }.padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(chosen == t, { chosen = t; Channels.preview(ctx, t) }, colors = RadioButtonDefaults.colors(selectedColor = Brand))
+                    Text(t.label, style = MaterialTheme.typography.titleMedium)
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { picking = false; onTone(chosen) }) { Text("تمام", color = Brand) } },
+        dismissButton = { TextButton(onClick = { picking = false; chosen = tone }) { Text("إلغاء") } },
+    )
     val a = ask ?: return
     val (title, body, go) = when (a) {
         Ask.Rotate -> Triple("تغيّر الرابط؟", "بتطلع كل الأجهزة التانية.", "غيّره")
@@ -289,3 +327,7 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
         dismissButton = { TextButton(onClick = { ask = null }) { Text("إلغاء") } },
     )
 }
+
+/** Ring for a message that just arrived, unless the phone already shows it (it came as an instant notification). */
+fun ringsNow(ctx: Context, m: Msg, now: Long = System.currentTimeMillis() / 1000): Boolean =
+    now - m.createdAt < 600 && ctx.getSystemService(android.app.NotificationManager::class.java).activeNotifications.none { it.tag == "yn-${m.id}" }

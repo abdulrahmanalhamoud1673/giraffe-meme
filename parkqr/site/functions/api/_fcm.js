@@ -4,6 +4,7 @@
 const SCOPE = 'https://www.googleapis.com/auth/firebase.messaging';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';   // fixed here: the address inside the file is never trusted
 export const MAX_APP_DEVICES = 5;
+export const TONES = ['nashmi', 'bell', 'tap', 'alarm'];   // each has its own pair of notification channels in the app
 
 export function serviceAccount(env) {
   try {
@@ -37,6 +38,7 @@ async function accessToken(account, fetchImpl) {
 export async function ensureFcmTable(env) {
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS fcm_tokens (token TEXT PRIMARY KEY, car_id TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()))').run();
   await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_fcm_car ON fcm_tokens(car_id)').run();
+  try { await env.DB.prepare('ALTER TABLE fcm_tokens ADD COLUMN tone TEXT').run(); } catch (_) { /* column already there */ }
 }
 
 // Sends to every phone of the owner. Tokens Google says are gone get removed. Never logs the token or the secret.
@@ -44,7 +46,7 @@ export async function notifyApp(env, carId, payload, fetchImpl = fetch) {
   const account = serviceAccount(env);
   if (!account) return { sent: 0, failed: 0 };
   await ensureFcmTable(env);
-  const { results } = await env.DB.prepare('SELECT token FROM fcm_tokens WHERE car_id = ?').bind(carId).all();
+  const { results } = await env.DB.prepare('SELECT token, tone FROM fcm_tokens WHERE car_id = ?').bind(carId).all();
   if (!results.length) return { sent: 0, failed: 0 };
   let sent = 0, failed = 0;
   try {
@@ -56,7 +58,7 @@ export async function notifyApp(env, carId, payload, fetchImpl = fetch) {
           token: row.token,
           // a "notification" message is shown by Android itself, even when the app is closed
           notification: { title: String(payload.title || 'يا نشمي'), body: String(payload.body || '').slice(0, 200) },
-          android: { priority: 'HIGH', ttl: '7200s', notification: { channel_id: payload.urgent ? 'urgent' : 'messages', tag: String(payload.tag || 'yn') } },
+          android: { priority: 'HIGH', ttl: '7200s', notification: { channel_id: (payload.urgent ? 'urgent' : 'messages') + (TONES.includes(row.tone) ? '_' + row.tone : ''), tag: String(payload.tag || 'yn') } },
         } }),
       });
       if (r.ok) sent++;
