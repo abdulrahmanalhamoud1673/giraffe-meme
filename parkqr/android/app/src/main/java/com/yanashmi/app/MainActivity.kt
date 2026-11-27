@@ -1,6 +1,7 @@
 package com.yanashmi.app
 
 import android.Manifest
+import android.app.NotificationManager
 import android.graphics.Color as AColor
 import android.os.Build
 import android.os.Bundle
@@ -21,7 +22,7 @@ import androidx.compose.ui.unit.LayoutDirection
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(AColor.TRANSPARENT), navigationBarStyle = SystemBarStyle.auto(AColor.TRANSPARENT, AColor.TRANSPARENT) { false })
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT), navigationBarStyle = SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT))
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 YnTheme { Surface(Modifier.fillMaxSize(), color = Bg) { Root() } }
@@ -73,5 +74,8 @@ fun Root() {
         }
     }
     if (key.length < 16) AuthScreen(onDone = { token, k -> store.token = token; store.key = k; key = k })
-    else HomeScreen(store, onLogout = { store.clear(); key = "" })
+    else HomeScreen(store, onNewKey = { store.key = it; key = it }, onLogout = {
+        // leave nothing of this account behind on the phone
+        store.clear(); Photos.clear(); ctx.getSystemService(NotificationManager::class.java).cancelAll(); key = ""
+    })
 }

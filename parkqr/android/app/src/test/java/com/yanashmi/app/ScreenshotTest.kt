@@ -44,10 +44,10 @@ class ScreenshotTest {
 
     @Test fun sticker() = shot("6-sticker") { HomeFrame(Tab.Sticker, {}, 1) { StickerTab("k3m9q2x7ab") } }
 
-    @Test fun account() = shot("7-account") { HomeFrame(Tab.Account, {}, 0) { AccountTab("x", sample, {}) } }
+    @Test fun account() = shot("7-account") { HomeFrame(Tab.Account, {}, 0) { AccountTab("x", sample, {}, {}) } }
 
     @Test fun chat() = shot("8-chat") {
-        androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(ChatBg).padding(12.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
+        androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(Bg).padding(12.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
             Bubble(false, "سيارتك مسكّرة عليّ، ممكن تحرّكها؟", "08:12 م", null, note = "عند مدخل العمارة")
             Bubble(true, "جاي خلال دقيقتين", "08:13 م", null)
             Bubble(false, "تمام، انا واقف قدام المحل", "08:13 م", null)

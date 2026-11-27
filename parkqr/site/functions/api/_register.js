@@ -1,13 +1,17 @@
 import { json, rid, deviceHash, readJson } from './_shared.js';
 import { ensureSources } from './_extra.js';
 import { validateName, normalizeName, validatePhone } from './_validate.js';
+import { checkNote } from './_notefilter.js';
+import { sender, takeHit } from './_guard.js';
 
 // Shared by /api/register and the Google sign-in: validates, applies the limits, stores the car, returns the JSON Response.
 export async function createCar(env, request, b) {
   const nameError = validateName(b.name);
   if (nameError) return json({ error: nameError }, 400);
   const name = normalizeName(b.name);
-  const nickname = String(b.nickname || '').trim().slice(0, 60);
+  // Strangers who scan the sticker see the nickname: it goes through the same filter, and is dropped if it fails.
+  const nick = checkNote(String(b.nickname || '').trim().slice(0, 60), 60);
+  const nickname = nick.ok ? nick.note : '';
   const v = validatePhone(b.phone);
   if (v.error) return json({ error: v.error }, 400);
   const phone = v.phone;
@@ -22,6 +26,8 @@ export async function createCar(env, request, b) {
 
   const sameNumber = await env.DB.prepare('SELECT COUNT(*) AS n FROM cars WHERE phone = ?').bind(phone).first();
   if (sameNumber.n >= 3) return json({ error: 'phone_limit' }, 429);
+
+  if (!(await takeHit(env, 'register:' + (await sender(request, env)).net, 20, 86400))) return json({ error: 'rate_limited' }, 429);
 
   const id = rid(10), owner_key = rid(28);
   await env.DB.prepare('INSERT INTO cars (id, owner_key, name, nickname, phone, ip_hash) VALUES (?,?,?,?,?,?)')

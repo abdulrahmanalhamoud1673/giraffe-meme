@@ -29,7 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -50,7 +49,7 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
     val listState = rememberLazyListState()
     val first by rememberPhoto(key, m.id, m.photo)
     suspend fun pull() { try { thread = Api.thread(key, m.id) } catch (_: Exception) { } }
-    LaunchedEffect(m.id) { while (true) { pull(); delay(3000) } }
+    PollWhileVisible(m.id, 3000) { pull() }
     val items = thread?.messages ?: emptyList()
     LaunchedEffect(items.size) { if (items.isNotEmpty()) listState.animateScrollToItem(items.size) }
     fun send(photo: String?) {
@@ -59,19 +58,16 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
         scope.launch { try { Api.say(key, m.id, t, photo); text = ""; pull() } catch (e: Exception) { err = errText(e) } finally { sending = false } }
     }
     if (camera) { CameraScreen { photo -> camera = false; if (photo != null) send(photo) }; return }
-    Column(Modifier.fillMaxSize().background(ChatBg).imePadding()) {
-        Box(Modifier.fillMaxWidth().background(HeroBrush)) {
-            Lattice(Modifier.matchParentSize())
-            Row(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 14.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                GlassButton(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", onBack)
-                Spacer(Modifier.width(12.dp))
-                Box(Modifier.size(44.dp).clip(CircleShape).background(MintBrush), contentAlignment = Alignment.Center) { Icon(Icons.Filled.Person, null, tint = Night) }
-                Spacer(Modifier.width(10.dp))
+    Column(Modifier.fillMaxSize().background(Bg).imePadding()) {
+        Column(Modifier.fillMaxWidth().background(Color.White).statusBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Ink) }
                 Column(Modifier.weight(1f)) {
-                    Text("شخص عند سيارتك", color = Color.White, style = MaterialTheme.typography.titleMedium)
-                    Text(if (thread?.open == false) "انتهت المحادثة" else "رقمكم مخفي عن بعض", color = OnNight, style = MaterialTheme.typography.bodySmall)
+                    Text("عند سيارتك", style = MaterialTheme.typography.titleMedium)
+                    Text(if (thread?.open == false) "انتهت المحادثة" else "رقمكم مخفي", color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
             }
+            HorizontalDivider(color = Line)
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             item {

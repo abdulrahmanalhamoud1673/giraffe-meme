@@ -4,7 +4,7 @@ import { escalate } from './_escalate.js';
 // The sender (who holds the secret message id) can remind the owner once, after 3 minutes without a reply.
 export async function onRequestPost(ctx) {
   try { return await handle({ request: ctx.request, env: ctx.env, waitUntil: ctx.waitUntil ? ctx.waitUntil.bind(ctx) : null }); }
-  catch (err) { return json({ error: 'server', detail: String((err && err.message) || err).slice(0, 160) }, 500); }
+  catch (err) { console.log('nudge failed', String((err && err.message) || err)); return json({ error: 'server' }, 500); }
 }
 
 async function handle({ request, env, waitUntil }) {

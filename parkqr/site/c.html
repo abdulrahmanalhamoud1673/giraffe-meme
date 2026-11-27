@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261127e">
+<link rel="stylesheet" href="/app.css?v=20261127g">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -52,8 +52,8 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261127e"></script>
-<script src="/camera.js?v=20261127e"></script>
+<script src="/shared.js?v=20261127g"></script>
+<script src="/camera.js?v=20261127g"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
@@ -125,7 +125,7 @@ $('sendPhoto').onclick=()=>{$('sendPhoto').disabled=true;send(pending,window.__p
 $('camBack').onclick=()=>{stopCam();view('pick')};
 
 // ---- the conversation screen (WhatsApp style), shown right after sending
-const CHAT_ERR={text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.',photo_unrelated:'الصورة ما بتبيّن السيارة. صوّر المشكلة بوضوح.',bad_photo:'الصورة مش صالحة. صوّر من جديد.',photo_check_down:'فحص الصور مش متاح هلأ. ابعت كتابة أو جرّب بعد شوي.'};
+const CHAT_ERR={wait_owner:'استنى ردّ صاحب السيارة.',text_rejected:'الرسالة ما انقبلت. اكتب بالعربي وبأدب، بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.',photo_unrelated:'الصورة ما بتبيّن السيارة. صوّر المشكلة بوضوح.',bad_photo:'الصورة مش صالحة. صوّر من جديد.',photo_check_down:'فحص الصور مش متاح هلأ. ابعت كتابة أو جرّب بعد شوي.'};
 let sentInfo=null,replyAt=0,replyKey=null,nudgeDone=false,nudgeTimer=null;
 function startConversation(id,kind,noPhoto){
   const t0=Math.floor(Date.now()/1000);sentInfo={id,kind,t0};document.body.classList.add('chatMode');

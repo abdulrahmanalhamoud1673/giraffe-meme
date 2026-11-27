@@ -17,30 +17,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Brand: deep emerald night, mint for action on dark, emerald for action on light, shemagh red only for urgency.
-val Night = Color(0xFF07110D)
-val Forest = Color(0xFF0E2A1F)
+// Flat and light: white surfaces, near-black text, one green for action, red only for urgency.
+val Night = Color(0xFF0B1511)
 val Green = Color(0xFF0C7A4D)
 val GreenDark = Color(0xFF075235)
 val Mint = Color(0xFF4BE3A4)
-val MintSoft = Color(0xFFE4F6EE)
+val MintSoft = Color(0xFFE6F6EE)
 val Red = Color(0xFFC2183A)
-val RedSoft = Color(0xFFFCE8EC)
-val Gold = Color(0xFFE2BC6B)
-val GoldSoft = Color(0xFFFBF3E1)
-val Bg = Color(0xFFF4F6F5)
+val RedSoft = Color(0xFFFCE9ED)
+val Bg = Color(0xFFF6F7F7)
 val Surface0 = Color(0xFFFFFFFF)
-val Ink = Color(0xFF0F1714)
-val Muted = Color(0xFF68756F)
-val Line = Color(0xFFE3E9E6)
-val OnNight = Color(0xFFA9C2B6)
-val Bubble = Color(0xFFEBF0ED)
-val ChatBg = Color(0xFFEDF2EF)
-
-val NightBrush = Brush.verticalGradient(listOf(Night, Forest))
-val HeroBrush = Brush.linearGradient(listOf(Color(0xFF0B1F17), Color(0xFF0F3D2A), Color(0xFF0C6B45)))
-val ActionBrush = Brush.horizontalGradient(listOf(Color(0xFF0C7A4D), Color(0xFF11975F)))
-val MintBrush = Brush.horizontalGradient(listOf(Color(0xFF4BE3A4), Color(0xFF8CF0C6)))
+val Ink = Color(0xFF0F1613)
+val Muted = Color(0xFF6C7771)
+val Line = Color(0xFFE6EAE8)
+val Bubble = Color(0xFFEEF1F0)
 
 @OptIn(ExperimentalTextApi::class)
 val Cairo = FontFamily(

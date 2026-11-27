@@ -34,7 +34,7 @@ const inbox = await (await INBOX.onRequestGet({ request: new Request('http://x/'
 check('inbox flags the message with a photo', inbox.messages.find((m) => m.id === id)?.photo === 1);
 
 // The verdicts
-const clean = () => { for (const t of ['messages', 'photos', 'photo_checks']) db.prepare('DELETE FROM ' + t).run(); };
+const clean = () => { for (const t of ['messages', 'photos', 'hits']) db.prepare('DELETE FROM ' + t).run(); };
 const count = (t) => db.prepare('SELECT COUNT(*) n FROM ' + t).get().n;
 for (const [name, v] of [['not a vehicle (a fridge)', { vehicle: false }], ['photo of a screen', { screen: true }], ['indecent photo', { indecent: true }], ['abusive writing', { abusive_text: true }]]) {
   clean(); [s, j] = await send('hit', fakeJpeg(), { ...env, AI: fakeAI(v) });

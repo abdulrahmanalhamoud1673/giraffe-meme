@@ -200,7 +200,7 @@ function mountChat(box, o) {
       inp.placeholder = r.open ? 'اكتب رسالة…' : 'انتهت المحادثة';
     } catch (_) { /* keep what we have */ }
   }
-  async function post(body) { say(''); try { await o.send(body); inp.value = ''; await refresh(); list.scrollTop = list.scrollHeight; } catch (e) { say(e && e.code); } }
+  async function post(body) { say(''); try { const typed = inp.value; await o.send(body); if (inp.value === typed) inp.value = ''; await refresh(); list.scrollTop = list.scrollHeight; } catch (e) { say(e && e.code); } }
   q('form').onsubmit = (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) post({ text: t }); };
   q('.camBtn').onclick = async () => { const p = await liveCapture(); if (p) post({ photo: p, text: inp.value.trim() }); };
   function close() { alive = false; clearInterval(timer); box.classList.remove('chatApp'); box.innerHTML = ''; box.hidden = true; }

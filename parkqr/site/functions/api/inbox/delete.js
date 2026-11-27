@@ -6,6 +6,7 @@ export async function onRequestPost({ request, env }) {
   if (!car) return json({ error: 'unauthorized' }, 401);
   const id = car.id;
   const run = async (sql) => { try { await env.DB.prepare(sql).bind(id).run(); } catch (_) { /* table not created yet */ } };
+  await run('DELETE FROM chat WHERE msg_id IN (SELECT id FROM messages WHERE car_id = ?)');
   await run('DELETE FROM photos WHERE car_id = ?');
   await run('DELETE FROM notes WHERE car_id = ?');
   await run("DELETE FROM messages WHERE kind LIKE 'nudge:%' AND car_id = ?");

@@ -1,6 +1,8 @@
 // Photos for problem reports (hit, fault, open window, lights on). The photo must be taken live with the camera:
 // the page uses getUserMedia (no gallery picker), and the server checks that it is a real, small JPEG and then asks a
 // vision model (Cloudflare Workers AI, binding `AI`) what is in it. A photo nobody checked is never shown to anyone.
+import { takeHit } from './_guard.js';
+
 export const PHOTO_KINDS = ['hit', 'fault', 'open', 'lights'];
 export const MAX_PHOTO_BYTES = 220 * 1024;
 export const PHOTO_KEEP_SECONDS = 7 * 86400;
@@ -73,12 +75,7 @@ export async function checkPhoto(env, b64) {
   return 'unavailable';
 }
 
-// Each check costs AI quota, and refused photos leave no message behind, so tries are counted separately per device.
-export async function takePhotoCheck(env, device) {
-  await env.DB.prepare('CREATE TABLE IF NOT EXISTS photo_checks (device_hash TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()))').run();
-  await env.DB.prepare('DELETE FROM photo_checks WHERE created_at < unixepoch() - ?').bind(CHECK_WINDOW_SECONDS).run();
-  const used = await env.DB.prepare('SELECT COUNT(*) AS n FROM photo_checks WHERE device_hash = ?').bind(device).first();
-  if (used.n >= CHECK_LIMIT) return false;
-  await env.DB.prepare('INSERT INTO photo_checks (device_hash) VALUES (?)').bind(device).run();
-  return true;
+// Each check costs AI quota, and refused photos leave no message behind, so tries are counted separately.
+export async function takePhotoCheck(env, from) {
+  return (await takeHit(env, 'photo:' + from.dev, CHECK_LIMIT, CHECK_WINDOW_SECONDS)) && takeHit(env, 'photo:' + from.net, CHECK_LIMIT * 3, CHECK_WINDOW_SECONDS);
 }
