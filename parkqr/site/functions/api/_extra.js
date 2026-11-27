@@ -16,3 +16,10 @@ export async function ensureNotes(env) {
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS notes (msg_id TEXT PRIMARY KEY, car_id TEXT NOT NULL, text TEXT NOT NULL)').run();
   nt = true;
 }
+let ch = false;
+export async function ensureChat(env) {
+  if (ch) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS chat (id TEXT PRIMARY KEY, msg_id TEXT NOT NULL, side TEXT NOT NULL, text TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()))').run();
+  await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_chat_msg ON chat(msg_id, created_at)').run();
+  ch = true;
+}

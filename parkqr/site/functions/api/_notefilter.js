@@ -22,10 +22,10 @@ const WORDS = n(`كلب حمار حمير غبي غبيه اهبل هبل زفت
 const STRONG = n(`شرموط قحبه منيوك متناك كسمك كسختك كساختك يلعن ابنالكلب ابنالحرام ابنالقحبه fuck shit bitch asshole pussy whore bastard nude porn`.split(/\s+/));
 const PREFIX = /^(?:وال|بال|فال|كال|لل|ال|و|ف|ب|ل|ك)/;
 
-export function checkNote(text) {
+export function checkNote(text, max = MAX_NOTE) {
   const raw = String(text == null ? '' : text).trim();
   if (!raw) return { ok: true, note: '' };
-  if (raw.length > MAX_NOTE) return { ok: false, reason: 'long' };
+  if (raw.length > max) return { ok: false, reason: 'long' };
   const digits = raw.replace(/[٠-٩]/g, (d) => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[۰-۹]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/\D/g, '');
   if (digits.length >= 6) return { ok: false, reason: 'number' };
   if (/https?:|www\.|\.com|\.net|\.org|\.jo\b|@|t\.me|wa\.me/i.test(raw)) return { ok: false, reason: 'link' };

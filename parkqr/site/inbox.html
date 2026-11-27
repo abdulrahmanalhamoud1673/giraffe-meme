@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127a">
+<link rel="stylesheet" href="app.css?v=20261127b">
 <link rel="manifest" href="/manifest.webmanifest" id="manifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#0b0d0c">
@@ -37,8 +37,8 @@
   <p class="delLink"><a href="delete-account.html">حذف حسابي</a> · <a href="privacy.html">الخصوصية</a></p>
 </div>
 
-<script src="shared.js?v=20261127a"></script>
-<script src="push.js?v=20261127a"></script>
+<script src="shared.js?v=20261127b"></script>
+<script src="push.js?v=20261127b"></script>
 <script>
 let key=location.hash.slice(1);
 try{
@@ -139,6 +139,14 @@ function render(d){
       }
       th.appendChild(row);
     }
+    const cb=document.createElement('button');cb.type='button';cb.className='chatToggle';cb.textContent=m.chat?'المحادثة ('+m.chat+')':'ردّ بكتابة';
+    const panel=document.createElement('div');panel.className='chatBox';panel.hidden=true;panel.innerHTML='<div class="chatList"></div><form class="chatForm"><input maxlength="140" placeholder="اكتب رسالة قصيرة…" autocomplete="off"><button type="submit" aria-label="إرسال"></button></form><p class="note"></p>';
+    const pull=async()=>{try{const r=await api('/inbox/chat?id='+encodeURIComponent(m.id),{headers:H});const l=panel.querySelector('.chatList');l.textContent='';for(const x of r.messages){const d=document.createElement('div');d.className='cm '+(x.side==='o'?'me':'him');d.textContent=x.text;l.appendChild(d)}l.scrollTop=l.scrollHeight;panel.querySelector('form').hidden=!r.open}catch(_){}};
+    cb.onclick=()=>{panel.hidden=!panel.hidden;if(!panel.hidden){pull();panel._t=setInterval(()=>{if(panel.hidden||!document.body.contains(panel))clearInterval(panel._t);else pull()},4000)}};
+    panel.querySelector('form').onsubmit=async e=>{e.preventDefault();const inp=panel.querySelector('input'),t=inp.value.trim();if(!t)return;panel.querySelector('.note').textContent='';
+      try{await api('/inbox/chat?id='+encodeURIComponent(m.id),{method:'POST',headers:H,body:JSON.stringify({text:t})});inp.value='';pull()}
+      catch(err){panel.querySelector('.note').textContent=err.code==='text_rejected'?'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.':err.code==='slow'?'استنى ثواني.':err.code==='closed'?'انتهت المحادثة.':'ما قدرنا نرسل.'}};
+    th.appendChild(cb);th.appendChild(panel);
     box.appendChild(th);
   }
 }
