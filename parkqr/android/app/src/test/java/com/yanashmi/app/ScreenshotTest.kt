@@ -28,9 +28,13 @@ class ScreenshotTest {
         rule.onRoot().captureRoboImage("build/shots/$name.png")
     }
 
-    @Test fun welcome() = shot("1-welcome") { WelcomeScreen(false, "", {}, {}, {}) }
+    @Test fun welcome() = shot("1-welcome") { WelcomeScreen(false, "", {}, {}, still = .8f) }
 
-    @Test fun register() = shot("2-register") { RegisterScreen(RegisterState().apply { first = "أحمد"; last = "الخطيب"; phone = "0790000000"; consent = true }, false, "", {}, {}) }
+    @Test fun storyScan() = shot("1b-scan") { WelcomeScreen(false, "", {}, {}, still = 1.62f) }
+
+    @Test fun storyReply() = shot("1c-reply") { WelcomeScreen(false, "", {}, {}, still = 2.93f) }
+
+    @Test fun car() = shot("2-car") { CarScreen(CarForm().apply { name = "أحمد الخطيب"; phone = "0790000000"; make = "تويوتا"; color = "بيضاء" }, false, "", {}, {}) }
 
     @Test fun link() = shot("3-link") { LinkScreen("", {}, false, "", {}, {}) }
 
@@ -55,5 +59,5 @@ class ScreenshotTest {
         }
     }
 
-    @Test @Config(qualifiers = "w320dp-h568dp-xhdpi") fun smallWelcome() = shot("9-welcome-small") { WelcomeScreen(false, "", {}, {}, {}) }
+    @Test @Config(qualifiers = "w320dp-h568dp-xhdpi") fun smallWelcome() = shot("9-welcome-small") { WelcomeScreen(false, "", {}, {}, still = 2.93f) }
 }

@@ -29,7 +29,18 @@ let origins = false, hits = false;
 export async function ensureOrigins(env) {
   if (origins) return;
   try { await env.DB.prepare('ALTER TABLE messages ADD COLUMN ip_hash TEXT').run(); } catch (_) { /* column already there */ }
+  await ensureIndexes(env);
   origins = true;
+}
+
+// Lookups that would otherwise read a whole table once there are thousands of cars.
+let indexed = false;
+export async function ensureIndexes(env) {
+  if (indexed) return;
+  for (const sql of ['cars(phone)', 'cars(ip_hash, created_at)', 'cars(created_at)', 'messages(kind)']) {
+    await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_' + sql.replace(/\W+/g, '_') + ' ON ' + sql).run();
+  }
+  indexed = true;
 }
 
 // Counts one try under `key` and says whether it is allowed. One statement, so parallel requests cannot slip past.
@@ -37,6 +48,7 @@ export async function takeHit(env, key, limit, windowSeconds) {
   if (!hits) {
     await env.DB.prepare('CREATE TABLE IF NOT EXISTS hits (k TEXT NOT NULL, expires_at INTEGER NOT NULL)').run();
     await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_hits ON hits(k, expires_at)').run();
+    await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_hits_old ON hits(expires_at)').run();
     hits = true;
   }
   await env.DB.prepare('DELETE FROM hits WHERE expires_at < unixepoch()').run();

@@ -31,6 +31,11 @@ check('nothing created yet', db.prepare('SELECT COUNT(*) n FROM cars').get().n =
 [s, j] = await post({ idToken: mk({}), phone: '0795551234' }); check('phone but no consent: refused', s === 400 && j.error === 'consent_required');
 [s, j] = await post({ idToken: mk({}), phone: '0795551234', consent: true, nickname: 'كيا سوداء' }); check('signup creates the car and returns the key', s === 200 && j.token && j.owner_key && j.existing === false);
 const first = j;
+check('the car carries the Google name', db.prepare('SELECT name FROM cars WHERE id = ?').get(first.token).name === 'أحمد الخطيب');
+[s, j] = await post({ idToken: mk({ sub: 'g-3', email: 'c@gmail.com', name: 'Abood 9c5_9 🚗' }), phone: '0777105928', consent: true, name: 'اسم مزور' }, '5.5.5.5');
+check('unusual Google name: still signs up, symbols dropped, typed name ignored', s === 200 && db.prepare('SELECT name FROM cars WHERE id = ?').get(j.token).name === 'Abood');
+check('no usable name at all: a plain one', AUTH.nameFromGoogle('123 🚗') === 'صاحب السيارة' && AUTH.nameFromGoogle('') === 'صاحب السيارة');
+db.prepare('DELETE FROM accounts WHERE sub = ?').run('g-3'); db.prepare('DELETE FROM cars WHERE id = ?').run(j.token);
 [s, j] = await post({ idToken: mk({}) }, '2.2.2.2'); check('signing in again (new phone) returns the same inbox key', s === 200 && j.existing === true && j.owner_key === first.owner_key && j.token === first.token);
 [s, j] = await post({ idToken: mk({ sub: 'g-2', email: 'b@gmail.com' }), phone: '0788403917', consent: true, name: 'سامي الحسن' }, '3.3.3.3'); check('a different Google account gets a different car', s === 200 && j.token !== first.token);
 check('one account row per Google user', db.prepare('SELECT COUNT(*) n FROM accounts').get().n === 2);

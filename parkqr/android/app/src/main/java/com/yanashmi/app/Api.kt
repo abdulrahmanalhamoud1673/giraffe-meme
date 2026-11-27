@@ -57,14 +57,10 @@ object Api {
 
     private fun enc(s: String) = URLEncoder.encode(s, "UTF-8")
 
-    suspend fun register(name: String, nickname: String, phone: String): Registered {
-        val r = call("POST", "/api/register", body = JSONObject().put("name", name).put("nickname", nickname).put("phone", phone).put("consent", true).put("src", "app"))
-        return Registered(r.getString("token"), r.getString("owner_key"))
-    }
-
-    suspend fun google(idToken: String, name: String = "", nickname: String = "", phone: String = "", consent: Boolean = false): GoogleResult {
+    /** Sign in; with a phone number, sign up (the name comes from the Google account, on the server). */
+    suspend fun google(idToken: String, nickname: String = "", phone: String = ""): GoogleResult {
         val b = JSONObject().put("idToken", idToken).put("src", "app")
-        if (phone.isNotEmpty()) b.put("name", name).put("nickname", nickname).put("phone", phone).put("consent", consent)
+        if (phone.isNotEmpty()) b.put("nickname", nickname).put("phone", phone).put("consent", true)
         return parseGoogle(call("POST", "/api/auth/google", body = b))
     }
 

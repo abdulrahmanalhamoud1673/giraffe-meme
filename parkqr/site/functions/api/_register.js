@@ -2,13 +2,14 @@ import { json, rid, deviceHash, readJson } from './_shared.js';
 import { ensureSources } from './_extra.js';
 import { validateName, normalizeName, validatePhone } from './_validate.js';
 import { checkNote } from './_notefilter.js';
-import { sender, takeHit } from './_guard.js';
+import { sender, takeHit, ensureIndexes } from './_guard.js';
 
 // Shared by /api/register and the Google sign-in: validates, applies the limits, stores the car, returns the JSON Response.
-export async function createCar(env, request, b) {
-  const nameError = validateName(b.name);
+// `verifiedName` comes from a verified Google token; a typed name has to pass the checks.
+export async function createCar(env, request, b, verifiedName = '') {
+  const nameError = verifiedName ? null : validateName(b.name);
   if (nameError) return json({ error: nameError }, 400);
-  const name = normalizeName(b.name);
+  const name = verifiedName || normalizeName(b.name);
   // Strangers who scan the sticker see the nickname: it goes through the same filter, and is dropped if it fails.
   const nick = checkNote(String(b.nickname || '').trim().slice(0, 60), 60);
   const nickname = nick.ok ? nick.note : '';
@@ -17,6 +18,7 @@ export async function createCar(env, request, b) {
   const phone = v.phone;
   if (b.consent !== true) return json({ error: 'consent_required' }, 400);
 
+  await ensureIndexes(env);
   const ip_hash = await deviceHash(request, env);
   const recent = await env.DB.prepare('SELECT COUNT(*) AS n FROM cars WHERE ip_hash = ? AND created_at > unixepoch() - 86400').bind(ip_hash).first();
   if (recent.n >= 5) return json({ error: 'rate_limited' }, 429);

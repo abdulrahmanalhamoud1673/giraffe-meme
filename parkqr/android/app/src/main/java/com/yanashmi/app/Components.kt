@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -48,7 +49,8 @@ fun YnButton(text: String, modifier: Modifier = Modifier, style: BtnStyle = BtnS
     val fg = if (style == BtnStyle.Primary) Color.White else Ink
     val on = enabled && !busy
     Row(
-        modifier.fillMaxWidth().height(height).clip(shape).background(if (style == BtnStyle.Primary) Green.copy(alpha = if (enabled) 1f else .4f) else Color.White)
+        modifier.fillMaxWidth().height(height).then(if (style == BtnStyle.Primary && on) Modifier.shadow(10.dp, shape, ambientColor = Green, spotColor = Green) else Modifier)
+            .clip(shape).background(if (style == BtnStyle.Primary) Green.copy(alpha = if (enabled) 1f else .4f) else Color.White)
             .then(if (style == BtnStyle.Outline) Modifier.border(1.dp, Line, shape) else Modifier)
             .clickable(enabled = on, onClick = onClick).padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
@@ -78,12 +80,13 @@ fun YnField(value: String, onChange: (String) -> Unit, label: String, modifier: 
     }
 }
 
-/** White card with a hairline border, the one container used everywhere. */
+/** White card with a soft shadow, the one container used everywhere. */
 @Composable
-fun YnCard(modifier: Modifier = Modifier, color: Color = Surface0, border: Color = Line, onClick: (() -> Unit)? = null, padding: Dp = 16.dp, content: @Composable ColumnScope.() -> Unit) {
-    val shape = RoundedCornerShape(20.dp)
+fun YnCard(modifier: Modifier = Modifier, color: Color = Surface0, border: Color = Color.Transparent, onClick: (() -> Unit)? = null, padding: Dp = 16.dp, content: @Composable ColumnScope.() -> Unit) {
+    val shape = RoundedCornerShape(24.dp)
     Column(
-        modifier.fillMaxWidth().clip(shape).background(color).border(1.dp, border, shape).then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(padding),
+        modifier.fillMaxWidth().shadow(5.dp, shape, ambientColor = Color(0x1F000000), spotColor = Color(0x1F000000)).clip(shape).background(color).border(1.dp, border, shape)
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier).padding(padding),
         content = content,
     )
 }
@@ -101,24 +104,27 @@ fun Banner(text: String, modifier: Modifier = Modifier, icon: ImageVector = Icon
     }
 }
 
-/** The title every screen starts with. */
+/** The dark top of every tab, with rounded bottom corners. */
 @Composable
-fun TopTitle(title: String, onBack: (() -> Unit)? = null, trailing: (@Composable () -> Unit)? = null) {
-    Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 20.dp)) {
-        if (onBack != null) IconButton(onClick = onBack, Modifier.padding(top = 4.dp).offset(x = 12.dp)) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Ink) }
-        Row(Modifier.fillMaxWidth().padding(top = if (onBack == null) 18.dp else 4.dp, bottom = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(title, style = MaterialTheme.typography.headlineLarge, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            trailing?.invoke()
-        }
-    }
+fun TabHeader(content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)).background(HeroBrush).statusBarsPadding().padding(horizontal = 22.dp, vertical = 20.dp), content = content)
 }
 
-/** An inner screen: title, scrolling content, and the main button pinned at the bottom. */
+/** An inner screen: dark title area, light sheet, and the main button pinned at the bottom. */
 @Composable
-fun SheetScreen(title: String, onBack: (() -> Unit)? = null, bottom: (@Composable ColumnScope.() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxSize().background(Color.White).imePadding()) {
-        TopTitle(title, onBack)
-        Column(Modifier.weight(1f).fillMaxWidth().verticalScrollable().padding(horizontal = 20.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
-        if (bottom != null) Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = bottom)
+fun SheetScreen(title: String, subtitle: String? = null, onBack: (() -> Unit)? = null, bottom: (@Composable ColumnScope.() -> Unit)? = null, content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxSize().background(NightBrush)) {
+        Column(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 22.dp, end = 22.dp, top = 10.dp, bottom = 22.dp)) {
+            if (onBack != null) {
+                Box(Modifier.size(44.dp).clip(CircleShape).background(Color(0x1FFFFFFF)).clickable(onClick = onBack), contentAlignment = Alignment.Center) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Color.White) }
+                Spacer(Modifier.height(12.dp))
+            }
+            Text(title, color = Color.White, style = MaterialTheme.typography.headlineLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (subtitle != null) Text(subtitle, color = OnNight, style = MaterialTheme.typography.bodyLarge)
+        }
+        Column(Modifier.weight(1f).fillMaxWidth().clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)).background(Bg).imePadding()) {
+            Column(Modifier.weight(1f).fillMaxWidth().verticalScrollable().padding(horizontal = 20.dp, vertical = 20.dp), verticalArrangement = Arrangement.spacedBy(14.dp), content = content)
+            if (bottom != null) Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(horizontal = 20.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(8.dp), content = bottom)
+        }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -30,6 +31,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -80,7 +83,7 @@ fun HomeScreen(store: Store, onNewKey: (String) -> Unit, onLogout: () -> Unit) {
         try { val i = Api.inbox(key); inbox = i; err = "" }
         catch (e: ApiError) { if (e.status == 401) onLogout() else err = errText(e) } catch (e: Exception) { err = errText(e) }
     }
-    PollWhileVisible(key, 6000) { load() }
+    PollWhileVisible(key, 10000) { load() }
     val chat = open
     if (chat != null) { BackHandler { open = null }; ChatScreen(key, inbox?.messages?.firstOrNull { it.id == chat.id } ?: chat, onBack = { open = null }, onChanged = { scope.launch { load() } }); return }
     if (tab != Tab.Inbox) BackHandler { tab = Tab.Inbox }
@@ -118,13 +121,19 @@ fun HomeFrame(tab: Tab, onTab: (Tab) -> Unit, fresh: Int, content: @Composable C
 fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit, onOpen: (Msg) -> Unit, onChanged: () -> Unit, onSticker: () -> Unit) {
     val msgs = inbox?.messages ?: emptyList()
     val paused = inbox?.paused == true
-    TopTitle(inbox?.nickname?.ifBlank { null } ?: "سيارتي") {
-        Text(if (paused) "متوقف" else "متاح", color = if (paused) Red else Green, style = MaterialTheme.typography.labelMedium)
-        Spacer(Modifier.width(8.dp))
-        Switch(checked = !paused, enabled = inbox != null, onCheckedChange = { on -> onPause(!on) },
-            colors = SwitchDefaults.colors(checkedTrackColor = Green, checkedThumbColor = Color.White, uncheckedTrackColor = Line, uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
+    TabHeader {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(52.dp).clip(RoundedCornerShape(18.dp)).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DirectionsCar, null, tint = Mint, modifier = Modifier.size(28.dp)) }
+            Spacer(Modifier.width(14.dp))
+            Column(Modifier.weight(1f)) {
+                Text(inbox?.nickname?.ifBlank { null } ?: "سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(if (paused) "متوقف، ما حدا بيقدر يبعتلك" else "متاح لاستقبال الرسائل", color = if (paused) Color(0xFFFFA6B5) else Mint, style = MaterialTheme.typography.bodySmall)
+            }
+            Switch(checked = !paused, enabled = inbox != null, onCheckedChange = { on -> onPause(!on) },
+                colors = SwitchDefaults.colors(checkedTrackColor = Mint, checkedThumbColor = Night, uncheckedTrackColor = Color(0x33FFFFFF), uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
+        }
     }
-    if (err.isNotEmpty()) Banner(err, Modifier.padding(start = 16.dp, end = 16.dp, bottom = 8.dp))
+    if (err.isNotEmpty()) Banner(err, Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
     when {
         inbox == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { if (err.isEmpty()) CircularProgressIndicator(color = Green) }
         msgs.isEmpty() -> Column(Modifier.fillMaxSize().verticalScrollable().padding(horizontal = 48.dp, vertical = 90.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -132,7 +141,7 @@ fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit
             Text("ما في رسائل", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(top = 16.dp, bottom = 20.dp))
             YnButton("رمز سيارتي", icon = Icons.Filled.QrCode2, onClick = onSticker)
         }
-        else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        else -> LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             items(msgs, key = { it.id }) { m -> MessageCard(key, m, onOpen = { onOpen(m) }, onChanged = onChanged) }
         }
     }
@@ -151,7 +160,7 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
     val photo by rememberPhoto(key, m.id, m.photo)
     val fresh = m.reply == null
     val urgent = m.kind == "hit" || m.kind == "urgent"
-    YnCard(onClick = onOpen, border = if (fresh) (if (urgent) Red else Green) else Line) {
+    YnCard(onClick = onOpen, border = if (fresh) (if (urgent) Red else Mint) else Color.Transparent) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconBadge(kindIcon(m.kind), if (urgent) Red else Green, if (urgent) RedSoft else MintSoft, 42.dp)
             Spacer(Modifier.width(12.dp))
@@ -179,15 +188,11 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
             }
         }
         if (err.isNotEmpty()) Banner(err, Modifier.padding(top = 8.dp))
-        Row(Modifier.fillMaxWidth().padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            if (!fresh) {
-                Icon(Icons.Filled.CheckCircle, null, tint = Green, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
-                Text(REPLIES[m.reply] ?: m.reply ?: "", color = GreenDark, style = MaterialTheme.typography.labelMedium)
-            }
-            Spacer(Modifier.weight(1f))
-            Icon(Icons.Filled.ChatBubbleOutline, null, tint = Green, modifier = Modifier.size(17.dp)); Spacer(Modifier.width(6.dp))
-            Text(if (m.chat > 0) "محادثة (${m.chat})" else "محادثة", color = Green, style = MaterialTheme.typography.labelMedium)
+        if (!fresh) Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Filled.CheckCircle, null, tint = Green, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
+            Text(REPLIES[m.reply] ?: m.reply ?: "", color = GreenDark, style = MaterialTheme.typography.labelMedium)
         }
+        YnButton(if (m.chat > 0) "المحادثة (${m.chat})" else "افتح المحادثة", Modifier.padding(top = 10.dp), style = BtnStyle.Outline, icon = Icons.Filled.ChatBubble, height = 48.dp, onClick = onOpen)
     }
     if (askBlock) AlertDialog(
         onDismissRequest = { askBlock = false }, containerColor = Color.White,
@@ -209,20 +214,21 @@ private fun qr(text: String): Bitmap {
 @Composable
 fun StickerTab(token: String) {
     val ctx = LocalContext.current
-    TopTitle("رمز سيارتي")
+    TabHeader { Text("ملصق سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall) }
     Column(Modifier.fillMaxSize().verticalScrollable().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (token.isEmpty()) {
             Banner("الرمز مش محفوظ على هالجهاز. افتحه من صندوقك على الموقع.", icon = Icons.Filled.Info, tint = Green, back = MintSoft)
         } else {
             val url = "https://yanashmi.com/c?t=$token"
             val bmp = remember(url) { qr(url) }
-            YnCard(Modifier.widthIn(max = 300.dp), padding = 20.dp) {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(verticalAlignment = Alignment.CenterVertically) { StarMark(22, Green); Spacer(Modifier.width(8.dp)); Text("يا نشمي", style = MaterialTheme.typography.titleLarge) }
-                    Image(bmp.asImageBitmap(), "رمز الستيكر", Modifier.padding(vertical = 14.dp).fillMaxWidth().aspectRatio(1f))
-                    Text("مسكّر عليّ؟ امسح الرمز", style = MaterialTheme.typography.titleMedium)
-                    Text("YN-${token.uppercase()}", color = Muted, style = MaterialTheme.typography.labelMedium)
+            val shape = RoundedCornerShape(28.dp)
+            Column(Modifier.widthIn(max = 300.dp).fillMaxWidth().shadow(14.dp, shape).clip(shape).background(Color.White), horizontalAlignment = Alignment.CenterHorizontally) {
+                Row(Modifier.fillMaxWidth().background(HeroBrush).padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    StarMark(24); Spacer(Modifier.width(8.dp)); Text("يا نشمي", color = Color.White, style = MaterialTheme.typography.titleLarge)
                 }
+                Image(bmp.asImageBitmap(), "رمز الستيكر", Modifier.padding(top = 14.dp, start = 24.dp, end = 24.dp).fillMaxWidth().aspectRatio(1f))
+                Text("مسكّر عليّ؟ امسح الرمز", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+                Text("YN-${token.uppercase()}", color = Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(bottom = 16.dp))
             }
             YnButton("شارك للطباعة", icon = Icons.Filled.Share) { ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), "شارك")) }
         }
@@ -256,8 +262,14 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
     var note by remember { mutableStateOf("") }
     var err by remember { mutableStateOf("") }
     fun link(k: String) = "https://yanashmi.com/inbox.html#$k"
-    TopTitle(inbox?.name ?: "حسابي")
-    Column(Modifier.fillMaxSize().verticalScrollable().padding(horizontal = 16.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    TabHeader {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(Modifier.size(52.dp).clip(CircleShape).background(Mint), contentAlignment = Alignment.Center) { Text(inbox?.name?.take(1) ?: "ي", color = Night, style = MaterialTheme.typography.headlineSmall) }
+            Spacer(Modifier.width(14.dp))
+            Text(inbox?.name ?: "حسابي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
+    }
+    Column(Modifier.fillMaxSize().verticalScrollable().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         if (err.isNotEmpty()) Banner(err)
         if (note.isNotEmpty()) Banner(note, icon = Icons.Filled.CheckCircle, tint = Green, back = MintSoft)
         Text("الأمان", color = Muted, style = MaterialTheme.typography.labelMedium)

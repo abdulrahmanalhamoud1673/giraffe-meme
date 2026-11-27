@@ -49,7 +49,7 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
     val listState = rememberLazyListState()
     val first by rememberPhoto(key, m.id, m.photo)
     suspend fun pull() { try { thread = Api.thread(key, m.id) } catch (_: Exception) { } }
-    PollWhileVisible(m.id, 3000) { pull() }
+    PollWhileVisible(m.id, 4000) { pull() }
     val items = thread?.messages ?: emptyList()
     LaunchedEffect(items.size) { if (items.isNotEmpty()) listState.animateScrollToItem(items.size) }
     fun send(photo: String?) {
@@ -59,15 +59,17 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
     }
     if (camera) { CameraScreen { photo -> camera = false; if (photo != null) send(photo) }; return }
     Column(Modifier.fillMaxSize().background(Bg).imePadding()) {
-        Column(Modifier.fillMaxWidth().background(Color.White).statusBarsPadding()) {
-            Row(Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Ink) }
-                Column(Modifier.weight(1f)) {
-                    Text("عند سيارتك", style = MaterialTheme.typography.titleMedium)
-                    Text(if (thread?.open == false) "انتهت المحادثة" else "رقمكم مخفي", color = Muted, style = MaterialTheme.typography.bodySmall)
+        Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)).background(HeroBrush).statusBarsPadding().padding(horizontal = 6.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Color.White) }
+            Box(Modifier.size(42.dp).clip(CircleShape).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.Person, null, tint = Mint) }
+            Spacer(Modifier.width(10.dp))
+            Column(Modifier.weight(1f)) {
+                Text("شخص عند سيارتك", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Shield, null, tint = Mint, modifier = Modifier.size(13.dp)); Spacer(Modifier.width(4.dp))
+                    Text(if (thread?.open == false) "انتهت المحادثة" else "محادثة محمية · رقمكم مخفي", color = OnNight, style = MaterialTheme.typography.bodySmall)
                 }
             }
-            HorizontalDivider(color = Line)
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             item {
