@@ -2,7 +2,7 @@
 
 // SHA-256 of secrets that were pasted into a chat. Only the hashes are stored, never the secrets.
 export const EXPOSED = {
-  ADMIN_KEY: ['9f528ac2359a8edb61428f597e2ba250dd9fc339d78777c65d09c87659aefa2a'],
+  ADMIN_KEY: ['4a931ad6dbba1f175abfbf7fbf9cc063340e06722c77168eae3697367f319ee6', '9f528ac2359a8edb61428f597e2ba250dd9fc339d78777c65d09c87659aefa2a'],
   SALT: ['de790b4c8fc2be4754a085eb628e59b919315fd7a64df476be414cff30b2caf7'],
   VAPID_PRIVATE: ['0681e72ef1c8ca2a4b214c2a0b47f1d3ad811fc5875b4dc2c5b1074449b5e503'],
 };
