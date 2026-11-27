@@ -32,6 +32,8 @@ export async function onRequestGet({ request, env }) {
     const { results: srcs } = await env.DB.prepare('SELECT src AS k, COUNT(*) AS n FROM sources GROUP BY src ORDER BY n DESC LIMIT 20').all();
     bySource = Object.fromEntries(srcs.map((r) => [r.k, r.n]));
   } catch (_) { /* table not created yet */ }
+  let reports = [];
+  try { reports = (await env.DB.prepare("SELECT strftime('%Y-%m-%d', created_at, 'unixepoch') AS day, kind, said FROM reports ORDER BY created_at DESC LIMIT 50").all()).results; } catch (_) { /* table not created yet */ }
   const usage = {
     bySource,
     cars: { total: cars.n || 0, last24h: cars.d1 || 0, last7d: cars.d7 || 0, perDay },
@@ -41,7 +43,7 @@ export async function onRequestGet({ request, env }) {
     carsWithMessages: withMsg.n || 0,
     messages: { total: msgs.n || 0, replied: msgs.replied || 0, last24h: msgs.d1 || 0, last7d: msgs.d7 || 0, avgReplyMinutes: msgs.avg_reply == null ? null : Math.round(msgs.avg_reply / 6) / 10 },
   };
-  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact), usage, exposed: await exposedSecrets(env) }), {
+  return new Response(JSON.stringify({ total, counts, contacts: contacts.map(c => c.contact), usage, reports, exposed: await exposedSecrets(env) }), {
     headers: { 'content-type': 'application/json; charset=utf-8' },
   });
 }

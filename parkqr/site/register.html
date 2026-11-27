@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127k">
+<link rel="stylesheet" href="app.css?v=20261127m">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <meta name="theme-color" content="#120d0e">
 <title>سجّل سيارتك — يا نشمي</title>
@@ -97,7 +97,7 @@ body{background:
             <div class="picks" id="makes" role="radiogroup" aria-labelledby="makeLbl"></div>
             <div class="picks colors" id="colors" role="radiogroup" aria-label="اللون"></div>
             <input type="text" id="nickname" maxlength="40" placeholder="تويوتا بيضاء" aria-label="وصف السيارة"></div>
-          <label class="cons"><input type="checkbox" id="consent"><span>موافق على حفظ اسمي ورقمي</span></label>
+          <label class="cons"><input type="checkbox" id="consent"><span>موافق على <a href="terms.html">الشروط</a> و<a href="privacy.html">الخصوصية</a></span></label>
           <p class="ferr" id="err" role="alert"></p>
           <button class="cta go" type="submit" id="btn">احصل على الرمز</button>
         </form>
@@ -141,8 +141,8 @@ body{background:
     <button class="x" id="saveClose" type="button">إغلاق</button>
   </div>
 </div>
-<script src="qr.js?v=20261127k"></script>
-<script src="shared.js?v=20261127k"></script>
+<script src="qr.js?v=20261127m"></script>
+<script src="shared.js?v=20261127m"></script>
 <script>
 const $=id=>document.getElementById(id);
 const f=$('f'),err=$('err'),btn=$('btn');

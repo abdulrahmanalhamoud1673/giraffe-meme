@@ -31,8 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 
 const val SCENE_MS = 3600
-private val CAPTIONS = listOf("الصق الرمز", "بيمسحه", "بتوصلك")
-
 /**
  * A short looping "video" that shows how the app works, drawn live so it is sharp on every screen and adds nothing to
  * the download. Tap to jump to the next part. `still` (0 until 3) freezes one moment, for the screenshot tests.
@@ -68,7 +66,6 @@ fun Story(modifier: Modifier = Modifier, still: Float? = null) {
             drawCircle(Brush.radialGradient(listOf(Accent.copy(alpha = .22f), Color.Transparent), stage.at(50f, 40f), 46 * u), 46 * u, stage.at(50f, 40f))
             when (scene) { 0 -> stage.sticker(t); 1 -> stage.scan(t); else -> stage.reply(t) }
         }
-        Text(CAPTIONS[scene], color = Color.White, style = MaterialTheme.typography.headlineLarge, textAlign = TextAlign.Center)
     }
 }
 

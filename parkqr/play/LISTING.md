@@ -21,6 +21,8 @@
 
 **الفئة:** أدوات (Tools)  |  **السعر:** مجاني  |  **اللغة:** العربية
 **رابط سياسة الخصوصية:** https://yanashmi.com/privacy.html
+**شروط الاستخدام:** https://yanashmi.com/terms
+**رابط حذف الحساب:** https://yanashmi.com/delete-account.html
 **إيميل التواصل:** info@yanashmi.com
 **التقييم العمري:** للجميع (تعبّي استبيان جوجل، ما فيه محتوى حساس)
 

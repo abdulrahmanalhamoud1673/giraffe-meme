@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127k">
+<link rel="stylesheet" href="app.css?v=20261127m">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>لوحة الأرقام — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -182,6 +182,14 @@ $('vGen').onclick=async()=>{
 for(const [id,k] of [['vPub','pub'],['vPriv','priv']])$(id).onclick=async()=>{try{await navigator.clipboard.writeText(vk[k]);$(id).textContent='انتسخ ✓'}catch(_){$('vMsg').textContent='ما قدرنا ننسخ. جرّب متصفح ثاني.'}};
 $('kf').addEventListener('submit',e=>{e.preventDefault();load($('k').value)});
 try{const k=sessionStorage.getItem('yn_admin');if(k){$('k').value=k;load(k)}}catch(_){}
+</script>
+<script>
+// reported messages, shown under the numbers (needs the same key)
+(function(){const f=window.fetch;window.fetch=async(...a)=>{const r=await f(...a);if(String(a[0]).includes('/api/results')&&r.ok)r.clone().json().then(d=>{
+  let box=document.getElementById('reports');if(!box){box=document.createElement('section');box.id='reports';box.style.cssText='max-width:700px;margin:20px auto;padding:0 16px';document.body.appendChild(box)}
+  box.textContent='';const h=document.createElement('h2');h.textContent='البلاغات ('+(d.reports||[]).length+')';box.appendChild(h);
+  for(const x of d.reports||[]){const p=document.createElement('p');p.textContent=x.day+' · '+x.kind+' · '+(x.said||'بدون كتابة');box.appendChild(p)}
+});return r}})();
 </script>
 </body>
 </html>

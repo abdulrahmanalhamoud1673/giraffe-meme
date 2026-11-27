@@ -64,6 +64,23 @@ check('parallel reminders: one', count("messages WHERE kind LIKE 'nudge:%'") ===
 await DEL.onRequestPost({ request: req('/', {}, '2.2.2.2', 'o', nk), env });
 check('account deletion removes the conversations too', count('chat') === 0 && count('messages') === 0 && count('cars') === 0);
 
+// report: keeps what was said, blocks the sender
+const RPT = await api('inbox/report.js');
+const reg2 = await (await REG.onRequestPost({ request: req('/', { name: 'سامي الحسن', phone: '0788403917', consent: true }, '3.1.1.1'), env })).json();
+db.prepare('DELETE FROM hits').run();
+const bad = await (await SEND.onRequestPost({ request: req('/', { token: reg2.token, kind: 'block', note: 'عند المدخل' }, '4.1.1.1'), env })).json();
+await CHAT.onRequestPost({ request: req('/api/chat?id=' + bad.id, { text: 'انزل بسرعة' }, '4.1.1.1'), env });
+const report = (key, id) => RPT.onRequestPost({ request: req('/', { id }, '2.2.2.2', 'o', key), env });
+check('report needs the key', (await report(null, bad.id)).status === 401);
+check('cannot report another car\'s message', (await report(nk, bad.id)).status === 401 || count('reports') === 0);
+check('report accepted', (await report(reg2.owner_key, bad.id)).status === 200);
+check('the report keeps what was said', /عند المدخل \| انزل بسرعة/.test(db.prepare('SELECT said FROM reports').get().said));
+db.prepare('UPDATE messages SET created_at = created_at - 600').run();
+await SEND.onRequestPost({ request: req('/', { token: reg2.token, kind: 'block' }, '4.1.1.1'), env });
+check('the reported sender is blocked', count("messages WHERE car_id = '" + reg2.token + "' AND kind = 'block'") === 1);
+await report(reg2.owner_key, bad.id); check('one report per message', count('reports') === 1);
+await DEL.onRequestPost({ request: req('/', {}, '2.2.2.2', 'o', reg2.owner_key), env }); check('deleting the account removes its reports', count('reports') === 0);
+
 // errors do not describe the database
 r = await SEND.onRequestPost({ request: req('/', { token: 'x', kind: 'block' }, '1.1.1.1'), env: { DB: { prepare: () => { throw new Error('SQLITE secret table'); } } } });
 check('server errors say nothing about the inside', r.status === 500 && !(await r.text()).includes('SQLITE'));

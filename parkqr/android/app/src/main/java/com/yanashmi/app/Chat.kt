@@ -46,6 +46,8 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
     var text by remember { mutableStateOf("") }; var err by remember { mutableStateOf("") }
     var camera by remember { mutableStateOf(false) }
     var sending by remember { mutableStateOf(false) }
+    var blocked by remember { mutableStateOf(false) }
+    var ask by remember { mutableStateOf<Moderate?>(null) }
     val listState = rememberLazyListState()
     val first by rememberPhoto(key, m.id, m.photo)
     suspend fun pull() { try { thread = Api.thread(key, m.id) } catch (_: Exception) { } }
@@ -57,6 +59,7 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
         sending = true; err = ""
         scope.launch { try { Api.say(key, m.id, t, photo); text = ""; pull() } catch (e: Exception) { err = errText(e) } finally { sending = false } }
     }
+    ask?.let { what -> ModerationDialog(what, key, m.id, onDone = { blocked = true }, onError = { err = it }) { ask = null } }
     if (camera) { CameraScreen { photo -> camera = false; if (photo != null) send(photo) }; return }
     Column(Modifier.fillMaxSize().background(Bg).imePadding()) {
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)).background(HeroBrush).statusBarsPadding().padding(horizontal = 6.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -67,6 +70,7 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
                 Text("عند سيارتك", color = Color.White, style = MaterialTheme.typography.titleMedium)
                 if (thread?.open == false) Text("انتهت", color = OnNight, style = MaterialTheme.typography.bodySmall)
             }
+            ModerationMenu(blocked, Color.White) { ask = it }
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             item {

@@ -87,6 +87,7 @@ object Api {
 
     /** New secret link; the old one stops working everywhere. */
     suspend fun rotate(key: String): String = call("POST", "/api/inbox/rotate", key, JSONObject()).getString("owner_key")
+    suspend fun report(key: String, id: String) { call("POST", "/api/inbox/report", key, JSONObject().put("id", id)) }
     suspend fun deleteAccount(key: String) { call("POST", "/api/inbox/delete", key, JSONObject()) }
 
     suspend fun thread(key: String, id: String): Thread {

@@ -6,7 +6,13 @@ import androidx.security.crypto.MasterKey
 
 /** The owner key and a few settings, encrypted on the device (Android Keystore). */
 class Store(ctx: Context) {
-    private val prefs = EncryptedSharedPreferences.create(
+    private val prefs = try { open(ctx) } catch (_: Exception) {
+        // The phone's key store lost the key (restore, system update): start clean, the person signs in again.
+        ctx.deleteSharedPreferences("yn_secure")
+        open(ctx)
+    }
+
+    private fun open(ctx: Context) = EncryptedSharedPreferences.create(
         ctx, "yn_secure",
         MasterKey.Builder(ctx).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,

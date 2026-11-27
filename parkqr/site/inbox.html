@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127k">
+<link rel="stylesheet" href="app.css?v=20261127m">
 <link rel="manifest" href="/manifest.webmanifest" id="manifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#120d0e">
@@ -51,10 +51,10 @@
   </nav>
 </div>
 
-<script src="qr.js?v=20261127k"></script>
-<script src="shared.js?v=20261127k"></script>
-<script src="camera.js?v=20261127k"></script>
-<script src="push.js?v=20261127k"></script>
+<script src="qr.js?v=20261127m"></script>
+<script src="shared.js?v=20261127m"></script>
+<script src="camera.js?v=20261127m"></script>
+<script src="push.js?v=20261127m"></script>
 <script>
 let key=location.hash.slice(1);
 try{
@@ -186,6 +186,9 @@ function render(d){
     const bl=document.createElement('button');bl.type='button';bl.className='blockBtn';bl.textContent='حظر';
     bl.onclick=async()=>{if(!confirm('بدك تحظر هالشخص؟ ما رح توصلك رسائله ولا بيعرف.'))return;bl.disabled=true;try{await api('/inbox/block',{method:'POST',headers:H,body:JSON.stringify({id:m.id})});bl.textContent='تم الحظر'}catch(_){bl.disabled=false}};
     inb.querySelector('.meta').appendChild(bl);
+    const rp=document.createElement('button');rp.type='button';rp.className='blockBtn reportBtn';rp.textContent='إبلاغ';
+    rp.onclick=async()=>{if(!confirm('تبلّغ عن المرسل؟ بينحظر عندك.'))return;rp.disabled=true;try{await api('/inbox/report',{method:'POST',headers:H,body:JSON.stringify({id:m.id})});rp.textContent='وصل البلاغ'}catch(_){rp.disabled=false}};
+    inb.querySelector('.meta').appendChild(rp);
     th.appendChild(inb);
     if(m.reply){
       const out=document.createElement('div');out.className='bub out';

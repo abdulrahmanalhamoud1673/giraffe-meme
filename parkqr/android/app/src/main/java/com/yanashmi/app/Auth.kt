@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -26,6 +27,7 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
@@ -40,7 +42,7 @@ enum class AuthStep { Welcome, Car, Link }
 fun AuthScreen(onDone: (String, String) -> Unit) {
     val scope = rememberCoroutineScope()
     val ctx = LocalContext.current
-    var step by remember { mutableStateOf(AuthStep.Welcome) }
+    var step by rememberSaveable { mutableStateOf(AuthStep.Welcome) }
     val form = remember { CarForm() }
     var link by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var err by remember { mutableStateOf("") }
@@ -51,7 +53,7 @@ fun AuthScreen(onDone: (String, String) -> Unit) {
         scope.launch {
             try { block() }
             catch (_: GetCredentialCancellationException) { }
-            catch (_: NoCredentialException) { err = "ما لقينا حساب جوجل على الموبايل. ضيف حساب من الإعدادات وجرّب." }
+            catch (_: NoCredentialException) { err = "ضيف حساب جوجل عالموبايل." }
             catch (_: GetCredentialException) { err = "ما زبط الدخول بجوجل. جرّب كمان مرة." }
             catch (e: Exception) { err = errText(e) }
             finally { busy = false }
@@ -92,25 +94,39 @@ fun AuthScreen(onDone: (String, String) -> Unit) {
 
 @Composable
 fun WelcomeScreen(busy: Boolean, err: String, onGoogle: () -> Unit, onLink: () -> Unit, still: Float? = null) {
+    BoxWithConstraints(Modifier.fillMaxSize().background(NightBrush).statusBarsPadding()) {
+        val story = (maxHeight - if (err.isEmpty()) 250.dp else 340.dp).coerceAtLeast(240.dp)
+        Column(Modifier.fillMaxWidth().verticalScrollable()) {
+            Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                StarMark(28); Spacer(Modifier.width(8.dp)); Text("يا نشمي", color = Color.White, style = MaterialTheme.typography.titleLarge)
+            }
+            Shemagh(Modifier.padding(bottom = 14.dp))
+            Story(Modifier.height(story).fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 18.dp), still)
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)).background(Color.White).navigationBarsPadding().padding(horizontal = 22.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                if (err.isNotEmpty()) Banner(err)
+                YnButton("ابدأ بحساب جوجل", busy = busy, leading = {
+                    Box(Modifier.size(28.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) { Image(painterResource(R.drawable.ic_google), null, Modifier.size(18.dp)) }
+                }, onClick = onGoogle)
+                TextButton(onClick = onLink, enabled = !busy) { Text("عندي رابط", style = MaterialTheme.typography.labelLarge) }
+                Legal()
+            }
+        }
+    }
+}
+
+/** Terms and privacy: two small links, accepted by continuing. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun Legal(prefix: String = "") {
     val ctx = LocalContext.current
-    Column(Modifier.fillMaxSize().background(NightBrush).statusBarsPadding()) {
-        Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            StarMark(28); Spacer(Modifier.width(8.dp)); Text("يا نشمي", color = Color.White, style = MaterialTheme.typography.titleLarge)
-        }
-        Shemagh(Modifier.padding(bottom = 14.dp))
-        Story(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 18.dp), still)
-        Column(
-            Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)).background(Color.White).navigationBarsPadding().padding(horizontal = 22.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            if (err.isNotEmpty()) Banner(err)
-            YnButton("ابدأ بحساب جوجل", busy = busy, leading = {
-                Box(Modifier.size(28.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) { Image(painterResource(R.drawable.ic_google), null, Modifier.size(18.dp)) }
-            }, onClick = onGoogle)
-            TextButton(onClick = onLink, enabled = !busy) { Text("عندي رابط", style = MaterialTheme.typography.labelLarge) }
-            Text("الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.clickable { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/privacy"))) } catch (_: Exception) { } }.padding(4.dp))
-        }
+    fun open(page: String) { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/$page"))) } catch (_: Exception) { } }
+    FlowRow(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalArrangement = Arrangement.Center) {
+        if (prefix.isNotEmpty()) Text(prefix, color = Muted, style = MaterialTheme.typography.labelSmall, modifier = Modifier.padding(vertical = 6.dp))
+        Text("الشروط", color = Muted, style = MaterialTheme.typography.labelSmall, textDecoration = TextDecoration.Underline, modifier = Modifier.clickable { open("terms") }.padding(horizontal = 8.dp, vertical = 6.dp))
+        Text("الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall, textDecoration = TextDecoration.Underline, modifier = Modifier.clickable { open("privacy") }.padding(horizontal = 8.dp, vertical = 6.dp))
     }
 }
 
@@ -150,7 +166,7 @@ fun CarScreen(f: CarForm, busy: Boolean, err: String, onBack: () -> Unit, onSubm
         bottom = {
             if (err.isNotEmpty()) Banner(err)
             YnButton("جهّز ملصقي", busy = busy, onClick = onSubmit)
-            Text("بالمتابعة بتوافق على الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            Legal("بالمتابعة بتوافق على")
         },
     ) {
         YnField(f.phone, { f.phone = digits(it) }, "رقم الموبايل", placeholder = "07X XXX XXXX", keyboard = KeyboardType.Phone, icon = Icons.Filled.PhoneAndroid, ltr = true)

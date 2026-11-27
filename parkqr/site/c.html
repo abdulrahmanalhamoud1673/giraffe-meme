@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261127k">
+<link rel="stylesheet" href="/app.css?v=20261127m">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -29,7 +29,7 @@
       <input class="noteIn" id="noteIn" maxlength="80" placeholder="مثلاً: عند مدخل العمارة" autocomplete="off" hidden>
       <div id="list"></div>
       <p class="err" id="err" role="alert" style="margin-top:14px"></p>
-      <p class="note" style="margin-top:10px;text-align:center">للطوارئ: 911</p>
+      <p class="note" style="margin-top:10px;text-align:center">للطوارئ: 911 · <a href="/terms">بالإرسال بتوافق على الشروط</a></p>
     </section>
 
     <section id="cam" hidden>
@@ -52,8 +52,8 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261127k"></script>
-<script src="/camera.js?v=20261127k"></script>
+<script src="/shared.js?v=20261127m"></script>
+<script src="/camera.js?v=20261127m"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);

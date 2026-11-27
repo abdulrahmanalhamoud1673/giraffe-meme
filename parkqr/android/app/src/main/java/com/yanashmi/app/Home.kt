@@ -6,10 +6,11 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.Color as AColor
 import android.net.Uri
 import android.os.PersistableBundle
 import android.util.LruCache
+import android.widget.Toast
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -40,9 +41,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.zxing.BarcodeFormat
-import com.google.zxing.EncodeHintType
-import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -77,7 +75,7 @@ fun HomeScreen(store: Store, onNewKey: (String) -> Unit, onLogout: () -> Unit) {
     val scope = rememberCoroutineScope()
     var inbox by remember { mutableStateOf<Inbox?>(null) }
     var err by remember { mutableStateOf("") }
-    var tab by remember { mutableStateOf(Tab.Inbox) }
+    var tab by rememberSaveable { mutableStateOf(Tab.Inbox) }
     var open by remember { mutableStateOf<Msg?>(null) }
     suspend fun load() {
         try { val i = Api.inbox(key); inbox = i; err = "" }
@@ -126,8 +124,8 @@ fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit
             Box(Modifier.size(52.dp).clip(RoundedCornerShape(18.dp)).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DirectionsCar, null, tint = Accent, modifier = Modifier.size(28.dp)) }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(inbox?.nickname?.ifBlank { null } ?: "سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(if (paused) "متوقف" else "متاح", color = OnNight, style = MaterialTheme.typography.bodySmall)
+                Text(inbox?.nickname?.ifBlank { null } ?: "سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                if (paused) Text("متوقف", color = OnNight, style = MaterialTheme.typography.bodySmall)
             }
             Switch(checked = !paused, enabled = inbox != null, onCheckedChange = { on -> onPause(!on) },
                 colors = SwitchDefaults.colors(checkedTrackColor = Accent, checkedThumbColor = Color.White, uncheckedTrackColor = Color(0x33FFFFFF), uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
@@ -149,12 +147,12 @@ fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit
 
 private val SHORT_REPLY = mapOf("2" to "دقيقتين", "5" to "5 دقايق", "10" to "10 دقايق", "cant" to "ما بقدر")
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) {
     val scope = rememberCoroutineScope()
     var blocked by remember { mutableStateOf(false) }
-    var menu by remember { mutableStateOf(false) }
-    var askBlock by remember { mutableStateOf(false) }
+    var ask by remember { mutableStateOf<Moderate?>(null) }
     var sending by remember { mutableStateOf(false) }
     var err by remember { mutableStateOf("") }
     val photo by rememberPhoto(key, m.id, m.photo)
@@ -168,22 +166,17 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
                 Text(KINDS[m.kind] ?: m.kind, style = MaterialTheme.typography.titleSmall)
                 Text(timeAgo(m.createdAt), color = Muted, style = MaterialTheme.typography.bodySmall)
             }
-            Box {
-                IconButton(onClick = { menu = true }) { Icon(Icons.Filled.MoreVert, "خيارات", tint = Muted) }
-                DropdownMenu(menu, { menu = false }, containerColor = Color.White) {
-                    DropdownMenuItem(text = { Text(if (blocked) "تم الحظر" else "حظر المرسل", color = Red) }, enabled = !blocked, leadingIcon = { Icon(Icons.Filled.Block, null, tint = Red) }, onClick = { menu = false; askBlock = true })
-                }
-            }
+            ModerationMenu(blocked, Muted) { ask = it }
         }
         if (!m.note.isNullOrBlank()) Text(m.note, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 10.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Bubble).padding(10.dp))
         photo?.let { Image(it.asImageBitmap(), "صورة المشكلة", Modifier.padding(top = 10.dp).fillMaxWidth().heightIn(max = 210.dp).clip(RoundedCornerShape(14.dp)), contentScale = ContentScale.Crop) }
         if (fresh) {
-            Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            FlowRow(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 for ((k, label) in SHORT_REPLY) {
                     val main = k == "2"
                     Text(label, color = if (main) Color.White else BrandDark, textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium, maxLines = 1,
                         modifier = Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (main) Brand else BrandSoft)
-                            .clickable(enabled = !sending) { err = ""; sending = true; scope.launch { try { Api.reply(key, m.id, k); onChanged() } catch (e: Exception) { err = errText(e) } finally { sending = false } } }.padding(vertical = 11.dp))
+                            .clickable(enabled = !sending) { err = ""; sending = true; scope.launch { try { Api.reply(key, m.id, k); onChanged() } catch (e: Exception) { err = errText(e) } finally { sending = false } } }.padding(horizontal = 10.dp, vertical = 11.dp))
                 }
             }
         }
@@ -194,22 +187,10 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
         }
         YnButton(if (m.chat > 0) "المحادثة (${m.chat})" else "افتح المحادثة", Modifier.padding(top = 10.dp), style = BtnStyle.Outline, icon = Icons.Filled.ChatBubble, height = 48.dp, onClick = onOpen)
     }
-    if (askBlock) AlertDialog(
-        onDismissRequest = { askBlock = false }, containerColor = Color.White,
-        title = { Text("تحظر المرسل؟") }, text = { Text("ما رح يعرف.") },
-        confirmButton = { TextButton(onClick = { askBlock = false; scope.launch { try { Api.block(key, m.id); blocked = true } catch (e: Exception) { err = errText(e) } } }) { Text("احظر", color = Red) } },
-        dismissButton = { TextButton(onClick = { askBlock = false }) { Text("إلغاء") } },
-    )
+    ask?.let { what -> ModerationDialog(what, key, m.id, onDone = { blocked = true }, onError = { err = it }) { ask = null } }
 }
 
 // ---------- my sticker ----------
-
-private fun qr(text: String): Bitmap {
-    val m = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 640, 640, mapOf(EncodeHintType.MARGIN to 1))
-    val bmp = Bitmap.createBitmap(m.width, m.height, Bitmap.Config.ARGB_8888)
-    for (x in 0 until m.width) for (y in 0 until m.height) bmp.setPixel(x, y, if (m[x, y]) AColor.BLACK else AColor.WHITE)
-    return bmp
-}
 
 @Composable
 fun StickerTab(token: String) {
@@ -219,8 +200,7 @@ fun StickerTab(token: String) {
         if (token.isEmpty()) {
             Banner("افتح رمزك من الموقع.", icon = Icons.Filled.Info, tint = Brand, back = BrandSoft)
         } else {
-            val url = "https://yanashmi.com/c?t=$token"
-            val bmp = remember(url) { qr(url) }
+            val bmp = remember(token) { qr(scanUrl(token)) }
             val shape = RoundedCornerShape(28.dp)
             Column(Modifier.widthIn(max = 300.dp).fillMaxWidth().shadow(14.dp, shape).clip(shape).background(Color.White), horizontalAlignment = Alignment.CenterHorizontally) {
                 Row(Modifier.fillMaxWidth().background(HeroBrush).padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
@@ -230,7 +210,7 @@ fun StickerTab(token: String) {
                 Text("امسحني", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
                 Text("YN-${token.uppercase()}", color = Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(bottom = 16.dp))
             }
-            YnButton("شارك", icon = Icons.Filled.Share) { ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), "شارك")) }
+            YnButton("شارك للطباعة", icon = Icons.Filled.Share) { try { shareSticker(ctx, token) } catch (_: Exception) { Toast.makeText(ctx, "ما زبط، جرّب كمان مرة", Toast.LENGTH_SHORT).show() } }
         }
     }
 }
@@ -266,7 +246,7 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.size(52.dp).clip(CircleShape).background(Accent), contentAlignment = Alignment.Center) { Text(inbox?.name?.take(1) ?: "ي", color = Night, style = MaterialTheme.typography.headlineSmall) }
             Spacer(Modifier.width(14.dp))
-            Text(inbox?.name ?: "حسابي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(inbox?.name ?: "حسابي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 2, overflow = TextOverflow.Ellipsis)
         }
     }
     Column(Modifier.fillMaxSize().verticalScrollable().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -278,6 +258,8 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
             SettingRow(Icons.Filled.Autorenew, "غيّر الرابط") { ask = Ask.Rotate }
             HorizontalDivider(color = Line)
             SettingRow(Icons.Filled.Shield, "الخصوصية") { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/privacy"))) } catch (_: Exception) { } }
+            HorizontalDivider(color = Line)
+            SettingRow(Icons.Filled.Description, "الشروط") { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/terms"))) } catch (_: Exception) { } }
         }
         YnCard(padding = 0.dp) {
             SettingRow(Icons.AutoMirrored.Filled.Logout, "تسجيل الخروج") { ask = Ask.Logout }
