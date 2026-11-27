@@ -16,20 +16,19 @@ const { chromium } = require('playwright');
   await p.clock.install();
   await p.goto('http://localhost:8788/c?t=' + token); await p.waitForSelector('#pick:not([hidden])');
   await p.locator('.opt').nth(0).click(); await p.waitForSelector('#sent:not([hidden])');
-  const t0 = (await p.textContent('#nudgeBtn')).trim();
-  console.log('right after sending, button says:', t0, '| disabled:', await p.isDisabled('#nudgeBtn'));
-  // success path first: the page calls the server by itself when 2 minutes pass without a reply
+  console.log('chat screen opened right after sending, status:', (await p.textContent('.chatHead small')).trim());
+  // the page calls the server by itself when 2 minutes pass without a reply
   let autoCalls = 0;
   await p.route('**/api/nudge', (r) => { autoCalls++; r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }); });
-  await p.clock.fastForward('02:05'); await p.waitForTimeout(400);
-  console.log('automatic reminder sent once after 2 minutes:', autoCalls === 1, '|', (await p.textContent('#nudgeMsg')).trim(), '| button hidden:', await p.evaluate(() => document.getElementById('nudgeBtn').hidden));
+  await p.clock.fastForward('02:05'); await p.waitForTimeout(600);
+  console.log('automatic reminder sent once after 2 minutes:', autoCalls === 1, '| shown in the chat:', (await p.textContent('.chatMsgs')).includes('ذكّرناه'));
   await p.screenshot({ path: OUT + '/nudge_ready.png' });
-  // the real server thinks only seconds passed: it refuses and the page counts again
+  // the real server thinks only seconds passed: it refuses ("too soon") and the page quietly waits and retries
   const p2c = await b.newContext({ viewport: { width: 400, height: 860 } }); const p2 = await p2c.newPage(); p2.on('pageerror', (e) => errs.push(e.message));
   await p2.clock.install(); await p2.goto('http://localhost:8788/c?t=' + token); await p2.waitForSelector('#pick:not([hidden])');
   await p2.locator('.opt').nth(1).click(); await p2.waitForSelector('#sent:not([hidden])');
   await p2.clock.fastForward('02:05'); await p2.waitForTimeout(500);
-  console.log('real server says "too soon" -> page counts again:', (await p2.textContent('#nudgeBtn')).trim().startsWith('بنذكّره'));
+  console.log('real server says "too soon" -> no error shown, no false "reminded" line:', !(await p2.textContent('.chatMsgs')).includes('ذكّرناه'));
 
   // --- reply-time line on the scan page (server answer faked: 3 min)
   const c2 = await b.newContext({ viewport: { width: 400, height: 860 } }); const q = await c2.newPage(); q.on('pageerror', (e) => errs.push(e.message));

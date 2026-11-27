@@ -164,3 +164,46 @@ function chatBubble(m, mine, getSrc) {
   tm.textContent = String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0'); d.appendChild(tm);
   return d;
 }
+
+/* ---- WhatsApp-style chat screen, used by the scan page (sender) and the inbox (owner).
+   box: element to fill. opts: { title, back(), status(state)->text, load()->{open,items:[{mine,text,t,photo,id}]}, send(body)->promise,
+   photoUrl(item)->url|promise, quick:[[key,label]], onQuick(key), errText(code) }  returns { close(), refresh() } */
+function mountChat(box, o) {
+  box.classList.add('chatApp'); box.hidden = false;
+  box.innerHTML = '<header class="chatHead">' + (o.back ? '<button type="button" class="chBack" aria-label="رجوع"></button>' : '') +
+    '<div class="av"></div><div class="ti"><b></b><small></small></div></header><div class="chatMsgs" role="log" aria-live="polite"></div>' +
+    '<div class="chatQuick" hidden></div><p class="chatErr" role="alert"></p>' +
+    '<form class="chatBar"><button type="button" class="camBtn" aria-label="صوّر"></button><input maxlength="140" placeholder="اكتب رسالة…" autocomplete="off"><button type="submit" class="sendBtn" aria-label="أرسل"></button></form>';
+  const q = (s) => box.querySelector(s), list = q('.chatMsgs'), inp = q('input'), err = q('.chatErr'), quick = q('.chatQuick');
+  q('.av').innerHTML = ICON.block; q('.ti b').textContent = o.title; q('.camBtn').innerHTML = ICON.camera; q('.sendBtn').innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.4 20.4l17.5-7.5a1 1 0 000-1.8L3.4 3.6a1 1 0 00-1.4 1.2L4 11l9 1-9 1-2 6.2a1 1 0 001.4 1.2z"/></svg>';
+  if (o.back) { const b = q('.chBack'); b.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>'; b.onclick = () => { close(); o.back(); }; }
+  let timer = null, sig = '', alive = true, state = { open: true, items: [] };
+  const say = (code) => { err.textContent = code ? ((o.errText && o.errText(code)) || 'ما قدرنا نرسل. جرب كمان مرة.') : ''; };
+  async function refresh() {
+    try {
+      const r = await o.load(); state = r; q('.ti small').textContent = o.status ? o.status(r) : '';
+      const s = JSON.stringify(r.items.map((x) => [x.id, x.text, x.photo, x.t]));
+      if (s !== sig) {
+        sig = s; const near = list.scrollHeight - list.scrollTop - list.clientHeight < 140; list.textContent = '';
+        let day = '';
+        for (const m of r.items) {
+          if (m.sys) { const p = document.createElement('div'); p.className = 'sysMsg'; p.textContent = m.text; list.appendChild(p); continue; }
+          const dk = new Date(m.t * 1000).toDateString();
+          if (dk !== day) { day = dk; const d = document.createElement('div'); d.className = 'sysMsg'; d.textContent = new Date(m.t * 1000).toDateString() === new Date().toDateString() ? 'اليوم' : new Date(m.t * 1000).toLocaleDateString('ar'); list.appendChild(d); }
+          list.appendChild(chatBubble(m, m.mine, o.photoUrl));
+        }
+        if (near || !list.dataset.s) { list.scrollTop = list.scrollHeight; list.dataset.s = '1'; }
+      }
+      const show = r.open && o.quick && o.quick.length && !r.answered; quick.hidden = !show;
+      if (show && !quick.childElementCount) for (const [k, l] of o.quick) { const b = document.createElement('button'); b.type = 'button'; b.textContent = l; b.onclick = async () => { quick.hidden = true; try { await o.onQuick(k); } catch (_) {} refresh(); }; quick.appendChild(b); }
+      inp.disabled = !r.open; q('.camBtn').disabled = !r.open; q('.sendBtn').disabled = !r.open;
+      inp.placeholder = r.open ? 'اكتب رسالة…' : 'انتهت المحادثة';
+    } catch (_) { /* keep what we have */ }
+  }
+  async function post(body) { say(''); try { await o.send(body); inp.value = ''; await refresh(); list.scrollTop = list.scrollHeight; } catch (e) { say(e && e.code); } }
+  q('form').onsubmit = (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) post({ text: t }); };
+  q('.camBtn').onclick = async () => { const p = await liveCapture(); if (p) post({ photo: p, text: inp.value.trim() }); };
+  function close() { alive = false; clearInterval(timer); box.classList.remove('chatApp'); box.innerHTML = ''; box.hidden = true; }
+  refresh(); timer = setInterval(() => { if (alive) refresh(); }, 3000);
+  return { close, refresh };
+}

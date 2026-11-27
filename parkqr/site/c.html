@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261127c">
+<link rel="stylesheet" href="/app.css?v=20261127d">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -43,24 +43,7 @@
       </div>
     </section>
 
-    <section id="sent" hidden>
-      <h1>تم الإرسال</h1>
-      <p class="lead" id="sentMsg" style="margin-bottom:0"></p>
-      <ol class="track" aria-live="polite">
-        <li class="done"><span class="dot" id="dotSent"></span><div><b>وصلت رسالتك</b><div class="note">لصاحب السيارة.</div></div></li>
-        <li class="wait" id="stepReply"><span class="dot" id="dotReply"></span><div><b id="replyTitle">بانتظار ردّه</b><div class="note" id="replyBox">خلّي هالصفحة مفتوحة، الرد بيظهر هون لحاله.</div></div></li>
-      </ol>
-      <div id="nudgeBox" style="margin-top:18px" hidden>
-        <button class="cta alt" id="nudgeBtn" type="button" disabled style="width:100%"></button>
-        <p class="note" id="nudgeMsg" style="margin-top:8px;text-align:center"></p>
-      </div>
-      <div class="chatBox" id="chatBox" hidden>
-        <div class="chatList" id="chatList"></div>
-        <form class="chatForm" id="chatForm"><button type="button" class="camBtn" id="chatCam" aria-label="صوّر"></button><input id="chatIn" maxlength="140" placeholder="اكتب رسالة قصيرة…" autocomplete="off"><button type="submit" aria-label="إرسال"></button></form>
-        <p class="note" id="chatErr"></p>
-      </div>
-      <div class="reply" id="replyCard" hidden><span class="note">ردّ صاحب السيارة</span><b id="replyText"></b></div>
-    </section>
+    <section id="sent" hidden></section>
 
     <section id="bad" hidden>
       <h1 id="badTitle">الرابط غير صحيح</h1>
@@ -69,14 +52,13 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261127c"></script>
-<script src="/camera.js?v=20261127c"></script>
+<script src="/shared.js?v=20261127d"></script>
+<script src="/camera.js?v=20261127d"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
 $('lockPill').innerHTML=ICON.lock+'رقمه مخفي';
 $('whoIc').innerHTML=ICON.block;
-$('dotSent').innerHTML=ICON.check;
 $('camBack').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 function view(id){for(const v of ['pick','cam','sent','bad'])$(v).hidden=v!==id}
 function build(){
@@ -106,7 +88,7 @@ async function send(kind,photo){
   for(const b of document.querySelectorAll('.opt'))b.disabled=true;
   try{
     const r=await api('/send',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({token,kind,photo,note:$('noteIn').value.trim()})});
-    stopCam();$('sentMsg').textContent=MSG[kind];view('sent');window.scrollTo(0,0);poll(r.id,Date.now());startNudge(r.id);startChat(r.id);
+    stopCam();view('sent');window.scrollTo(0,0);startConversation(r.id,kind);
   }catch(e){
     for(const b of document.querySelectorAll('.opt'))b.disabled=false;
     if(photo){view('cam');$('camErr').textContent=({photo_unrelated:'الصورة ما بتبيّن السيارة أو مشكلتها. صوّر المشكلة بوضوح وجرّب كمان مرة.',bad_photo:'الصورة مش صالحة. أعد التصوير.',note_rejected:'الملاحظة ما انقبلت. ارجع وعدّلها أو شيلها.',wait:'أرسلت رسالة قبل شوي. استنى 5 دقائق.'})[e.code]||'صار خطأ، جرّب كمان مرة.';$('retake').click();return}
@@ -142,57 +124,43 @@ $('retake').onclick=()=>{window.__photo=null;if(stream){$('shot').hidden=true;$(
 $('sendPhoto').onclick=()=>{$('sendPhoto').disabled=true;send(pending,window.__photo)};
 $('camBack').onclick=()=>{stopCam();view('pick')};
 
-// ---- short chat with the owner (same id as the status page)
-let chatId='',chatTimer=null,chatSig='';
-const CHAT_ERR={photo_unrelated:'الصورة ما بتبيّن السيارة. صوّر المشكلة بوضوح.',bad_photo:'الصورة مش صالحة. صوّر من جديد.',text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.'};
-async function pullChat(){
-  try{
-    const r=await api('/chat?id='+encodeURIComponent(chatId));const sig=JSON.stringify(r.messages);
-    if(sig!==chatSig){chatSig=sig;const l=$('chatList');l.textContent='';for(const m of r.messages)l.appendChild(chatBubble(m,m.side==='s',x=>'/api/chat-photo?id='+encodeURIComponent(chatId)+'&c='+encodeURIComponent(x.id)));l.scrollTop=l.scrollHeight}
-    $('chatForm').hidden=!r.open;
-  }catch(_){}
+// ---- the conversation screen (WhatsApp style), shown right after sending
+const CHAT_ERR={text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.',photo_unrelated:'الصورة ما بتبيّن السيارة. صوّر المشكلة بوضوح.',bad_photo:'الصورة مش صالحة. صوّر من جديد.'};
+let sentInfo=null,replyAt=0,replyKey=null,nudgeDone=false,nudgeTimer=null;
+function startConversation(id,kind){
+  const t0=Math.floor(Date.now()/1000);sentInfo={id,kind,t0};document.body.classList.add('chatMode');
+  const box=$('sent');
+  mountChat(box,{
+    title:'صاحب السيارة',
+    status:r=>!r.open?'انتهت المحادثة':replyKey?'ردّ عليك':'وصلت رسالتك · بانتظار ردّه',
+    errText:c=>CHAT_ERR[c],
+    photoUrl:m=>'/api/chat-photo?id='+encodeURIComponent(id)+'&c='+encodeURIComponent(m.id),
+    send:b=>api('/chat?id='+encodeURIComponent(id),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(b)}),
+    load:async()=>{
+      let reply=null;try{reply=(await api('/status?id='+encodeURIComponent(id))).reply||null}catch(_){}
+      if(reply&&!replyKey){replyKey=reply;replyAt=Math.floor(Date.now()/1000)}
+      let chat={open:true,messages:[]};try{chat=await api('/chat?id='+encodeURIComponent(id))}catch(_){}
+      const items=[{id:'first',mine:true,text:MSG[kind],t:t0}];
+      if(!replyKey)items.push({sys:1,text:'بانتظار ردّه… خلّي هالصفحة مفتوحة، الرد بيظهر هون لحاله.'});
+      else items.push({id:'reply',mine:false,text:REPLY[replyKey],t:replyAt});
+      if(nudgeDone&&!replyKey)items.push({sys:1,text:'ذكّرناه.'});
+      for(const m of chat.messages)items.push({id:m.id,mine:m.side==='s',text:m.text,photo:!!m.photo,t:m.t});
+      return {open:chat.open,items};
+    },
+  });
+  const box2=$('sent');box2.querySelector('input').id='chatIn';box2.querySelector('.chatErr').id='chatErr';box2.querySelector('.camBtn').id='chatCam';box2.querySelector('.chatMsgs').id='chatList';
+  startNudge(id);
 }
-function startChat(id){
-  chatId=id;$('chatBox').hidden=false;chatSig='';pullChat();clearInterval(chatTimer);chatTimer=setInterval(pullChat,4000);
-  $('chatCam').innerHTML=ICON.camera;
-  const post=async(body)=>{$('chatErr').textContent='';
-    try{await api('/chat?id='+encodeURIComponent(chatId),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});$('chatIn').value='';pullChat()}
-    catch(err){$('chatErr').textContent=CHAT_ERR[err.code]||'ما قدرنا نرسل. جرب كمان مرة.'}};
-  $('chatForm').onsubmit=e=>{e.preventDefault();const t=$('chatIn').value.trim();if(t)post({text:t})};
-  $('chatCam').onclick=async()=>{const p=await liveCapture();if(p)post({photo:p,text:$('chatIn').value.trim()})};
-}
-// Automatic second alert: if there is no reply 2 minutes after sending, we alert him again (once). The button stays as a manual fallback.
-const NUDGE_AFTER=120;let nudgeTimer=null,sentAt=0,auto=false;
-function mmss(sec){return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
-function stopNudge(){clearInterval(nudgeTimer);nudgeTimer=null;$('nudgeBox').hidden=true}
+// Automatic second alert: 2 minutes without a reply -> we alert the owner again (once).
+const NUDGE_AFTER=120;
 function startNudge(id){
-  sentAt=Date.now();$('nudgeBox').hidden=false;$('nudgeMsg').textContent='';
-  const btn=$('nudgeBtn');
-  const tick=()=>{const left=Math.max(0,NUDGE_AFTER-Math.floor((Date.now()-sentAt)/1000));
-    if(left>0){btn.disabled=true;btn.textContent='بنذكّره تلقائياً بعد '+mmss(left)}else{btn.disabled=false;btn.textContent='ذكّره (بنبعتله تنبيه ثاني)';if(!auto){auto=true;btn.click()}}};
-  tick();nudgeTimer=setInterval(tick,1000);
-  btn.onclick=async()=>{
-    btn.disabled=true;
-    try{await api('/nudge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id})});
-      clearInterval(nudgeTimer);btn.hidden=true;$('nudgeMsg').textContent='ذكّرناه. استنى شوي.'}
-    catch(e){
-      const m={already_nudged:'ذكّرته قبل. استنى شوي.',already_replied:'',paused:'صاحب السيارة مش متاح حالياً.',too_soon:'بعد شوي.'};
-      const w=e.data&&e.data.wait;if(e.code==='too_soon'&&w){auto=false;sentAt=Date.now()-(NUDGE_AFTER-w)*1000;tick();return}
-      clearInterval(nudgeTimer);btn.hidden=e.code!=='server'&&e.code!=='network';$('nudgeMsg').textContent=m[e.code]!==undefined?m[e.code]:'ما قدرنا نرسل التذكير. جرب كمان مرة.';if(!btn.hidden){btn.disabled=false;btn.textContent='ذكّره'}
-    }
+  const at=Date.now();clearTimeout(nudgeTimer);
+  const go=async()=>{
+    if(replyKey||nudgeDone)return;
+    try{await api('/nudge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id})});nudgeDone=true}
+    catch(e){const w=e.data&&e.data.wait;if(e.code==='too_soon'&&w){nudgeTimer=setTimeout(go,(w+1)*1000)}else if(e.code==='already_nudged'||e.code==='already_replied'||e.code==='paused')nudgeDone=true}
   };
-}
-async function poll(id,t0){
-  try{
-    const r=await api('/status?id='+encodeURIComponent(id));
-    if(r.reply){
-      $('replyText').textContent=REPLY[r.reply];$('replyCard').hidden=false;
-      $('replyTitle').textContent='رد عليك';$('replyBox').textContent='';
-      const li=$('stepReply');li.className='done';$('dotReply').innerHTML=ICON.check;stopNudge();return;
-    }
-  }catch(_){}
-  if(Date.now()-t0<20*60*1000)setTimeout(()=>poll(id,t0),4000);
-  else{$('replyTitle').textContent='لسا ما رد';$('replyBox').textContent='ممكن يكون بعيد عن موبايله. جرب تنتظر شوي.';$('stepReply').className='';}
+  nudgeTimer=setTimeout(go,Math.max(0,NUDGE_AFTER*1000-(Date.now()-at)));
 }
 init();
 </script>

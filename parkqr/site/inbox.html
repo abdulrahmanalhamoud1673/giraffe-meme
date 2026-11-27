@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127c">
+<link rel="stylesheet" href="app.css?v=20261127d">
 <link rel="manifest" href="/manifest.webmanifest" id="manifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="theme-color" content="#0b0d0c">
@@ -33,13 +33,14 @@
 
   <div class="chat-top"><section class="notif" id="notif" hidden></section></div>
 
+  <div id="chatHost" hidden></div>
   <main class="chat-body" id="msgs"><p class="note" style="text-align:center">جاري التحميل…</p></main>
   <p class="delLink"><a href="delete-account.html">حذف حسابي</a> · <a href="privacy.html">الخصوصية</a></p>
 </div>
 
-<script src="shared.js?v=20261127c"></script>
-<script src="camera.js?v=20261127c"></script>
-<script src="push.js?v=20261127c"></script>
+<script src="shared.js?v=20261127d"></script>
+<script src="camera.js?v=20261127d"></script>
+<script src="push.js?v=20261127d"></script>
 <script>
 let key=location.hash.slice(1);
 try{
@@ -83,6 +84,24 @@ function dayLabel(ts){
 const clock=ts=>new Date(ts*1000).toLocaleTimeString('ar-JO-u-nu-latn',{hour:'numeric',minute:'2-digit'});
 const dbl='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4 8-9"/><path d="M10 15l2 2 9-10"/></svg>';
 
+const ERR_CHAT={text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',photo_unrelated:'الصورة ما بتبيّن السيارة.',bad_photo:'الصورة مش صالحة.',slow:'استنى ثواني.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.'};
+function openThreadChat(m){
+  const host=$('chatHost');let replied=m.reply||null;
+  mountChat(host,{
+    title:'شخص مسكّر عليك',back:()=>{sig='';load()},
+    status:r=>r.open?'رقمه مخفي':'انتهت المحادثة',errText:c=>ERR_CHAT[c],
+    quick:Object.entries(REPLY),onQuick:async k=>{await api('/inbox/reply',{method:'POST',headers:H,body:JSON.stringify({id:m.id,reply:k})});replied=k},
+    photoUrl:x=>chatPhotoUrl(x.id),
+    send:b=>api('/inbox/chat?id='+encodeURIComponent(m.id),{method:'POST',headers:H,body:JSON.stringify(b)}),
+    load:async()=>{
+      const t=await api('/inbox/chat?id='+encodeURIComponent(m.id),{headers:H});
+      const items=[{id:m.id,mine:false,text:(MSG[m.kind]||'')+(m.note?'\n'+m.note:''),photo:!!m.photo,t:m.created_at}];
+      if(replied)items.push({id:'reply',mine:true,text:REPLY[replied]||replied,t:m.replied_at||Math.floor(Date.now()/1000)});
+      for(const x of t.messages)items.push({id:x.id,mine:x.side==='o',text:x.text,photo:!!x.photo,t:x.t});
+      return {open:t.open,items,answered:!!replied};
+    },
+  });
+}
 const openChats=new Set();
 const photoCache={};
 async function chatPhotoUrl(id){if(!photoCache[id]){const r=await fetch('/api/photo?id='+encodeURIComponent(id),{headers:H});if(!r.ok)return '';photoCache[id]=URL.createObjectURL(await r.blob())}return photoCache[id]}
@@ -142,21 +161,9 @@ function render(d){
       }
       th.appendChild(row);
     }
-    const cb=document.createElement('button');cb.type='button';cb.className='chatToggle';cb.textContent=m.chat?'المحادثة ('+m.chat+')':'ردّ بكتابة';
-    const panel=document.createElement('div');panel.className='chatBox';panel.hidden=true;panel.innerHTML='<div class="chatList"></div><form class="chatForm"><button type="button" class="camBtn" aria-label="صوّر"></button><input maxlength="140" placeholder="اكتب رسالة قصيرة…" autocomplete="off"><button type="submit" aria-label="إرسال"></button></form><p class="note"></p>';
-    const pull=async()=>{try{const r=await api('/inbox/chat?id='+encodeURIComponent(m.id),{headers:H});const l=panel.querySelector('.chatList');l.textContent='';for(const x of r.messages)l.appendChild(chatBubble(x,x.side==='o',y=>chatPhotoUrl(y.id)));l.scrollTop=l.scrollHeight;panel.querySelector('form').hidden=!r.open}catch(_){}};
-    const startPanel=()=>{pull();panel._t=setInterval(()=>{if(panel.hidden||!document.body.contains(panel))clearInterval(panel._t);else pull()},4000)};
-    cb.onclick=()=>{panel.hidden=!panel.hidden;if(panel.hidden)openChats.delete(m.id);else{openChats.add(m.id);startPanel()}};
-    if(openChats.has(m.id)){panel.hidden=false;setTimeout(startPanel,0)}   // a new message re-draws the list: keep open chats open
-    panel.querySelector('.camBtn').innerHTML=ICON.camera;
-    const postChat=async(body)=>{const inp=panel.querySelector('input');panel.querySelector('.note').textContent='';
-      try{await api('/inbox/chat?id='+encodeURIComponent(m.id),{method:'POST',headers:H,body:JSON.stringify(body)});inp.value='';pull()}
-      catch(err){panel.querySelector('.note').textContent=err.code==='text_rejected'?'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.':err.code==='photo_unrelated'?'الصورة ما بتبيّن السيارة.':err.code==='slow'?'استنى ثواني.':err.code==='closed'?'انتهت المحادثة.':'ما قدرنا نرسل.'}};
-    panel.querySelector('.camBtn').onclick=async()=>{const p=await liveCapture();if(p)postChat({photo:p,text:panel.querySelector('input').value.trim()})};
-    panel.querySelector('form').onsubmit=async e=>{e.preventDefault();const inp=panel.querySelector('input'),t=inp.value.trim();if(!t)return;panel.querySelector('.note').textContent='';
-      try{await api('/inbox/chat?id='+encodeURIComponent(m.id),{method:'POST',headers:H,body:JSON.stringify({text:t})});inp.value='';pull()}
-      catch(err){panel.querySelector('.note').textContent=err.code==='text_rejected'?'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.':err.code==='slow'?'استنى ثواني.':err.code==='closed'?'انتهت المحادثة.':'ما قدرنا نرسل.'}};
-    th.appendChild(cb);th.appendChild(panel);
+    const cb=document.createElement('button');cb.type='button';cb.className='chatToggle';cb.textContent=m.chat?'المحادثة ('+m.chat+')':'ردّ بكتابة أو صورة';
+    cb.onclick=()=>openThreadChat(m);
+    th.appendChild(cb);
     box.appendChild(th);
   }
 }
