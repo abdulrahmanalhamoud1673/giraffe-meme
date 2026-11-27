@@ -13,7 +13,7 @@ class ApiError(val status: Int, val code: String) : Exception("$status $code")
 
 data class Msg(val id: String, val kind: String, val reply: String?, val createdAt: Long, val photo: Boolean, val note: String?, val chat: Int)
 data class Inbox(val name: String, val nickname: String, val paused: Boolean, val messages: List<Msg>)
-data class ChatMsg(val mine: Boolean, val text: String)
+data class ChatMsg(val id: String, val mine: Boolean, val text: String, val photo: Boolean, val t: Long)
 data class Thread(val open: Boolean, val messages: List<ChatMsg>)
 data class Registered(val token: String, val key: String)
 
@@ -78,9 +78,12 @@ object Api {
     suspend fun thread(key: String, id: String): Thread {
         val r = call("GET", "/api/inbox/chat?id=${enc(id)}", key)
         val a = r.getJSONArray("messages")
-        return Thread(r.optBoolean("open"), (0 until a.length()).map { a.getJSONObject(it) }.map { ChatMsg(it.optString("side") == "o", it.optString("text")) })
+        return Thread(r.optBoolean("open"), (0 until a.length()).map { a.getJSONObject(it) }.map { ChatMsg(it.optString("id"), it.optString("side") == "o", it.optString("text"), it.optInt("photo") == 1, it.optLong("t")) })
     }
-    suspend fun say(key: String, id: String, text: String) { call("POST", "/api/inbox/chat?id=${enc(id)}", key, JSONObject().put("text", text)) }
+    suspend fun say(key: String, id: String, text: String, photo: String? = null) {
+        val b = JSONObject().put("text", text); if (photo != null) b.put("photo", photo)
+        call("POST", "/api/inbox/chat?id=${enc(id)}", key, b)
+    }
 
     suspend fun photo(key: String, id: String): Bitmap? = withContext(Dispatchers.IO) {
         val c = open("GET", "/api/photo?id=${enc(id)}", key, null)
