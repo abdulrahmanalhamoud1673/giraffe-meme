@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.LayoutDirection
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(AColor.TRANSPARENT), navigationBarStyle = SystemBarStyle.light(AColor.TRANSPARENT, AColor.TRANSPARENT))
+        enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(AColor.TRANSPARENT), navigationBarStyle = SystemBarStyle.auto(AColor.TRANSPARENT, AColor.TRANSPARENT) { false })
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 YnTheme { Surface(Modifier.fillMaxSize(), color = Bg) { Root() } }
@@ -34,6 +34,11 @@ internal fun digits(s: String) = s.map { if (it in '٠'..'٩') ('0' + (it - '٠'
 
 internal fun errText(e: Throwable): String = when ((e as? ApiError)?.code) {
     "name_two_words" -> "اكتب اسمك الأول والعائلة."
+    "name_required", "name_short" -> "اكتب اسمك الأول واسم العائلة، حرفين على الأقل لكل واحد."
+    "name_chars" -> "الاسم حروف بس، بدون أرقام أو رموز."
+    "name_long" -> "الاسم طويل كثير."
+    "name_fake" -> "اكتب اسمك الحقيقي."
+    "consent_required" -> "لازم توافق على حفظ اسمك ورقمك."
     "bad_phone" -> "الرقم مش صحيح. اكتب رقم أردني مثل 0791234567."
     "fake_phone" -> "الرقم مش صحيح."
     "rate_limited", "phone_limit", "busy" -> "وصلت الحد المسموح. جرّب لاحقاً."

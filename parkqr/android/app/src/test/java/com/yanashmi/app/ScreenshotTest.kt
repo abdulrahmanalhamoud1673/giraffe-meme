@@ -28,21 +28,32 @@ class ScreenshotTest {
         rule.onRoot().captureRoboImage("build/shots/$name.png")
     }
 
-    @Test fun auth() = shot("auth") { AuthScreen { _, _ -> } }
+    @Test fun welcome() = shot("1-welcome") { WelcomeScreen(false, "", {}, {}, {}) }
 
-    @Test fun card() = shot("card") {
-        androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(Bg).padding(16.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)) {
-            MessageCard("x", Msg("1", "block", null, System.currentTimeMillis() / 1000 - 90, false, "عند مدخل العمارة", 2), {}, {})
-            MessageCard("x", Msg("2", "hit", "2", System.currentTimeMillis() / 1000 - 4000, false, null, 0), {}, {})
-        }
-    }
+    @Test fun register() = shot("2-register") { RegisterScreen(RegisterState().apply { first = "أحمد"; last = "الخطيب"; phone = "0790000000"; consent = true }, false, "", {}, {}) }
 
-    @Test fun chat() = shot("chat") {
-        androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(androidx.compose.ui.graphics.Color(0xFFEFE7D6)).padding(12.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
+    @Test fun link() = shot("3-link") { LinkScreen("", {}, false, "", {}, {}) }
+
+    private val sample get() = Inbox("أحمد الخطيب", "تويوتا بيضاء", false, listOf(
+        Msg("1", "block", null, System.currentTimeMillis() / 1000 - 90, false, "عند مدخل العمارة", 0),
+        Msg("2", "hit", "2", System.currentTimeMillis() / 1000 - 4000, false, null, 2)))
+
+    @Test fun inbox() = shot("4-inbox") { HomeFrame(Tab.Inbox, {}, 1) { InboxTab("x", sample, "", {}, {}, {}, {}) } }
+
+    @Test fun empty() = shot("5-empty") { HomeFrame(Tab.Inbox, {}, 0) { InboxTab("x", sample.copy(messages = emptyList()), "", {}, {}, {}, {}) } }
+
+    @Test fun sticker() = shot("6-sticker") { HomeFrame(Tab.Sticker, {}, 1) { StickerTab("k3m9q2x7ab") } }
+
+    @Test fun account() = shot("7-account") { HomeFrame(Tab.Account, {}, 0) { AccountTab("x", sample, {}) } }
+
+    @Test fun chat() = shot("8-chat") {
+        androidx.compose.foundation.layout.Column(androidx.compose.ui.Modifier.background(ChatBg).padding(12.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)) {
             Bubble(false, "سيارتك مسكّرة عليّ، ممكن تحرّكها؟", "08:12 م", null, note = "عند مدخل العمارة")
             Bubble(true, "جاي خلال دقيقتين", "08:13 م", null)
             Bubble(false, "تمام، انا واقف قدام المحل", "08:13 م", null)
             Bubble(true, "نزلت هلأ", "08:14 م", null)
         }
     }
+
+    @Test @Config(qualifiers = "w320dp-h568dp-xhdpi") fun smallWelcome() = shot("9-welcome-small") { WelcomeScreen(false, "", {}, {}, {}) }
 }

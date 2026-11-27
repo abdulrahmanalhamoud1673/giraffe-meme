@@ -11,5 +11,11 @@ class HelpersTest {
         assertEquals("هلأ", timeAgo(now - 10)); assertEquals("قبل 5 دقيقة", timeAgo(now - 300)); assertEquals("قبل 2 ساعة", timeAgo(now - 7300)); assertEquals("قبل 3 يوم", timeAgo(now - 3 * 86400 - 5))
     }
     @Test fun everyMessageKindHasText() { for (k in listOf("block", "urgent", "lights", "open", "fault", "hit", "thanks")) assertTrue(KINDS.containsKey(k)) }
+    @Test fun googleNamesKeepOnlyWhatTheServerAccepts() {
+        assertEquals("Ahmad" to "Al Khatib", nameParts("Ahmad Al Khatib"))
+        assertEquals("Sami" to "", nameParts("Sami x_99"))
+        assertEquals("أحمد" to "الخطيب", nameParts("  أحمد   الخطيب 🚗 "))
+        assertEquals("" to "", nameParts("123"))
+    }
     @Test fun repliesMatchTheServer() { assertEquals(listOf("2", "5", "10", "cant"), REPLIES.keys.toList()) }
 }
