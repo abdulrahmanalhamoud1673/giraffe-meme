@@ -108,7 +108,7 @@ fun HomeFrame(tab: Tab, onTab: (Tab) -> Unit, fresh: Int, content: @Composable C
                     selected = t == tab, onClick = { onTab(t) },
                     icon = { BadgedBox(badge = { if (t == Tab.Inbox && fresh > 0) Badge(containerColor = Red, contentColor = Color.White) { Text("$fresh") } }) { Icon(t.icon, t.label) } },
                     label = { Text(t.label, style = MaterialTheme.typography.labelSmall) },
-                    colors = NavigationBarItemDefaults.colors(selectedIconColor = GreenDark, selectedTextColor = GreenDark, indicatorColor = MintSoft, unselectedIconColor = Muted, unselectedTextColor = Muted),
+                    colors = NavigationBarItemDefaults.colors(selectedIconColor = BrandDark, selectedTextColor = BrandDark, indicatorColor = BrandSoft, unselectedIconColor = Muted, unselectedTextColor = Muted),
                 )
             }
         }
@@ -123,19 +123,19 @@ fun InboxTab(key: String, inbox: Inbox?, err: String, onPause: (Boolean) -> Unit
     val paused = inbox?.paused == true
     TabHeader {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(52.dp).clip(RoundedCornerShape(18.dp)).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DirectionsCar, null, tint = Mint, modifier = Modifier.size(28.dp)) }
+            Box(Modifier.size(52.dp).clip(RoundedCornerShape(18.dp)).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.DirectionsCar, null, tint = Accent, modifier = Modifier.size(28.dp)) }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(inbox?.nickname?.ifBlank { null } ?: "سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(if (paused) "متوقف، ما حدا بيقدر يبعتلك" else "متاح لاستقبال الرسائل", color = if (paused) Color(0xFFFFA6B5) else Mint, style = MaterialTheme.typography.bodySmall)
+                Text(if (paused) "متوقف" else "متاح", color = OnNight, style = MaterialTheme.typography.bodySmall)
             }
             Switch(checked = !paused, enabled = inbox != null, onCheckedChange = { on -> onPause(!on) },
-                colors = SwitchDefaults.colors(checkedTrackColor = Mint, checkedThumbColor = Night, uncheckedTrackColor = Color(0x33FFFFFF), uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
+                colors = SwitchDefaults.colors(checkedTrackColor = Accent, checkedThumbColor = Color.White, uncheckedTrackColor = Color(0x33FFFFFF), uncheckedThumbColor = Color.White, uncheckedBorderColor = Color.Transparent))
         }
     }
     if (err.isNotEmpty()) Banner(err, Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp))
     when {
-        inbox == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { if (err.isEmpty()) CircularProgressIndicator(color = Green) }
+        inbox == null -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { if (err.isEmpty()) CircularProgressIndicator(color = Brand) }
         msgs.isEmpty() -> Column(Modifier.fillMaxSize().verticalScrollable().padding(horizontal = 48.dp, vertical = 90.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             IconBadge(Icons.Filled.NotificationsNone, size = 84.dp)
             Text("ما في رسائل", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(top = 16.dp, bottom = 20.dp))
@@ -160,9 +160,9 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
     val photo by rememberPhoto(key, m.id, m.photo)
     val fresh = m.reply == null
     val urgent = m.kind == "hit" || m.kind == "urgent"
-    YnCard(onClick = onOpen, border = if (fresh) (if (urgent) Red else Mint) else Color.Transparent) {
+    YnCard(onClick = onOpen, border = if (fresh) (if (urgent) Red else Accent) else Color.Transparent) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            IconBadge(kindIcon(m.kind), if (urgent) Red else Green, if (urgent) RedSoft else MintSoft, 42.dp)
+            IconBadge(kindIcon(m.kind), if (urgent) Red else Brand, if (urgent) RedSoft else BrandSoft, 42.dp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(KINDS[m.kind] ?: m.kind, style = MaterialTheme.typography.titleSmall)
@@ -181,22 +181,22 @@ fun MessageCard(key: String, m: Msg, onOpen: () -> Unit, onChanged: () -> Unit) 
             Row(Modifier.fillMaxWidth().padding(top = 12.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 for ((k, label) in SHORT_REPLY) {
                     val main = k == "2"
-                    Text(label, color = if (main) Color.White else GreenDark, textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium, maxLines = 1,
-                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (main) Green else MintSoft)
+                    Text(label, color = if (main) Color.White else BrandDark, textAlign = TextAlign.Center, style = MaterialTheme.typography.labelMedium, maxLines = 1,
+                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).background(if (main) Brand else BrandSoft)
                             .clickable(enabled = !sending) { err = ""; sending = true; scope.launch { try { Api.reply(key, m.id, k); onChanged() } catch (e: Exception) { err = errText(e) } finally { sending = false } } }.padding(vertical = 11.dp))
                 }
             }
         }
         if (err.isNotEmpty()) Banner(err, Modifier.padding(top = 8.dp))
         if (!fresh) Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Filled.CheckCircle, null, tint = Green, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
-            Text(REPLIES[m.reply] ?: m.reply ?: "", color = GreenDark, style = MaterialTheme.typography.labelMedium)
+            Icon(Icons.Filled.CheckCircle, null, tint = Brand, modifier = Modifier.size(16.dp)); Spacer(Modifier.width(6.dp))
+            Text(REPLIES[m.reply] ?: m.reply ?: "", color = BrandDark, style = MaterialTheme.typography.labelMedium)
         }
         YnButton(if (m.chat > 0) "المحادثة (${m.chat})" else "افتح المحادثة", Modifier.padding(top = 10.dp), style = BtnStyle.Outline, icon = Icons.Filled.ChatBubble, height = 48.dp, onClick = onOpen)
     }
     if (askBlock) AlertDialog(
         onDismissRequest = { askBlock = false }, containerColor = Color.White,
-        title = { Text("تحظر المرسل؟") }, text = { Text("ما رح توصلك رسائله، وما رح يعرف.") },
+        title = { Text("تحظر المرسل؟") }, text = { Text("ما رح يعرف.") },
         confirmButton = { TextButton(onClick = { askBlock = false; scope.launch { try { Api.block(key, m.id); blocked = true } catch (e: Exception) { err = errText(e) } } }) { Text("احظر", color = Red) } },
         dismissButton = { TextButton(onClick = { askBlock = false }) { Text("إلغاء") } },
     )
@@ -214,10 +214,10 @@ private fun qr(text: String): Bitmap {
 @Composable
 fun StickerTab(token: String) {
     val ctx = LocalContext.current
-    TabHeader { Text("ملصق سيارتي", color = Color.White, style = MaterialTheme.typography.headlineSmall) }
+    TabHeader { Text("رمزي", color = Color.White, style = MaterialTheme.typography.headlineSmall) }
     Column(Modifier.fillMaxSize().verticalScrollable().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (token.isEmpty()) {
-            Banner("الرمز مش محفوظ على هالجهاز. افتحه من صندوقك على الموقع.", icon = Icons.Filled.Info, tint = Green, back = MintSoft)
+            Banner("افتح رمزك من الموقع.", icon = Icons.Filled.Info, tint = Brand, back = BrandSoft)
         } else {
             val url = "https://yanashmi.com/c?t=$token"
             val bmp = remember(url) { qr(url) }
@@ -227,10 +227,10 @@ fun StickerTab(token: String) {
                     StarMark(24); Spacer(Modifier.width(8.dp)); Text("يا نشمي", color = Color.White, style = MaterialTheme.typography.titleLarge)
                 }
                 Image(bmp.asImageBitmap(), "رمز الستيكر", Modifier.padding(top = 14.dp, start = 24.dp, end = 24.dp).fillMaxWidth().aspectRatio(1f))
-                Text("مسكّر عليّ؟ امسح الرمز", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
+                Text("امسحني", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 8.dp))
                 Text("YN-${token.uppercase()}", color = Muted, style = MaterialTheme.typography.labelMedium, modifier = Modifier.padding(bottom = 16.dp))
             }
-            YnButton("شارك للطباعة", icon = Icons.Filled.Share) { ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), "شارك")) }
+            YnButton("شارك", icon = Icons.Filled.Share) { ctx.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, url), "شارك")) }
         }
     }
 }
@@ -264,21 +264,20 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
     fun link(k: String) = "https://yanashmi.com/inbox.html#$k"
     TabHeader {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(Modifier.size(52.dp).clip(CircleShape).background(Mint), contentAlignment = Alignment.Center) { Text(inbox?.name?.take(1) ?: "ي", color = Night, style = MaterialTheme.typography.headlineSmall) }
+            Box(Modifier.size(52.dp).clip(CircleShape).background(Accent), contentAlignment = Alignment.Center) { Text(inbox?.name?.take(1) ?: "ي", color = Night, style = MaterialTheme.typography.headlineSmall) }
             Spacer(Modifier.width(14.dp))
             Text(inbox?.name ?: "حسابي", color = Color.White, style = MaterialTheme.typography.headlineSmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
     Column(Modifier.fillMaxSize().verticalScrollable().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         if (err.isNotEmpty()) Banner(err)
-        if (note.isNotEmpty()) Banner(note, icon = Icons.Filled.CheckCircle, tint = Green, back = MintSoft)
-        Text("الأمان", color = Muted, style = MaterialTheme.typography.labelMedium)
+        if (note.isNotEmpty()) Banner(note, icon = Icons.Filled.CheckCircle, tint = Brand, back = BrandSoft)
         YnCard(padding = 0.dp) {
-            SettingRow(Icons.Filled.Link, "انسخ رابط حسابي") { copySecret(ctx, link(key)); err = ""; note = "انتسخ. احفظه وما تبعته لحدا." }
+            SettingRow(Icons.Filled.Link, "انسخ رابطي") { copySecret(ctx, link(key)); err = ""; note = "انتسخ" }
             HorizontalDivider(color = Line)
-            SettingRow(Icons.Filled.Autorenew, "غيّر الرابط وطلّع كل الأجهزة") { ask = Ask.Rotate }
+            SettingRow(Icons.Filled.Autorenew, "غيّر الرابط") { ask = Ask.Rotate }
             HorizontalDivider(color = Line)
-            SettingRow(Icons.Filled.Shield, "سياسة الخصوصية") { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/privacy"))) } catch (_: Exception) { } }
+            SettingRow(Icons.Filled.Shield, "الخصوصية") { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/privacy"))) } catch (_: Exception) { } }
         }
         YnCard(padding = 0.dp) {
             SettingRow(Icons.AutoMirrored.Filled.Logout, "تسجيل الخروج") { ask = Ask.Logout }
@@ -288,9 +287,9 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
     }
     val a = ask ?: return
     val (title, body, go) = when (a) {
-        Ask.Rotate -> Triple("تغيّر الرابط؟", "الرابط القديم بيبطل يشتغل، وكل جهاز تاني بيطلع من حسابك. ملصق السيارة بيضل نفسه.", "غيّره")
-        Ask.Logout -> Triple("تطلع من الحساب؟", "إذا ما سجّلت بجوجل، انسخ رابط حسابك أول، لأنه بدونه ما بترجع.", "اطلع")
-        Ask.Delete -> Triple("حذف الحساب نهائياً؟", "رح ينحذف حسابك وكل رسائلك وصورك. ما في رجعة.", "احذف")
+        Ask.Rotate -> Triple("تغيّر الرابط؟", "بتطلع كل الأجهزة التانية.", "غيّره")
+        Ask.Logout -> Triple("خروج؟", "بدون جوجل، انسخ رابطك أول.", "اطلع")
+        Ask.Delete -> Triple("حذف الحساب؟", "ما في رجعة.", "احذف")
     }
     AlertDialog(
         onDismissRequest = { ask = null }, containerColor = Color.White, title = { Text(title) }, text = { Text(body) },
@@ -303,7 +302,7 @@ fun AccountTab(key: String, inbox: Inbox?, onNewKey: (String) -> Unit, onLogout:
                         else { val fresh = Api.rotate(key); onNewKey(fresh); copySecret(ctx, link(fresh)) }
                     } catch (e: Exception) { err = errText(e) }
                 }
-            }) { Text(go, color = if (a == Ask.Delete) Red else Green) }
+            }) { Text(go, color = if (a == Ask.Delete) Red else Brand) }
         },
         dismissButton = { TextButton(onClick = { ask = null }) { Text("إلغاء") } },
     )

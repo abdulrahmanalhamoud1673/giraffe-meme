@@ -17,26 +17,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// Brand: deep emerald night on top, calm light sheet below, mint for action on dark, red only for urgency.
-val Night = Color(0xFF06130E)
-val Forest = Color(0xFF0E3325)
-val Green = Color(0xFF0C7A4D)
-val GreenDark = Color(0xFF075235)
-val Mint = Color(0xFF4BE3A4)
-val MintSoft = Color(0xFFE3F6ED)
-val Red = Color(0xFFC2183A)
-val RedSoft = Color(0xFFFCE9ED)
+// Identity: the red of the shemagh on near-black and white. One accent, nothing else competes with it.
+val Night = Color(0xFF120D0E)
+val NightEnd = Color(0xFF2A0A11)
+val Brand = Color(0xFFC8102E)
+val BrandDark = Color(0xFF8F0B21)
+val Accent = Color(0xFFFF4D63)
+val BrandSoft = Color(0xFFFCEBEE)
+val Red = Brand
+val RedSoft = BrandSoft
 val Gold = Color(0xFFFFCB66)
-val Bg = Color(0xFFF3F5F4)
+val Bg = Color(0xFFF6F5F4)
 val Surface0 = Color(0xFFFFFFFF)
-val Ink = Color(0xFF0F1613)
-val Muted = Color(0xFF68746E)
-val Line = Color(0xFFE4E9E6)
-val Bubble = Color(0xFFEDF1EF)
-val OnNight = Color(0xFFA8C4B7)
+val Ink = Color(0xFF161213)
+val Muted = Color(0xFF756C6E)
+val Line = Color(0xFFEAE6E6)
+val Bubble = Color(0xFFF0EDED)
+val OnNight = Color(0xFFD3C3C6)
 
-val NightBrush = Brush.verticalGradient(listOf(Night, Forest))
-val HeroBrush = Brush.linearGradient(listOf(Color(0xFF071A12), Color(0xFF0E3B29), Color(0xFF0C6B45)))
+val NightBrush = Brush.verticalGradient(listOf(Night, NightEnd))
+val HeroBrush = Brush.linearGradient(listOf(Color(0xFF140D0F), Color(0xFF45101A), Color(0xFFA50E28)))
 
 @OptIn(ExperimentalTextApi::class)
 val Cairo = FontFamily(
@@ -56,8 +56,8 @@ val YnTypography = Typography(
 
 @Composable
 fun YnTheme(content: @Composable () -> Unit) = MaterialTheme(
-    colorScheme = lightColorScheme(primary = Green, onPrimary = Color.White, secondary = Red, background = Bg, surface = Surface0, onSurface = Ink,
-        onBackground = Ink, surfaceVariant = Bubble, outline = Line, outlineVariant = Line, primaryContainer = MintSoft, secondaryContainer = MintSoft, surfaceContainer = Surface0),
+    colorScheme = lightColorScheme(primary = Brand, onPrimary = Color.White, secondary = Red, background = Bg, surface = Surface0, onSurface = Ink,
+        onBackground = Ink, surfaceVariant = Bubble, outline = Line, outlineVariant = Line, primaryContainer = BrandSoft, secondaryContainer = BrandSoft, surfaceContainer = Surface0),
     typography = YnTypography,
     shapes = Shapes(small = RoundedCornerShape(12.dp), medium = RoundedCornerShape(18.dp), large = RoundedCornerShape(28.dp)),
     content = content,

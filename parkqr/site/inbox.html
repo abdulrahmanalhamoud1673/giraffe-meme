@@ -6,10 +6,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127i">
+<link rel="stylesheet" href="app.css?v=20261127k">
 <link rel="manifest" href="/manifest.webmanifest" id="manifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="theme-color" content="#06130e">
+<meta name="theme-color" content="#120d0e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="يا نشمي">
@@ -23,11 +23,10 @@
     <div class="av" id="av"></div>
     <div class="meta">
       <b id="who">سيارتك</b>
-      <small><i class="dot" id="dot"></i><span id="recTitle">استقبال الرسائل شغّال</span></small>
+      <small><i class="dot" id="dot"></i><span id="recTitle">متاح</span></small>
     </div>
     <div class="sw-wrap">
       <button class="switch sm" id="pauseBtn" role="switch" aria-checked="true" aria-label="استقبال الرسائل" type="button"></button>
-      <span>استقبال</span>
     </div>
   </header>
 
@@ -36,12 +35,12 @@
   <div id="chatHost" hidden></div>
   <main class="chat-body" id="msgs"><p class="note" style="text-align:center">جاري التحميل…</p></main>
   <section class="tabPage" id="tabSticker" hidden>
-    <div class="myCode"><header>يا نشمي</header><div class="qr" id="myQr" role="img" aria-label="رمز سيارتي"></div><b>مسكّر عليّ؟ امسح الرمز</b><small id="myCodeText" dir="ltr"></small></div>
-    <button class="cta" id="shareMine" type="button">شارك للطباعة</button>
+    <div class="myCode"><header>يا نشمي</header><div class="qr" id="myQr" role="img" aria-label="رمز سيارتي"></div><b>امسحني</b><small id="myCodeText" dir="ltr"></small></div>
+    <button class="cta" id="shareMine" type="button">شارك</button>
     <p class="tabNote" id="stickerNote" role="status"></p>
   </section>
   <section class="tabPage" id="tabAccount" hidden>
-    <div class="rows"><button type="button" id="aCopy">انسخ رابط حسابي<span>‹</span></button><button type="button" id="aRotate">غيّر الرابط وطلّع كل الأجهزة<span>‹</span></button><a href="privacy.html">سياسة الخصوصية<span>‹</span></a></div>
+    <div class="rows"><button type="button" id="aCopy">انسخ رابطي<span>‹</span></button><button type="button" id="aRotate">غيّر الرابط<span>‹</span></button><a href="privacy.html">الخصوصية<span>‹</span></a></div>
     <div class="rows"><button type="button" id="aOut">تسجيل الخروج<span>‹</span></button><a class="danger" href="delete-account.html">حذف الحساب<span>‹</span></a></div>
     <p class="tabNote" id="accNote" role="status"></p>
   </section>
@@ -52,10 +51,10 @@
   </nav>
 </div>
 
-<script src="qr.js?v=20261127i"></script>
-<script src="shared.js?v=20261127i"></script>
-<script src="camera.js?v=20261127i"></script>
-<script src="push.js?v=20261127i"></script>
+<script src="qr.js?v=20261127k"></script>
+<script src="shared.js?v=20261127k"></script>
+<script src="camera.js?v=20261127k"></script>
+<script src="push.js?v=20261127k"></script>
 <script>
 let key=location.hash.slice(1);
 try{
@@ -139,7 +138,7 @@ async function copyText(t,el,done){try{await navigator.clipboard.writeText(t);el
 $('shareMine').onclick=async()=>{const url=scanUrl(myCar);if(navigator.share){try{await navigator.share({url})}catch(_){}}else copyText(url,$('stickerNote'),'انتسخ رابط الرمز.')};
 $('aCopy').onclick=()=>copyText(myLink(),$('accNote'),'انتسخ. احفظه وما تبعته لحدا.');
 $('aRotate').onclick=async()=>{
-  if(!confirm('الرابط القديم بيبطل يشتغل، وكل جهاز تاني بيطلع من حسابك. أكمّل؟'))return;
+  if(!confirm('تغيّر الرابط؟ بتطلع كل الأجهزة التانية.'))return;
   try{const r=await api('/inbox/rotate',{method:'POST',headers:H,body:'{}'});
     try{localStorage.setItem('yn_key',r.owner_key);const g=JSON.parse(localStorage.getItem('yn_reg')||'null');if(g){g.key=r.owner_key;localStorage.setItem('yn_reg',JSON.stringify(g))}}catch(_){}
     key=r.owner_key;H.authorization='Bearer '+key;history.replaceState(null,'','#'+key);
@@ -159,7 +158,7 @@ function render(d){
   paused=d.car.paused;
   $('pauseBtn').setAttribute('aria-checked',String(!paused));
   $('dot').className='dot'+(paused?' off':'');
-  $('recTitle').textContent=paused?'استقبال الرسائل متوقف':'استقبال الرسائل شغّال';
+  $('recTitle').textContent=paused?'متوقف':'متاح';
   const nudges={};for(const m of d.messages){if(m.kind.indexOf('nudge:')===0){const o=m.kind.slice(6);nudges[o]=(nudges[o]||0)+1}}
   const list=d.messages.filter(m=>m.kind.indexOf('nudge:')!==0).sort((a,b)=>a.created_at-b.created_at);
   const waiting=list.filter(m=>!m.reply).length;
@@ -195,16 +194,15 @@ function render(d){
       out.querySelector('.meta span').textContent=clock(m.replied_at||m.created_at);
       th.appendChild(out);
     }else{
-      const hint=document.createElement('div');hint.className='qr-hint';hint.textContent='ردّ بضغطة:';th.appendChild(hint);
-      const row=document.createElement('div');row.className='qr-row';
+            const row=document.createElement('div');row.className='qr-row';
       for(const [k,l] of Object.entries(REPLY)){
-        const b=document.createElement('button');b.className='chip';b.textContent=l;
+        const b=document.createElement('button');b.className='chip';b.textContent={'2':'دقيقتين','5':'5 دقايق','10':'10 دقايق',cant:'ما بقدر'}[k]||l;
         b.onclick=async()=>{for(const x of row.children)x.disabled=true;try{await api('/inbox/reply',{method:'POST',headers:H,body:JSON.stringify({id:m.id,reply:k})})}catch(_){}sig='';load()};
         row.appendChild(b);
       }
       th.appendChild(row);
     }
-    const cb=document.createElement('button');cb.type='button';cb.className='chatToggle';cb.textContent=m.chat?'المحادثة ('+m.chat+')':'ردّ بكتابة أو صورة';
+    const cb=document.createElement('button');cb.type='button';cb.className='chatToggle';cb.textContent=m.chat?'المحادثة ('+m.chat+')':'محادثة';
     cb.onclick=()=>openThreadChat(m);
     th.appendChild(cb);
     box.appendChild(th);
@@ -267,27 +265,27 @@ async function renderNotif(){
      +soundHelp(platform)
      +'<p class="n-note">لو بتستخدم أكثر من جهاز، فعّلها على كل واحد.</p></div>';
   }else if(st==='ios-install'){
-    h=head('bell','فعّل التنبيهات على الآيفون','آبل بتطلب خطوة مرة وحدة.')
+    h=head('bell','فعّل التنبيهات على الآيفون','')
      +'<ol class="how compact">'
      +li(1,'افتح هالصفحة من <b>Safari</b>.')
      +li(2,'اضغط <b>مشاركة</b> '+ico('share')+' ثم <b>إضافة إلى الشاشة الرئيسية</b> '+ico('plus'))
      +li(3,'افتح <b>يا نشمي</b> من الشاشة الرئيسية، واضغط <b>فعّل التنبيهات</b> ثم <b>السماح</b>.')
      +'</ol>';
   }else if(st==='denied'){
-    h=head('alert','التنبيهات محظورة','افتحها من إعدادات الموبايل.')
-     +'<ol class="how compact">'
+    h=head('alert','التنبيهات محظورة','')
+     +'<details class="help"><summary>كيف أفتحها؟</summary><ol class="how compact">'
      +(platform==='ios'
         ?li(1,'<b>الإعدادات</b> ← <b>الإشعارات</b> ← <b>يا نشمي</b>.')+li(2,'فعّل <b>السماح بالإشعارات</b> وارجع هون.')
         :li(1,'اضغط <b>القفل</b> (أو ⓘ) جنب عنوان الموقع.')+li(2,'<b>الأذونات</b> ← <b>الإشعارات</b> ← <b>السماح</b>، وحدّث الصفحة.'))
-     +'</ol>';
+     +'</ol></details>';
   }else if(st==='unsupported'){
     h=head('alert','هالمتصفح ما بيدعم التنبيهات','استخدم Chrome (أندرويد) أو Safari (آيفون). الرسائل بتضل محفوظة هون.');
   }else{
     nEl.className='notif ready';
-    h=head('bell','فعّل التنبيهات','بتوصلك كل رسالة فوراً، حتى لو الموقع مسكّر.')
+    h=head('bell','فعّل التنبيهات','')
      +pcWarn()
      +'<button class="btn-big" id="nOn" type="button">'+ICON.bell+'فعّل التنبيهات</button>'
-     +'<p class="n-hint">رح يسألك المتصفح، اضغط <span class="mini-allow">السماح</span></p><p class="n-msg" id="nMsg" role="status"></p>';
+     +'<p class="n-msg" id="nMsg" role="status"></p>';
   }
   nEl.innerHTML=h;
   const msg=(t,c)=>{const m=$('nMsg');if(m){m.textContent=t;m.className='n-msg '+(c||'')}};

@@ -97,6 +97,7 @@ fun WelcomeScreen(busy: Boolean, err: String, onGoogle: () -> Unit, onLink: () -
         Row(Modifier.fillMaxWidth().padding(vertical = 14.dp), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
             StarMark(28); Spacer(Modifier.width(8.dp)); Text("يا نشمي", color = Color.White, style = MaterialTheme.typography.titleLarge)
         }
+        Shemagh(Modifier.padding(bottom = 14.dp))
         Story(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 24.dp).padding(bottom = 18.dp), still)
         Column(
             Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)).background(Color.White).navigationBarsPadding().padding(horizontal = 22.dp, vertical = 16.dp),
@@ -106,8 +107,8 @@ fun WelcomeScreen(busy: Boolean, err: String, onGoogle: () -> Unit, onLink: () -
             YnButton("ابدأ بحساب جوجل", busy = busy, leading = {
                 Box(Modifier.size(28.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) { Image(painterResource(R.drawable.ic_google), null, Modifier.size(18.dp)) }
             }, onClick = onGoogle)
-            TextButton(onClick = onLink, enabled = !busy) { Text("عندي رابط حساب", style = MaterialTheme.typography.labelLarge) }
-            Text("بالمتابعة بتوافق على سياسة الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall,
+            TextButton(onClick = onLink, enabled = !busy) { Text("عندي رابط", style = MaterialTheme.typography.labelLarge) }
+            Text("الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.clickable { try { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://yanashmi.com/privacy"))) } catch (_: Exception) { } }.padding(4.dp))
         }
     }
@@ -144,16 +145,12 @@ class CarForm {
 fun CarScreen(f: CarForm, busy: Boolean, err: String, onBack: () -> Unit, onSubmit: () -> Unit) {
     val first = f.name.trim().substringBefore(' ')
     SheetScreen(
-        if (first.isEmpty()) "أهلاً" else "أهلاً $first",
-        "ضل رقمك وسيارتك",
-        onBack,
+        if (first.isEmpty()) "سيارتك" else "أهلاً $first",
+        onBack = onBack,
         bottom = {
             if (err.isNotEmpty()) Banner(err)
             YnButton("جهّز ملصقي", busy = busy, onClick = onSubmit)
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Filled.Lock, null, tint = Muted, modifier = Modifier.size(13.dp)); Spacer(Modifier.width(5.dp))
-                Text("بالمتابعة بتوافق على حفظ رقمك. ما حدا بيشوفه.", color = Muted, style = MaterialTheme.typography.labelSmall)
-            }
+            Text("بالمتابعة بتوافق على الخصوصية", color = Muted, style = MaterialTheme.typography.labelSmall, modifier = Modifier.fillMaxWidth(), textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         },
     ) {
         YnField(f.phone, { f.phone = digits(it) }, "رقم الموبايل", placeholder = "07X XXX XXXX", keyboard = KeyboardType.Phone, icon = Icons.Filled.PhoneAndroid, ltr = true)
@@ -162,16 +159,16 @@ fun CarScreen(f: CarForm, busy: Boolean, err: String, onBack: () -> Unit, onSubm
             for (m in CAR_MAKES) {
                 val on = f.make == m
                 Text(m, color = if (on) Color.White else Ink, style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(if (on) Green else Color.White).border(1.dp, if (on) Green else Line, RoundedCornerShape(14.dp))
+                    modifier = Modifier.clip(RoundedCornerShape(14.dp)).background(if (on) Brand else Color.White).border(1.dp, if (on) Brand else Line, RoundedCornerShape(14.dp))
                         .clickable { f.make = m }.padding(horizontal = 16.dp, vertical = 11.dp))
             }
         }
-        if (f.make == "غيرها") YnField(f.other, { if (it.length <= 24) f.other = it }, "اكتب نوعها بالعربي", placeholder = "مثلاً: فورد")
+        if (f.make == "غيرها") YnField(f.other, { if (it.length <= 24) f.other = it }, "النوع", placeholder = "فورد")
         Text(if (f.color.isEmpty()) "اللون" else "اللون: ${f.color}", style = MaterialTheme.typography.labelMedium)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             for ((name, c) in CAR_COLORS) {
                 val on = f.color == name
-                Box(Modifier.size(46.dp).clip(CircleShape).border(2.dp, if (on) Green else Color.Transparent, CircleShape).padding(5.dp).clip(CircleShape).background(c).border(1.dp, Line, CircleShape)
+                Box(Modifier.size(46.dp).clip(CircleShape).border(2.dp, if (on) Brand else Color.Transparent, CircleShape).padding(5.dp).clip(CircleShape).background(c).border(1.dp, Line, CircleShape)
                     .clickable(onClickLabel = name) { f.color = name }, contentAlignment = Alignment.Center) {
                     if (on) Icon(Icons.Filled.Check, name, tint = if (c.red + c.green + c.blue > 2f) Ink else Color.White, modifier = Modifier.size(18.dp))
                 }
@@ -185,7 +182,7 @@ fun CarScreen(f: CarForm, busy: Boolean, err: String, onBack: () -> Unit, onSubm
 @Composable
 fun LinkScreen(link: String, onLink: (String) -> Unit, busy: Boolean, err: String, onBack: () -> Unit, onOpen: () -> Unit) {
     val clipboard = LocalClipboardManager.current
-    SheetScreen("أهلاً من جديد", "الصق رابط حسابك", onBack, bottom = {
+    SheetScreen("عندي رابط", onBack = onBack, bottom = {
         if (err.isNotEmpty()) Banner(err)
         YnButton("افتح حسابي", busy = busy, enabled = link.isNotBlank(), onClick = onOpen)
     }) {

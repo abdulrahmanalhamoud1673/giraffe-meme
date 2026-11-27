@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261127i">
+<link rel="stylesheet" href="/app.css?v=20261127k">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -22,14 +22,14 @@
     <section id="pick" hidden>
       <div class="who">
         <span class="ic" id="whoIc"></span>
-        <div class="grow"><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه وهويته مخفيين. بس رسالتك بتوصله.</small></div><span class="codeTag" id="codeLine" dir="ltr"></span>
+        <div class="grow"><b id="whoName">صاحب السيارة</b><small id="whoSub">رقمه مخفي</small></div><span class="codeTag" id="codeLine" dir="ltr"></span>
       </div>
       <div class="askRow"><h1>شو بدك تقوله؟</h1></div>
       <button class="noteToggle" id="noteToggle" type="button">+ ملاحظة <small>(اختياري)</small></button>
       <input class="noteIn" id="noteIn" maxlength="80" placeholder="مثلاً: عند مدخل العمارة" autocomplete="off" hidden>
       <div id="list"></div>
       <p class="err" id="err" role="alert" style="margin-top:14px"></p>
-      <p class="note" style="margin-top:10px">الرسائل جاهزة فقط لحماية الجميع. هاي الخدمة للتنبيه وليست للطوارئ الرسمية (النجدة 911).</p>
+      <p class="note" style="margin-top:10px;text-align:center">للطوارئ: 911</p>
     </section>
 
     <section id="cam" hidden>
@@ -52,8 +52,8 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261127i"></script>
-<script src="/camera.js?v=20261127i"></script>
+<script src="/shared.js?v=20261127k"></script>
+<script src="/camera.js?v=20261127k"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
@@ -142,7 +142,7 @@ function startConversation(id,kind,noPhoto){
       let chat={open:true,messages:[]};try{chat=await api('/chat?id='+encodeURIComponent(id))}catch(_){}
       const items=[{id:'first',mine:true,text:MSG[kind],t:t0}];
       if(noPhoto)items.push({sys:1,text:'وصلت رسالتك بدون الصورة، لأنه فحص الصور مش متاح هلأ.'});
-      if(!replyKey)items.push({sys:1,text:'بانتظار ردّه… خلّي هالصفحة مفتوحة، الرد بيظهر هون لحاله.'});
+      if(!replyKey)items.push({sys:1,text:'بانتظار ردّه…'});
       else items.push({id:'reply',mine:false,text:REPLY[replyKey],t:replyAt});
       if(nudgeDone&&!replyKey)items.push({sys:1,text:'ذكّرناه.'});
       for(const m of chat.messages)items.push({id:m.id,mine:m.side==='s',text:m.text,photo:!!m.photo,t:m.t});

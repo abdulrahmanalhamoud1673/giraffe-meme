@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun StarMark(size: Int = 44, color: Color = Mint) {
+fun StarMark(size: Int = 44, color: Color = Accent) {
     Canvas(Modifier.size(size.dp)) {
         val s = this.size.minDimension; val c = s / 2; val r = s * 0.46f
         fun diamond(rad: Float) = Path().apply { moveTo(c, c - rad); lineTo(c + rad, c); lineTo(c, c + rad); lineTo(c - rad, c); close() }
@@ -49,8 +49,8 @@ fun YnButton(text: String, modifier: Modifier = Modifier, style: BtnStyle = BtnS
     val fg = if (style == BtnStyle.Primary) Color.White else Ink
     val on = enabled && !busy
     Row(
-        modifier.fillMaxWidth().height(height).then(if (style == BtnStyle.Primary && on) Modifier.shadow(10.dp, shape, ambientColor = Green, spotColor = Green) else Modifier)
-            .clip(shape).background(if (style == BtnStyle.Primary) Green.copy(alpha = if (enabled) 1f else .4f) else Color.White)
+        modifier.fillMaxWidth().height(height).then(if (style == BtnStyle.Primary && on) Modifier.shadow(10.dp, shape, ambientColor = Brand, spotColor = Brand) else Modifier)
+            .clip(shape).background(if (style == BtnStyle.Primary) Brand.copy(alpha = if (enabled) 1f else .4f) else Color.White)
             .then(if (style == BtnStyle.Outline) Modifier.border(1.dp, Line, shape) else Modifier)
             .clickable(enabled = on, onClick = onClick).padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
@@ -75,7 +75,7 @@ fun YnField(value: String, onChange: (String) -> Unit, label: String, modifier: 
             leadingIcon = icon?.let { { Icon(it, null, tint = Muted, modifier = Modifier.size(20.dp)) } }, trailingIcon = trailing,
             textStyle = MaterialTheme.typography.bodyLarge.copy(textDirection = if (ltr) TextDirection.Ltr else TextDirection.Content),
             shape = RoundedCornerShape(16.dp), keyboardOptions = KeyboardOptions(keyboardType = keyboard),
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Green, unfocusedBorderColor = Line, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, cursorColor = Green),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Brand, unfocusedBorderColor = Line, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, cursorColor = Brand),
         )
     }
 }
@@ -92,7 +92,7 @@ fun YnCard(modifier: Modifier = Modifier, color: Color = Surface0, border: Color
 }
 
 @Composable
-fun IconBadge(icon: ImageVector, tint: Color = Green, back: Color = MintSoft, size: Dp = 46.dp) {
+fun IconBadge(icon: ImageVector, tint: Color = Brand, back: Color = BrandSoft, size: Dp = 46.dp) {
     Box(Modifier.size(size).clip(RoundedCornerShape(size / 3)).background(back), contentAlignment = Alignment.Center) { Icon(icon, null, tint = tint, modifier = Modifier.size(size * .5f)) }
 }
 
@@ -100,7 +100,18 @@ fun IconBadge(icon: ImageVector, tint: Color = Green, back: Color = MintSoft, si
 fun Banner(text: String, modifier: Modifier = Modifier, icon: ImageVector = Icons.Filled.ErrorOutline, tint: Color = Red, back: Color = RedSoft) {
     Row(modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(back).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, tint = tint, modifier = Modifier.size(20.dp)); Spacer(Modifier.width(10.dp))
-        Text(text, color = if (tint == Red) Red else GreenDark, style = MaterialTheme.typography.bodyMedium)
+        Text(text, color = if (back == RedSoft) BrandDark else Ink, style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/** The red and white check of the shemagh: the app's signature, used sparingly. */
+@Composable
+fun Shemagh(modifier: Modifier = Modifier) {
+    Canvas(modifier.fillMaxWidth().height(10.dp)) {
+        val c = size.height / 2
+        drawRect(Color.White)
+        var i = 0
+        while (i * c < size.width) { drawRect(Brand, Offset(i * c, if (i % 2 == 0) 0f else c), androidx.compose.ui.geometry.Size(c, c)); i++ }
     }
 }
 

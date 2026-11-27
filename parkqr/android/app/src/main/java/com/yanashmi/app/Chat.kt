@@ -61,14 +61,11 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
     Column(Modifier.fillMaxSize().background(Bg).imePadding()) {
         Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)).background(HeroBrush).statusBarsPadding().padding(horizontal = 6.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "رجوع", tint = Color.White) }
-            Box(Modifier.size(42.dp).clip(CircleShape).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.Person, null, tint = Mint) }
+            Box(Modifier.size(42.dp).clip(CircleShape).background(Color(0x1FFFFFFF)), contentAlignment = Alignment.Center) { Icon(Icons.Filled.Person, null, tint = Accent) }
             Spacer(Modifier.width(10.dp))
             Column(Modifier.weight(1f)) {
-                Text("شخص عند سيارتك", color = Color.White, style = MaterialTheme.typography.titleMedium)
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Filled.Shield, null, tint = Mint, modifier = Modifier.size(13.dp)); Spacer(Modifier.width(4.dp))
-                    Text(if (thread?.open == false) "انتهت المحادثة" else "محادثة محمية · رقمكم مخفي", color = OnNight, style = MaterialTheme.typography.bodySmall)
-                }
+                Text("عند سيارتك", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                if (thread?.open == false) Text("انتهت", color = OnNight, style = MaterialTheme.typography.bodySmall)
             }
         }
         LazyColumn(Modifier.weight(1f).fillMaxWidth(), state = listState, contentPadding = PaddingValues(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -82,17 +79,17 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
             }
         }
         if (m.reply == null && thread?.open != false) Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(horizontal = 12.dp, vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            for ((k, label) in REPLIES) Text(label, color = Green, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clip(RoundedCornerShape(99.dp)).background(Color.White).border(1.dp, Line, RoundedCornerShape(99.dp))
+            for ((k, label) in REPLIES) Text(label, color = Brand, fontSize = 13.sp, fontWeight = FontWeight.Bold, modifier = Modifier.clip(RoundedCornerShape(99.dp)).background(Color.White).border(1.dp, Line, RoundedCornerShape(99.dp))
                 .clickable { scope.launch { try { Api.reply(key, m.id, k); onChanged() } catch (_: Exception) { } } }.padding(horizontal = 14.dp, vertical = 8.dp))
         }
         if (err.isNotEmpty()) Text(err, color = Red, fontSize = 12.sp, modifier = Modifier.background(Color.White).fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp))
         if (thread?.open != false) Row(Modifier.fillMaxWidth().background(Color.White).navigationBarsPadding().padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { camera = true }, Modifier.size(46.dp).clip(CircleShape).background(MintSoft)) { Icon(Icons.Filled.CameraAlt, "صوّر", tint = GreenDark) }
+            IconButton(onClick = { camera = true }, Modifier.size(46.dp).clip(CircleShape).background(BrandSoft)) { Icon(Icons.Filled.CameraAlt, "صوّر", tint = BrandDark) }
             Spacer(Modifier.width(8.dp))
             OutlinedTextField(text, { if (it.length <= 140) text = it }, Modifier.weight(1f), placeholder = { Text("اكتب رسالة…", color = Muted) }, shape = RoundedCornerShape(26.dp), maxLines = 3,
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Green, unfocusedBorderColor = Line, focusedContainerColor = Bg, unfocusedContainerColor = Bg))
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Brand, unfocusedBorderColor = Line, focusedContainerColor = Bg, unfocusedContainerColor = Bg))
             Spacer(Modifier.width(8.dp))
-            IconButton(onClick = { send(null) }, enabled = !sending && text.isNotBlank(), modifier = Modifier.size(48.dp).clip(CircleShape).background(if (text.isNotBlank()) Green else Line)) { Icon(Icons.AutoMirrored.Filled.Send, "أرسل", tint = Color.White) }
+            IconButton(onClick = { send(null) }, enabled = !sending && text.isNotBlank(), modifier = Modifier.size(48.dp).clip(CircleShape).background(if (text.isNotBlank()) Brand else Line)) { Icon(Icons.AutoMirrored.Filled.Send, "أرسل", tint = Color.White) }
         }
     }
 }
@@ -102,7 +99,7 @@ fun Bubble(mine: Boolean, text: String, time: String, pic: Bitmap?, note: String
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.Start else Arrangement.End) {
         Column(
             Modifier.widthIn(max = 270.dp).clip(RoundedCornerShape(topStart = if (mine) 4.dp else 16.dp, topEnd = if (mine) 16.dp else 4.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
-                .background(if (mine) Green else Color.White).animateContentSize().padding(horizontal = 10.dp, vertical = 7.dp),
+                .background(if (mine) Brand else Color.White).animateContentSize().padding(horizontal = 10.dp, vertical = 7.dp),
         ) {
             pic?.let { Image(it.asImageBitmap(), null, Modifier.padding(bottom = 6.dp).widthIn(max = 230.dp).heightIn(max = 260.dp).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Crop) }
             if (text.isNotEmpty()) Text(text, color = if (mine) Color.White else Ink, fontSize = 15.sp)

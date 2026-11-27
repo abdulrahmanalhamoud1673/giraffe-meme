@@ -65,7 +65,7 @@ fun notifyMessage(ctx: Context, m: Msg) {
 fun show(ctx: Context, tag: String, title: String, body: String, urgent: Boolean) {
     val open = PendingIntent.getActivity(ctx, 0, Intent(ctx, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
     val n = NotificationCompat.Builder(ctx, if (urgent) CH_URGENT else CH_NORMAL)
-        .setSmallIcon(R.drawable.ic_notify).setColor(0xFF0C7A4D.toInt())
+        .setSmallIcon(R.drawable.ic_notify).setColor(0xFFC8102E.toInt())
         .setContentTitle(title).setContentText(body)
         .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true).setContentIntent(open).build()
     try { ctx.getSystemService(NotificationManager::class.java).notify(tag, 0, n) } catch (_: SecurityException) { }

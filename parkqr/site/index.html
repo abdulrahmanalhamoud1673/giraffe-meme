@@ -17,33 +17,34 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://yanashmi.com/og.png">
-<meta name="theme-color" content="#06130e">
+<meta name="theme-color" content="#120d0e">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{--night:#06130e;--forest:#0e3325;--green:#0c7a4d;--mint:#4be3a4;--soft:#e3f6ed;--gold:#ffcb66;--ink:#0f1613;--muted:#68746e;--on:#a8c4b7;--bg:#f3f5f4}
+:root{--night:#120d0e;--forest:#2a0a11;--green:#c8102e;--accent:#ff4d63;--soft:#fcebee;--gold:#ffcb66;--ink:#161213;--muted:#756c6e;--on:#d3c3c6;--bg:#f6f5f4}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
 a{color:inherit;text-decoration:none}
-:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .hero{background:linear-gradient(180deg,var(--night),var(--forest));color:#fff;border-radius:0 0 36px 36px;padding:max(14px,env(safe-area-inset-top)) 20px 28px}
 .in{max-width:1040px;margin:0 auto}
+.band{height:10px;margin:12px -20px 0;background:conic-gradient(#c8102e 25%,#fff 0 50%,#c8102e 0 75%,#fff 0) 0 0/10px 10px}
 .brand{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800;font-size:1.35rem}
-.brand svg{width:30px;height:30px;color:var(--mint)}
+.brand svg{width:30px;height:30px;color:var(--accent)}
 .cols{display:grid;gap:18px;margin-top:14px}
 .story{cursor:pointer;user-select:none;max-width:430px;width:100%;margin:0 auto}
 .bars{display:flex;gap:6px}
 .bars i{flex:1;height:3px;border-radius:9px;background:#ffffff33;overflow:hidden}
-.bars b{display:block;height:100%;width:0;background:var(--mint)}
+.bars b{display:block;height:100%;width:0;background:var(--accent)}
 .bars i.done b{width:100%}
 .bars i.now b{animation:fill 3.6s linear forwards}
 @keyframes fill{to{width:100%}}
 .stage{aspect-ratio:100/80;width:100%;max-height:46vh;margin:0 auto;display:block}
 .scene{display:none}.scene.on{display:block}
-.cap{text-align:center;min-height:92px}
-.cap h2{font-size:1.45rem;font-weight:800}
+.cap{text-align:center;min-height:56px}
+.cap h2{font-size:1.8rem;font-weight:900}
 .cap p{color:var(--on);font-size:.98rem}
 .on .fly{animation:fly .8s .3s cubic-bezier(.3,1.5,.5,1) both}
 @keyframes fly{from{transform:translate(-46px,-30px) rotate(-18deg) scale(1.9)}}
@@ -57,7 +58,7 @@ a{color:inherit;text-decoration:none}
 @keyframes pop{from{opacity:0;transform:scale(.4)}}
 .actions{max-width:430px;width:100%;margin:0 auto;display:grid;gap:10px;align-content:center}
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:58px;border-radius:19px;font-weight:800;font-size:1.08rem;border:0;font-family:inherit;cursor:pointer}
-.btn.main{background:var(--mint);color:var(--night);box-shadow:0 14px 30px -14px var(--mint)}
+.btn.main{background:var(--green);color:#fff;box-shadow:0 14px 30px -14px #c8102e}
 .btn.alt{border:1px solid #ffffff38;color:#fff}
 main{max-width:1040px;margin:0 auto;padding:22px 18px 40px;display:grid;gap:16px}
 .cards{display:grid;gap:12px}
@@ -68,7 +69,7 @@ main{max-width:1040px;margin:0 auto;padding:22px 18px 40px;display:grid;gap:16px
 .codeForm{background:#fff;border-radius:24px;padding:18px;box-shadow:0 6px 20px -10px #0003}
 .codeForm label{font-weight:700;font-size:.95rem}
 .codeForm div{display:flex;gap:8px;margin-top:10px}
-.codeForm input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:1px solid #e4e9e6;border-radius:15px;background:var(--bg)}
+.codeForm input{flex:1;min-width:0;font:inherit;padding:12px 14px;border:1px solid #eae6e6;border-radius:15px;background:var(--bg)}
 .codeForm button{font:inherit;font-weight:800;background:var(--green);color:#fff;border:0;border-radius:15px;padding:0 22px;cursor:pointer}
 footer{text-align:center;color:var(--muted);font-size:.85rem;padding:0 18px 34px}
 footer a{text-decoration:underline;margin:0 8px}
@@ -83,39 +84,40 @@ footer a{text-decoration:underline;margin:0 8px}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 1.5L22.5 12 12 22.5 1.5 12z"/><path d="M12 6.5L17.5 12 12 17.5 6.5 12z"/><circle cx="12" cy="12" r="1.3" fill="currentColor"/></svg>
       <h1 style="font-size:inherit">يا نشمي</h1>
     </div>
+    <div class="band" aria-hidden="true"></div>
     <div class="cols">
       <div class="story" id="story" aria-label="كيف بيشتغل">
         <div class="bars"><i><b></b></i><i><b></b></i><i><b></b></i></div>
         <svg class="stage" viewBox="0 0 100 80" direction="rtl" aria-hidden="true">
           <defs>
-            <radialGradient id="glow"><stop offset="0" stop-color="#4be3a4" stop-opacity=".24"/><stop offset="1" stop-color="#4be3a4" stop-opacity="0"/></radialGradient>
-            <symbol id="code" viewBox="0 0 12 12"><rect width="12" height="12" rx="1.6" fill="#fff"/><g fill="#06130e"><path d="M1 1h3.4v3.4H1zM7.6 1H11v3.4H7.6zM1 7.6h3.4V11H1z"/><path d="M5.2 1h1v2h-1zM5.4 4.4h1v1h-1zM1.4 5.4h2v1h-2zM4.4 6.4h2v1h-2zM7.4 5.4h1v2h-1zM9.4 6h1.4v1H9.4zM6 8.4h1v2.4H6zM8.2 8.2h1.2v1.2H8.2zM9.8 9.6H11V11H9.8z"/></g><g fill="#fff"><path d="M1.7 1.7h2v2h-2zM8.3 1.7h2v2h-2zM1.7 8.3h2v2h-2z"/></g><g fill="#0c7a4d"><path d="M2.2 2.2h1v1h-1zM8.8 2.2h1v1h-1zM2.2 8.8h1v1h-1z"/></g></symbol>
-            <g id="car"><path d="M25 46L35 29q2-3 6-3h22q4 0 6 3l10 17z" fill="#f2f7f5"/><rect x="12" y="44" width="76" height="16" rx="7" fill="#f2f7f5"/><path d="M31 44l8-14h11v14zM53 44V30h12l8 14z" fill="#1b4d3a"/><circle cx="29" cy="60" r="8.5" fill="#06130e"/><circle cx="71" cy="60" r="8.5" fill="#06130e"/><circle cx="29" cy="60" r="3.5" fill="#b9cfc5"/><circle cx="71" cy="60" r="3.5" fill="#b9cfc5"/><circle cx="15" cy="51" r="1.8" fill="#ffcb66"/></g>
+            <radialGradient id="glow"><stop offset="0" stop-color="#ff4d63" stop-opacity=".24"/><stop offset="1" stop-color="#ff4d63" stop-opacity="0"/></radialGradient>
+            <symbol id="code" viewBox="0 0 12 12"><rect width="12" height="12" rx="1.6" fill="#fff"/><g fill="#120d0e"><path d="M1 1h3.4v3.4H1zM7.6 1H11v3.4H7.6zM1 7.6h3.4V11H1z"/><path d="M5.2 1h1v2h-1zM5.4 4.4h1v1h-1zM1.4 5.4h2v1h-2zM4.4 6.4h2v1h-2zM7.4 5.4h1v2h-1zM9.4 6h1.4v1H9.4zM6 8.4h1v2.4H6zM8.2 8.2h1.2v1.2H8.2zM9.8 9.6H11V11H9.8z"/></g><g fill="#fff"><path d="M1.7 1.7h2v2h-2zM8.3 1.7h2v2h-2zM1.7 8.3h2v2h-2z"/></g><g fill="#c8102e"><path d="M2.2 2.2h1v1h-1zM8.8 2.2h1v1h-1zM2.2 8.8h1v1h-1z"/></g></symbol>
+            <g id="car"><path d="M25 46L35 29q2-3 6-3h22q4 0 6 3l10 17z" fill="#faf6f6"/><rect x="12" y="44" width="76" height="16" rx="7" fill="#faf6f6"/><path d="M31 44l8-14h11v14zM53 44V30h12l8 14z" fill="#4a2a30"/><circle cx="29" cy="60" r="8.5" fill="#120d0e"/><circle cx="71" cy="60" r="8.5" fill="#120d0e"/><circle cx="29" cy="60" r="3.5" fill="#d9cacd"/><circle cx="71" cy="60" r="3.5" fill="#d9cacd"/><circle cx="15" cy="51" r="1.8" fill="#ffcb66"/></g>
           </defs>
           <circle cx="50" cy="40" r="46" fill="url(#glow)"/>
           <g class="scene">
             <use href="#car"/><path d="M4 69h92" stroke="#ffffff55" stroke-width=".6"/>
             <g class="fly" style="transform-origin:61px 39px"><use href="#code" x="55" y="33" width="12" height="12"/></g>
-            <circle class="ring" cx="61" cy="39" r="10" fill="none" stroke="#4be3a4" stroke-width="1.1"/>
+            <circle class="ring" cx="61" cy="39" r="10" fill="none" stroke="#ff4d63" stroke-width="1.1"/>
           </g>
           <g class="scene">
             <use href="#car" x="-6" y="4"/><use href="#code" x="49" y="37" width="12" height="12"/>
             <g class="slide">
-              <rect x="56" y="8" width="36" height="60" rx="6" fill="#02080a"/><rect x="57.8" y="9.8" width="32.4" height="56.4" rx="4.6" fill="#12372a"/><rect x="69" y="11.4" width="10" height="2.2" rx="1.1" fill="#02080a"/>
+              <rect x="56" y="8" width="36" height="60" rx="6" fill="#02080a"/><rect x="57.8" y="9.8" width="32.4" height="56.4" rx="4.6" fill="#3a1a20"/><rect x="69" y="11.4" width="10" height="2.2" rx="1.1" fill="#02080a"/>
               <use href="#code" x="64" y="23" width="20" height="20"/>
-              <path d="M61 26v-6h6M81 20h6v6M61 40v6h6M87 40v6h-6" fill="none" stroke="#4be3a4" stroke-width="1.2"/>
-              <rect class="beam" x="62" y="23" width="24" height="1" rx=".5" fill="#4be3a4"/>
-              <g class="pop" style="animation-delay:2.4s"><circle cx="74" cy="56" r="6" fill="#4be3a4"/><path d="M71 56l2 2 4-4" fill="none" stroke="#06130e" stroke-width="1.3"/></g>
+              <path d="M61 26v-6h6M81 20h6v6M61 40v6h6M87 40v6h-6" fill="none" stroke="#ff4d63" stroke-width="1.2"/>
+              <rect class="beam" x="62" y="23" width="24" height="1" rx=".5" fill="#ff4d63"/>
+              <g class="pop" style="animation-delay:2.4s"><circle cx="74" cy="56" r="6" fill="#ff4d63"/><path d="M71 56l2 2 4-4" fill="none" stroke="#120d0e" stroke-width="1.3"/></g>
             </g>
           </g>
           <g class="scene">
-            <rect x="24" y="2" width="52" height="76" rx="8" fill="#02080a"/><rect x="26" y="4" width="48" height="72" rx="6.4" fill="#f3f5f4"/><rect x="43" y="6" width="14" height="2.8" rx="1.4" fill="#02080a"/>
-            <g class="pop" style="animation-delay:.2s"><rect x="29" y="14" width="42" height="17" rx="4" fill="#fff"/><circle cx="64.5" cy="22.5" r="4.2" fill="#e3f6ed"/><circle cx="64.5" cy="22.5" r="1.8" fill="#0c7a4d"/><text x="46" y="21.5" text-anchor="middle" font-size="3.7" font-weight="800" fill="#0f1613">سيارتك مسكّرة عليّ</text><text x="46" y="27" text-anchor="middle" font-size="2.9" fill="#68746e">هلأ · رقمه مخفي</text></g>
-            <g class="pop" style="animation-delay:1.2s"><rect x="30" y="36" width="34" height="11" rx="4" fill="#0c7a4d"/><text x="47" y="42.8" text-anchor="middle" font-size="3.5" font-weight="800" fill="#fff">جاي خلال دقيقتين</text></g>
-            <g class="pop" style="animation-delay:2.1s"><rect x="41" y="51" width="30" height="16" rx="3.5" fill="#fff"/><rect x="42.5" y="52.5" width="27" height="13" rx="2.5" fill="#e3f6ed"/><rect x="50" y="54.5" width="12" height="6" rx="2.4" fill="#0c7a4d"/><rect x="46.5" y="57.5" width="19" height="5" rx="2" fill="#0c7a4d"/><circle cx="50.5" cy="62.5" r="1.9" fill="#06130e"/><circle cx="61.5" cy="62.5" r="1.9" fill="#06130e"/></g>
+            <rect x="24" y="2" width="52" height="76" rx="8" fill="#02080a"/><rect x="26" y="4" width="48" height="72" rx="6.4" fill="#f6f5f4"/><rect x="43" y="6" width="14" height="2.8" rx="1.4" fill="#02080a"/>
+            <g class="pop" style="animation-delay:.2s"><rect x="29" y="14" width="42" height="17" rx="4" fill="#fff"/><circle cx="64.5" cy="22.5" r="4.2" fill="#fcebee"/><circle cx="64.5" cy="22.5" r="1.8" fill="#c8102e"/><text x="46" y="21.5" text-anchor="middle" font-size="3.7" font-weight="800" fill="#161213">سيارتك مسكّرة عليّ</text><text x="46" y="27" text-anchor="middle" font-size="2.9" fill="#756c6e">هلأ · رقمه مخفي</text></g>
+            <g class="pop" style="animation-delay:1.2s"><rect x="30" y="36" width="34" height="11" rx="4" fill="#c8102e"/><text x="47" y="42.8" text-anchor="middle" font-size="3.5" font-weight="800" fill="#fff">جاي خلال دقيقتين</text></g>
+            <g class="pop" style="animation-delay:2.1s"><rect x="41" y="51" width="30" height="16" rx="3.5" fill="#fff"/><rect x="42.5" y="52.5" width="27" height="13" rx="2.5" fill="#fcebee"/><rect x="50" y="54.5" width="12" height="6" rx="2.4" fill="#c8102e"/><rect x="46.5" y="57.5" width="19" height="5" rx="2" fill="#c8102e"/><circle cx="50.5" cy="62.5" r="1.9" fill="#120d0e"/><circle cx="61.5" cy="62.5" r="1.9" fill="#120d0e"/></g>
           </g>
         </svg>
-        <div class="cap" aria-live="off"><h2 id="capT">حط الملصق على سيارتك</h2><p id="capS">رمز خاص فيك، بدون رقمك</p></div>
+        <div class="cap" aria-live="off"><h2 id="capT">الصق الرمز</h2></div>
       </div>
       <div class="actions">
         <a class="btn main" href="register.html">سجّل سيارتك</a>
@@ -126,29 +128,23 @@ footer a{text-decoration:underline;margin:0 8px}
 </header>
 
 <main>
-  <div class="cards">
-    <div class="card"><i><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></i><div><b>رقمك مخفي</b><span>اللي بيمسح ما بيشوف رقمك ولا اسمك.</span></div></div>
-    <div class="card"><i><svg viewBox="0 0 24 24"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1z"/><circle cx="12" cy="13" r="3.5"/></svg></i><div><b>صور من الكاميرا بس</b><span>وبتتفحص آلياً قبل ما توصلك.</span></div></div>
-    <div class="card"><i><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 7.8-8 9-4.5-1.2-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></i><div><b>محادثة محمية</b><span>فلتر للمسبّات والمعاكسة، وحظر بضغطة.</span></div></div>
-  </div>
-  <form class="codeForm" id="codeForm"><label for="codeIn">الرمز ما انقرأ؟ اكتب الكود اللي تحته</label>
+  <form class="codeForm" id="codeForm"><label for="codeIn">عندك كود؟</label>
     <div><input id="codeIn" dir="ltr" placeholder="YN-XXXXXXXXXX" maxlength="20" autocomplete="off" autocapitalize="characters"><button type="submit">افتح</button></div></form>
 </main>
 
 <footer>
   <p><a href="privacy.html">الخصوصية</a><a href="delete-account.html">حذف الحساب</a></p>
-  <p>خدمة تنبيه بين الناس، مش للطوارئ. للطوارئ: 911</p>
 </footer>
 <script>
 (function(){
-  var C=[['حط الملصق على سيارتك','رمز خاص فيك، بدون رقمك'],['أي حدا بيمسحه بالكاميرا','بدون ما ينزّل تطبيق'],['بتوصلك رسالته وبتردّ','محادثة محمية، وصور من الكاميرا بس']];
+  var C=['الصق الرمز','بيمسحه','بتوصلك'];
   var s=document.querySelectorAll('.scene'),b=document.querySelectorAll('.bars i'),i=0,t;
   function show(n){
     i=n%3;clearTimeout(t);
     for(var k=0;k<3;k++){s[k].classList.remove('on');b[k].className=k<i?'done':''}
     void document.body.offsetWidth;   // restart the animations
     s[i].classList.add('on');b[i].className='now';
-    document.getElementById('capT').textContent=C[i][0];document.getElementById('capS').textContent=C[i][1];
+    document.getElementById('capT').textContent=C[i];
     t=setTimeout(function(){show(i+1)},3600);
   }
   document.getElementById('story').addEventListener('click',function(){show(i+1)});

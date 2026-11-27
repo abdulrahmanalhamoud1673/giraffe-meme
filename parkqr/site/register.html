@@ -6,9 +6,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127i">
+<link rel="stylesheet" href="app.css?v=20261127k">
 <link rel="icon" type="image/png" href="/icon-192.png">
-<meta name="theme-color" content="#06130e">
+<meta name="theme-color" content="#120d0e">
 <title>سجّل سيارتك — يا نشمي</title>
 <meta name="robots" content="noindex">
 <style>
@@ -82,9 +82,8 @@ body{background:
   <main>
     <section id="formView">
       <h1>سجّل سيارتك</h1>
-      <p class="sub">دقيقة وبتاخذ رمزك الخاص.</p>
       <div class="card-form">
-        <div class="gBox" id="gBox" hidden><div id="gBtn"></div><div class="or" id="gOr">أو اكتب اسمك</div></div>
+        <div class="gBox" id="gBox" hidden><div id="gBtn"></div><div class="or" id="gOr">أو</div></div>
         <form id="f" novalidate>
           <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="row2">
@@ -98,7 +97,7 @@ body{background:
             <div class="picks" id="makes" role="radiogroup" aria-labelledby="makeLbl"></div>
             <div class="picks colors" id="colors" role="radiogroup" aria-label="اللون"></div>
             <input type="text" id="nickname" maxlength="40" placeholder="تويوتا بيضاء" aria-label="وصف السيارة"></div>
-          <label class="cons"><input type="checkbox" id="consent"><span>أوافق على حفظ اسمي ورقمي لإرسال التنبيهات فقط.</span></label>
+          <label class="cons"><input type="checkbox" id="consent"><span>موافق على حفظ اسمي ورقمي</span></label>
           <p class="ferr" id="err" role="alert"></p>
           <button class="cta go" type="submit" id="btn">احصل على الرمز</button>
         </form>
@@ -108,13 +107,12 @@ body{background:
 
     <section id="doneView" hidden>
       <div class="done-head"><span class="tick" id="tick"></span><h1 style="margin:0">جاهز يا نشمي</h1></div>
-      <p class="sub" style="margin-bottom:16px">هاد رمزك. فعّل التنبيهات عشان توصلك الرسائل فوراً.</p>
       <div class="card-form done-card">
         <div id="print-area"><div class="sticker">
           <div class="edge"></div><div class="qr" id="qr" role="img" aria-label="رمز QR الخاص بسيارتك"></div>
           <b>يا نشمي</b><small>مسكّر عليّ؟ امسح الرمز</small>
         </div></div>
-        <a class="bell-cta" id="inboxLink" href="inbox.html"><span class="bi" id="bellIc"></span><span><b>فعّل التنبيهات</b><small>خطوتين وتوصلك كل رسالة على موبايلك</small></span></a>
+        <a class="bell-cta" id="inboxLink" href="inbox.html"><span class="bi" id="bellIc"></span><span><b>فعّل التنبيهات</b></span></a>
         <div class="acts">
           <button type="button" id="printBtn"><span id="icPrint"></span>اطبع</button>
           <button type="button" id="pngBtn"><span id="icSave"></span>احفظ صورة</button>
@@ -123,7 +121,6 @@ body{background:
         <a class="share" id="shareBtn" href="#" target="_blank" rel="noopener"><span id="icShare"></span>ادعُ جيرانك على واتساب</a>
         <div class="want" id="want">
           <b>بدك ستيكر جاهز؟</b>
-          <p>مقاوم للشمس وأحسن من ورقة المكتبة. قلّنا إذا مهتم، وإحنا بنجهز حسب الطلب.</p>
           <div class="wq">وين ساكن؟</div>
           <div class="wchips" id="wArea" role="radiogroup" aria-label="المنطقة"></div>
           <div class="wq">كم مستعد تدفع للستيكر؟</div>
@@ -144,17 +141,17 @@ body{background:
     <button class="x" id="saveClose" type="button">إغلاق</button>
   </div>
 </div>
-<script src="qr.js?v=20261127i"></script>
-<script src="shared.js?v=20261127i"></script>
+<script src="qr.js?v=20261127k"></script>
+<script src="shared.js?v=20261127k"></script>
 <script>
 const $=id=>document.getElementById(id);
 const f=$('f'),err=$('err'),btn=$('btn');
-$('trust').innerHTML=ICON.lock+'<span>رقمك وهويتك ما بيظهروا لأي حدا.</span>';
+$('trust').hidden=true;
 $('tick').innerHTML=ICON.check;$('bellIc').innerHTML=ICON.bell;$('icPrint').innerHTML=ICON.print;
 $('icSave').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>';
 $('icShare').innerHTML=ICON.share;
 $('icCopy').innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/></svg>';
-$('keynote').innerHTML=ICON.lock+'<span>رابط صندوق رسائلك هو مفتاحك. احفظه (انسخه وابعته لنفسك) وما تشاركه. إذا ضاع ما بنقدر نرجعه.</span>';
+$('keynote').innerHTML=ICON.lock+'<span>رابطك هو مفتاحك. احفظه وما تشاركه.</span>';
 
 const FIELD_OF={name_required:'first',name_two_words:'first',name_chars:'first',name_short:'first',name_long:'first',name_fake:'first',bad_phone:'phone',fake_phone:'phone',phone_limit:'phone'};
 function clearErrors(){for(const id of ['e-first','e-phone','err'])$(id).textContent='';for(const id of ['first','last'])$(id).removeAttribute('aria-invalid');$('phoneBox').removeAttribute('aria-invalid');$('phone').removeAttribute('aria-invalid')}
@@ -219,7 +216,7 @@ function setGoogle(token,name){
   gToken=token;document.querySelector('.row2').hidden=!!token;
   $('gOr').hidden=!!token;$('gBtn').hidden=!!token;
   const old=document.querySelector('.gHello');if(old)old.remove();
-  if(token){const d=document.createElement('div');d.className='gHello';d.textContent='أهلاً '+(String(name||'').split(' ')[0])+'، ضل رقمك وسيارتك';$('gBox').appendChild(d)}
+  if(token){const d=document.createElement('div');d.className='gHello';d.textContent='أهلاً '+(String(name||'').split(' ')[0]);$('gBox').appendChild(d)}
 }
 async function onGoogle(res){
   clearErrors();
