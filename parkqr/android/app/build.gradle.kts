@@ -5,6 +5,10 @@ plugins {
     id("io.github.takahirom.roborazzi")
 }
 
+// Instant notifications need app/google-services.json (from the Firebase console). Without it the app still builds
+// and falls back to checking every 15 minutes.
+if (file("google-services.json").exists()) apply(plugin = "com.google.gms.google-services")
+
 android {
     namespace = "com.yanashmi.app"
     compileSdk = 35
@@ -12,8 +16,8 @@ android {
         applicationId = "com.yanashmi.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.3.0"
+        versionCode = 5
+        versionName = "1.4.0"
     }
     buildTypes {
         release {
@@ -53,6 +57,7 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.4.0")
     implementation("androidx.camera:camera-view:1.4.0")
     implementation("androidx.exifinterface:exifinterface:1.3.7")
+    implementation("com.google.firebase:firebase-messaging:24.1.0")
     implementation("androidx.credentials:credentials:1.3.0")
     implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
     implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")

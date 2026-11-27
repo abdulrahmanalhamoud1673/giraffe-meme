@@ -1,5 +1,7 @@
 // Web Push (RFC 8030 + RFC 8291 aes128gcm + RFC 8292 VAPID) using only WebCrypto, so it runs in Cloudflare Workers.
 
+import { notifyApp, fcmConfigured } from './_fcm.js';
+
 const enc = new TextEncoder();
 const b64u = {
   enc: (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''),
@@ -94,6 +96,11 @@ export function validEndpoint(endpoint) {
 
 // Notifies every device of a car owner. Dead subscriptions (404/410) are removed.
 export async function notifyOwner(env, carId, payload) {
+  const [web, app] = await Promise.all([notifyWeb(env, carId, payload), notifyApp(env, carId, payload).catch(() => ({ sent: 0, failed: 1 }))]);
+  return { sent: web.sent + app.sent, failed: web.failed + app.failed, ...(web.skipped && !fcmConfigured(env) ? { skipped: true } : {}) };
+}
+
+async function notifyWeb(env, carId, payload) {
   if (!pushConfigured(env)) return { sent: 0, failed: 0, skipped: true };
   const { results } = await env.DB.prepare('SELECT id, endpoint, p256dh, auth FROM push_subs WHERE car_id = ?').bind(carId).all();
   let sent = 0, failed = 0;

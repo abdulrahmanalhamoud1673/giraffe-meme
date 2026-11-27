@@ -8,5 +8,6 @@ export async function onRequestPost({ request, env }) {
   const key = rid(28);
   await env.DB.prepare('UPDATE cars SET owner_key = ? WHERE id = ?').bind(key, car.id).run();
   try { await env.DB.prepare('DELETE FROM push_subs WHERE car_id = ?').bind(car.id).run(); } catch (_) { /* table not created yet */ }
+  try { await env.DB.prepare('DELETE FROM fcm_tokens WHERE car_id = ?').bind(car.id).run(); } catch (_) { /* table not created yet */ }
   return json({ ok: true, owner_key: key });
 }

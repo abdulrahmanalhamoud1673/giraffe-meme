@@ -69,13 +69,13 @@ fun Root() {
     val askNotif = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { }
     LaunchedEffect(key) {
         if (key.length >= 16) {
-            scheduleChecks(ctx)
+            Push.register(ctx)
             if (Build.VERSION.SDK_INT >= 33) askNotif.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
     if (key.length < 16) AuthScreen(onDone = { token, k -> store.token = token; store.key = k; key = k })
     else HomeScreen(store, onNewKey = { store.key = it; key = it }, onLogout = {
         // leave nothing of this account behind on the phone
-        store.clear(); Photos.clear(); ctx.getSystemService(NotificationManager::class.java).cancelAll(); key = ""
+        Push.forget(ctx.applicationContext, store.key); store.clear(); Photos.clear(); ctx.getSystemService(NotificationManager::class.java).cancelAll(); key = ""
     })
 }

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --no-warnings unit/static.test.mjs && node --no-warnings unit/validate.test.mjs && node --no-warnings unit/push.test.mjs && node --no-warnings unit/api.test.mjs && node --no-warnings unit/results.test.mjs && node --no-warnings unit/features.test.mjs && node --no-warnings unit/interest.test.mjs && node --no-warnings unit/security.test.mjs && node --no-warnings unit/photo.test.mjs && node --no-warnings unit/block.test.mjs && node --no-warnings unit/note.test.mjs && node --no-warnings unit/channels.test.mjs && node --no-warnings unit/delete.test.mjs && node --no-warnings unit/chat.test.mjs && node --no-warnings unit/google.test.mjs && node --no-warnings unit/abuse.test.mjs",
+    "test": "node --no-warnings unit/static.test.mjs && node --no-warnings unit/validate.test.mjs && node --no-warnings unit/push.test.mjs && node --no-warnings unit/api.test.mjs && node --no-warnings unit/results.test.mjs && node --no-warnings unit/features.test.mjs && node --no-warnings unit/interest.test.mjs && node --no-warnings unit/security.test.mjs && node --no-warnings unit/photo.test.mjs && node --no-warnings unit/block.test.mjs && node --no-warnings unit/note.test.mjs && node --no-warnings unit/channels.test.mjs && node --no-warnings unit/delete.test.mjs && node --no-warnings unit/chat.test.mjs && node --no-warnings unit/google.test.mjs && node --no-warnings unit/abuse.test.mjs && node --no-warnings unit/fcm.test.mjs",
     "dev": "node --no-warnings dev-server.mjs"
   },
   "devDependencies": { "http_ece": "^1.2.0" }
