@@ -398,3 +398,5 @@ body{background:var(--bg)!important;font-size:16px;line-height:1.7}
 .rows>:last-child{border-bottom:0}.rows .danger{color:var(--red)}
 .tabPage .cta{width:min(300px,100%)}
 .tabNote{color:#075235;font-weight:700;text-align:center;min-height:1.4em}
+.reg .bell-cta{background:var(--green)}
+.sticker .edge{background:var(--hero)}
