@@ -339,3 +339,62 @@ body.chatMode{overflow:hidden}
 .chatBar button:disabled{opacity:.45;cursor:default}
 .chatApp .cm{max-width:84%;white-space:pre-wrap}
 .chatApp .cmImg{max-width:min(240px,100%);max-height:280px;width:auto;margin:0 0 5px}
+
+/* ===== the app's look (dark emerald headers, light sheet, soft cards). Comes last, so it wins. ===== */
+:root:root{--bg:#f3f5f4;--surface:#ffffff;--ink:#0f1613;--muted:#68746e;--line:#e4e9e6;--red:#c2183a;--green:#0c7a4d;--on-green:#ffffff;
+  --bubble:#edf1ef;--band-bg:#ffffff;--gold:#b98520;--soft-green:#e3f6ed;--soft-red:#fce9ed;--mint:#4be3a4;--night:#06130e;
+  --hero:linear-gradient(135deg,#071a12,#0e3b29 55%,#0c6b45);--display:'Cairo',system-ui,sans-serif;--body:'Cairo',system-ui,sans-serif;color-scheme:light}
+body{background:var(--bg)!important;font-size:16px;line-height:1.7}
+.band{display:none}
+.top{background:var(--hero);color:#fff;margin-inline:calc(-1 * max(18px,env(safe-area-inset-right,0px)));padding:calc(20px + env(safe-area-inset-top,0px)) 22px 22px;border-radius:0 0 30px 30px;margin-bottom:10px}
+.top .logo svg{color:var(--mint)}
+.top .back{color:#a8c4b7;font-weight:600}
+.cta,.btn-big{background:var(--green);color:#fff;border-radius:18px;font-weight:800;box-shadow:0 12px 24px -14px var(--green)}
+.cta.alt{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.card,.msgcard,.noKey{border:0;border-radius:24px;box-shadow:0 6px 20px -10px #0003}
+.opt{border-color:transparent;border-radius:20px;box-shadow:0 5px 16px -10px #0004}
+.opt .ic{background:var(--soft-green);color:var(--green);border-radius:14px}
+.opt.primary{background:var(--hero);color:#fff;border:0}
+.opt.primary .ic{background:#ffffff22;color:var(--mint)}
+.who{border:0;border-radius:22px;box-shadow:0 6px 20px -10px #0003}
+.chat-head{background:var(--hero);color:#fff;border:0;border-radius:0 0 30px 30px;padding-block:calc(16px + env(safe-area-inset-top,0px)) 18px}
+.chat-head .meta small,.chat-head .sw-wrap{color:#a8c4b7}
+.chat-head .av{background:#ffffff1f;color:var(--mint);box-shadow:none}
+.chat-head .dot{background:var(--mint)}.chat-head .dot.off{background:#ff8da1}
+.chat-head .switch[aria-checked="true"]{background:var(--mint)}
+.chat-body{background-image:none;padding-bottom:110px}
+.bub.in{border:0;border-radius:22px;box-shadow:0 6px 20px -10px #0003;width:100%;max-width:100%;padding:14px 16px 10px}
+.bub.in.new{box-shadow:0 0 0 2px var(--mint),0 8px 22px -12px #0004}
+.thread .qr-row{align-self:stretch;max-width:100%}
+.thread .chip{flex:1 1 40%;border:0;background:var(--soft-green);color:#075235;border-radius:14px;font-weight:700}
+.thread .chip:first-child{background:var(--green);color:#fff}
+.chatToggle{align-self:stretch;background:#fff;border-radius:16px;padding:11px;font-weight:800}
+.chatApp,.chatApp.chatApp{background:#eef2f0}
+.chatHead{background:var(--hero);border-radius:0 0 24px 24px}
+
+/* Google button, car choices */
+.gBox{display:grid;gap:10px;justify-items:center;margin-bottom:6px}
+.gBox .or{display:flex;align-items:center;gap:10px;width:100%;color:var(--muted);font-size:.82rem}
+.gBox .or::before,.gBox .or::after{content:"";flex:1;height:1px;background:var(--line)}
+.gHello{background:var(--soft-green);color:#075235;border-radius:16px;padding:12px 14px;font-weight:700;width:100%;text-align:center}
+.picks{display:flex;flex-wrap:wrap;gap:8px}
+.picks button{font:inherit;font-size:.9rem;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:14px;padding:7px 14px;cursor:pointer}
+.picks button[aria-checked="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.picks.colors button{width:42px;height:42px;border-radius:50%;padding:0;background:var(--c);border:1px solid var(--line)}
+.picks.colors button[aria-checked="true"]{background:var(--c);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--green)}
+
+/* inbox tabs, like the app */
+.tabs{position:fixed;z-index:30;bottom:0;inset-inline:0;display:flex;justify-content:center;background:#fff;border-top:1px solid var(--line);padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px))}
+.tabs button{flex:1;max-width:180px;display:grid;justify-items:center;gap:2px;background:none;border:0;font:inherit;font-size:.78rem;font-weight:700;color:var(--muted);cursor:pointer}
+.tabs svg{width:52px;height:30px;padding:4px 15px;border-radius:99px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tabs button[aria-selected="true"]{color:#075235}.tabs button[aria-selected="true"] svg{background:var(--soft-green)}
+.tabPage{display:grid;gap:14px;justify-items:center;padding:20px 18px 110px}
+.myCode{width:min(300px,100%);background:#fff;border-radius:28px;overflow:hidden;text-align:center;box-shadow:0 18px 36px -18px #0006}
+.myCode header{background:var(--hero);color:#fff;font-weight:800;font-size:1.2rem;padding:12px}
+.myCode .qr{padding:14px 22px 0}.myCode .qr svg{display:block;width:100%;height:auto}
+.myCode b{display:block;margin-top:6px}.myCode small{display:block;color:var(--muted);font-weight:700;padding-bottom:14px}
+.rows{width:min(420px,100%);background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 6px 20px -10px #0003}
+.rows button,.rows a{display:flex;justify-content:space-between;width:100%;font:inherit;font-weight:700;text-align:start;background:none;border:0;border-bottom:1px solid var(--line);padding:16px 18px;color:var(--ink);cursor:pointer;text-decoration:none}
+.rows>:last-child{border-bottom:0}.rows .danger{color:var(--red)}
+.tabPage .cta{width:min(300px,100%)}
+.tabNote{color:#075235;font-weight:700;text-align:center;min-height:1.4em}

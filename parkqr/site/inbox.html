@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127g">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=20261127h">
 <link rel="manifest" href="/manifest.webmanifest" id="manifest">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="theme-color" content="#0b0d0c">
+<meta name="theme-color" content="#06130e">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="يا نشمي">
@@ -35,12 +35,27 @@
 
   <div id="chatHost" hidden></div>
   <main class="chat-body" id="msgs"><p class="note" style="text-align:center">جاري التحميل…</p></main>
-  <p class="delLink"><a href="delete-account.html">حذف حسابي</a> · <a href="privacy.html">الخصوصية</a></p>
+  <section class="tabPage" id="tabSticker" hidden>
+    <div class="myCode"><header>يا نشمي</header><div class="qr" id="myQr" role="img" aria-label="رمز سيارتي"></div><b>مسكّر عليّ؟ امسح الرمز</b><small id="myCodeText" dir="ltr"></small></div>
+    <button class="cta" id="shareMine" type="button">شارك للطباعة</button>
+    <p class="tabNote" id="stickerNote" role="status"></p>
+  </section>
+  <section class="tabPage" id="tabAccount" hidden>
+    <div class="rows"><button type="button" id="aCopy">انسخ رابط حسابي<span>‹</span></button><button type="button" id="aRotate">غيّر الرابط وطلّع كل الأجهزة<span>‹</span></button><a href="privacy.html">سياسة الخصوصية<span>‹</span></a></div>
+    <div class="rows"><button type="button" id="aOut">تسجيل الخروج<span>‹</span></button><a class="danger" href="delete-account.html">حذف الحساب<span>‹</span></a></div>
+    <p class="tabNote" id="accNote" role="status"></p>
+  </section>
+  <nav class="tabs" id="tabs" role="tablist" hidden>
+    <button type="button" role="tab" data-tab="msgs" aria-selected="true"><svg viewBox="0 0 24 24"><path d="M6 17V11a6 6 0 0112 0v6l1.5 2h-15z"/><path d="M10 21a2 2 0 004 0"/></svg>الرسائل</button>
+    <button type="button" role="tab" data-tab="tabSticker" aria-selected="false"><svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 18h2v2h-2zM18 14h2M14 20h2"/></svg>رمزي</button>
+    <button type="button" role="tab" data-tab="tabAccount" aria-selected="false"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>حسابي</button>
+  </nav>
 </div>
 
-<script src="shared.js?v=20261127g"></script>
-<script src="camera.js?v=20261127g"></script>
-<script src="push.js?v=20261127g"></script>
+<script src="qr.js?v=20261127h"></script>
+<script src="shared.js?v=20261127h"></script>
+<script src="camera.js?v=20261127h"></script>
+<script src="push.js?v=20261127h"></script>
 <script>
 let key=location.hash.slice(1);
 try{
@@ -111,7 +126,35 @@ async function loadPhoto(id,im){
     im.src=photoCache[id];im.onclick=()=>window.open(photoCache[id],'_blank');
   }catch(_){}
 }
+let myCar='';
+function showTab(id){
+  for(const t of ['msgs','tabSticker','tabAccount'])$(t).hidden=t!==id;
+  document.querySelector('.chat-top').hidden=id!=='msgs';
+  for(const b of $('tabs').children)b.setAttribute('aria-selected',String(b.dataset.tab===id));
+  window.scrollTo(0,id==='msgs'?document.body.scrollHeight:0);
+}
+for(const b of $('tabs').children)b.onclick=()=>showTab(b.dataset.tab);
+const myLink=()=>new URL('inbox.html',location.href).href+'#'+key;
+async function copyText(t,el,done){try{await navigator.clipboard.writeText(t);el.textContent=done}catch(_){el.textContent=t}}
+$('shareMine').onclick=async()=>{const url=scanUrl(myCar);if(navigator.share){try{await navigator.share({url})}catch(_){}}else copyText(url,$('stickerNote'),'انتسخ رابط الرمز.')};
+$('aCopy').onclick=()=>copyText(myLink(),$('accNote'),'انتسخ. احفظه وما تبعته لحدا.');
+$('aRotate').onclick=async()=>{
+  if(!confirm('الرابط القديم بيبطل يشتغل، وكل جهاز تاني بيطلع من حسابك. أكمّل؟'))return;
+  try{const r=await api('/inbox/rotate',{method:'POST',headers:H,body:'{}'});
+    try{localStorage.setItem('yn_key',r.owner_key);const g=JSON.parse(localStorage.getItem('yn_reg')||'null');if(g){g.key=r.owner_key;localStorage.setItem('yn_reg',JSON.stringify(g))}}catch(_){}
+    key=r.owner_key;H.authorization='Bearer '+key;history.replaceState(null,'','#'+key);
+    copyText(myLink(),$('accNote'),'تغيّر الرابط وانتسخ الجديد. احفظه.');
+  }catch(_){$('accNote').textContent='ما زبط. جرب كمان مرة.'}
+};
+$('aOut').onclick=async()=>{
+  if(!confirm('احفظ رابط حسابك أول. تطلع؟'))return;
+  try{await Push.disable(H)}catch(_){}
+  try{localStorage.removeItem('yn_key');localStorage.removeItem('yn_reg')}catch(_){}
+  location.href='inbox.html';
+};
 function render(d){
+  if(myCar!==d.car.id){myCar=d.car.id;$('myQr').innerHTML=qrSvg(scanUrl(myCar));$('myCodeText').textContent=shortCode(myCar)}
+  $('tabs').hidden=false;
   $('who').textContent=d.car.nickname||(d.car.name||'').split(' ')[0]||'سيارتك';
   paused=d.car.paused;
   $('pauseBtn').setAttribute('aria-checked',String(!paused));
@@ -177,7 +220,7 @@ async function load(){
     const first=sig==='';sig=s;
     render(d);
     if(fresh.length)chime();
-    if(first||fresh.length)window.scrollTo({top:document.body.scrollHeight,behavior:first?'auto':'smooth'});
+    if((first||fresh.length)&&!$('msgs').hidden)window.scrollTo({top:document.body.scrollHeight,behavior:first?'auto':'smooth'});
   }catch(e){$('msgs').innerHTML='<div class="warn">الرابط غير صحيح. افتح صندوقك من الرابط اللي حفظته عند التسجيل.</div>'}
 }
 $('pauseBtn').onclick=async()=>{

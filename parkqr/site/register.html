@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261127g">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=20261127h">
 <link rel="icon" type="image/png" href="/icon-192.png">
-<meta name="theme-color" content="#0b0d0c">
+<meta name="theme-color" content="#06130e">
 <title>سجّل سيارتك — يا نشمي</title>
 <meta name="robots" content="noindex">
 <style>
@@ -84,6 +84,7 @@ body{background:
       <h1>سجّل سيارتك</h1>
       <p class="sub">دقيقة وبتاخذ رمزك الخاص.</p>
       <div class="card-form">
+        <div class="gBox" id="gBox" hidden><div id="gBtn"></div><div class="or" id="gOr">أو اكتب اسمك</div></div>
         <form id="f" novalidate>
           <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
           <div class="row2">
@@ -93,7 +94,10 @@ body{background:
           <div class="fld"><label for="phone">رقم الموبايل</label>
             <div class="phone" id="phoneBox"><span class="cc">+962</span><input type="tel" id="phone" inputmode="numeric" autocomplete="tel-national" placeholder="7X XXX XXXX" maxlength="22" required></div>
             <p class="ferr" id="e-phone" role="alert"></p></div>
-          <div class="fld"><label for="nickname">وصف السيارة <span style="font-weight:400">(اختياري)</span></label><input type="text" id="nickname" maxlength="40" placeholder="تويوتا بيضاء"></div>
+          <div class="fld"><label id="makeLbl">نوع السيارة <span style="font-weight:400">(اختياري)</span></label>
+            <div class="picks" id="makes" role="radiogroup" aria-labelledby="makeLbl"></div>
+            <div class="picks colors" id="colors" role="radiogroup" aria-label="اللون"></div>
+            <input type="text" id="nickname" maxlength="40" placeholder="تويوتا بيضاء" aria-label="وصف السيارة"></div>
           <label class="cons"><input type="checkbox" id="consent"><span>أوافق على حفظ اسمي ورقمي لإرسال التنبيهات فقط.</span></label>
           <p class="ferr" id="err" role="alert"></p>
           <button class="cta go" type="submit" id="btn">احصل على الرمز</button>
@@ -140,8 +144,8 @@ body{background:
     <button class="x" id="saveClose" type="button">إغلاق</button>
   </div>
 </div>
-<script src="qr.js?v=20261127g"></script>
-<script src="shared.js?v=20261127g"></script>
+<script src="qr.js?v=20261127h"></script>
+<script src="shared.js?v=20261127h"></script>
 <script>
 const $=id=>document.getElementById(id);
 const f=$('f'),err=$('err'),btn=$('btn');
@@ -181,19 +185,57 @@ try{const s=JSON.parse(localStorage.getItem('yn_reg')||'null');if(s&&s.token&&s.
 f.addEventListener('submit',async e=>{
   e.preventDefault();clearErrors();
   const fullName=normalizeName(f.first.value+' '+f.last.value);
-  const ne=validateName(fullName);if(ne){showError(ne);return}
+  if(!gToken){const ne=validateName(fullName);if(ne){showError(ne);return}}
   const phone='+962'+nationalDigits(f.phone.value);
   const pv=validatePhone(phone);if(pv.error){showError(pv.error);return}
   if(!f.consent.checked){err.textContent=ERR_TEXT.consent_required;return}
   btn.disabled=true;btn.textContent='جاري التسجيل…';
   try{
-    const r=await api('/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({
-      name:fullName,nickname:f.nickname.value,phone,consent:true,website:f.website.value,src:source()})});
+    const body=gToken?{idToken:gToken,nickname:f.nickname.value,phone,consent:true,src:source()}:{name:fullName,nickname:f.nickname.value,phone,consent:true,website:f.website.value,src:source()};
+    const r=await api(gToken?'/auth/google':'/register',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
     try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
     show(r.token,r.owner_key);
-  }catch(x){showError(x.code);btn.disabled=false;btn.textContent='احصل على الرمز'}
+  }catch(x){
+    if(x.code==='bad_token'){setGoogle('');err.textContent='انتهت جلسة جوجل. اضغط زر جوجل مرة تانية.'}else showError(x.code);
+    btn.disabled=false;btn.textContent='احصل على الرمز'}
 });
 
+
+/* ---- car: tap the make and the colour (the text stays editable) ---- */
+const MAKES=['تويوتا','هيونداي','كيا','نيسان','هوندا','مرسيدس','بي إم دبليو','تسلا','بي واي دي'];
+const COLORS=[['بيضاء','#fff'],['سوداء','#14171a'],['فضية','#c7cdd1'],['رمادية','#6f777d'],['حمراء','#c62835'],['زرقاء','#1e5fbf'],['خضراء','#23704a'],['ذهبية','#c9a55c']];
+const car={make:'',color:''};
+function pick(box,list,field){
+  for(const it of list){const [v,c]=Array.isArray(it)?it:[it];const b=document.createElement('button');b.type='button';b.setAttribute('role','radio');b.setAttribute('aria-checked','false');
+    if(c){b.style.setProperty('--c',c);b.setAttribute('aria-label',v);b.title=v}else b.textContent=v;
+    b.onclick=()=>{car[field]=v;for(const x of box.children)x.setAttribute('aria-checked',String(x===b));$('nickname').value=(car.make+' '+car.color).trim()};box.appendChild(b)}
+}
+pick($('makes'),MAKES,'make');pick($('colors'),COLORS,'color');
+
+/* ---- Google sign in (only on our own addresses: Google refuses any other) ---- */
+const GOOGLE_ID='970792846835-nhrrmivpefah46hn8sktn8albpbet90b.apps.googleusercontent.com';
+let gToken='';
+function setGoogle(token,name){
+  gToken=token;document.querySelector('.row2').hidden=!!token;
+  $('gOr').hidden=!!token;$('gBtn').hidden=!!token;
+  const old=document.querySelector('.gHello');if(old)old.remove();
+  if(token){const d=document.createElement('div');d.className='gHello';d.textContent='أهلاً '+(String(name||'').split(' ')[0])+'، ضل رقمك وسيارتك';$('gBox').appendChild(d)}
+}
+async function onGoogle(res){
+  clearErrors();
+  try{
+    const r=await api('/auth/google',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({idToken:res.credential})});
+    if(r.needs_signup){setGoogle(res.credential,r.name);$('phone').focus();return}
+    try{localStorage.setItem('yn_reg',JSON.stringify({token:r.token,key:r.owner_key}))}catch(_){}
+    show(r.token,r.owner_key);
+  }catch(_){err.textContent='ما زبط الدخول بجوجل. جرب كمان مرة.'}
+}
+if(['yanashmi.com','www.yanashmi.com','yanashmi.pages.dev'].includes(location.hostname)){
+  const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;
+  s.onload=()=>{google.accounts.id.initialize({client_id:GOOGLE_ID,callback:onGoogle});$('gBox').hidden=false;
+    google.accounts.id.renderButton($('gBtn'),{theme:'outline',size:'large',shape:'pill',text:'continue_with',locale:'ar',width:Math.min(360,$('gBox').clientWidth||300)})};
+  document.head.appendChild(s);
+}
 
 /* ---- "I want a ready-made sticker": area + the price they would pay ---- */
 const W_AREA=[['amman','عمّان'],['irbid','إربد'],['zarqa','الزرقاء'],['other','غيرها']];
