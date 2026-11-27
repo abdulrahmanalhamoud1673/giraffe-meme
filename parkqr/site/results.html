@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=20261119c">
+<link rel="stylesheet" href="app.css?v=20261127a">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>لوحة الأرقام — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -55,6 +55,15 @@ table.dist caption{text-align:start;font-weight:600;padding:12px 0 4px}
       </div>
     </div>
     <div class="warn" id="exposed" hidden style="margin:12px 0"></div>
+    <div id="vapidBox" hidden style="margin:0 0 18px">
+      <p class="note" style="margin-bottom:8px">مفاتيح الإشعارات الجديدة (بتتولّد بمتصفحك ومش بتظهر ولا بتنبعت لأحد):</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="cta alt" id="vGen" type="button">ولّد المفاتيح</button>
+        <button class="cta alt" id="vPub" type="button" hidden>نسخ VAPID_PUBLIC</button>
+        <button class="cta alt" id="vPriv" type="button" hidden>نسخ VAPID_PRIVATE</button>
+      </div>
+      <p class="note" id="vMsg" style="margin-top:8px"></p>
+    </div>
     <form class="keyrow" id="kf"><input id="k" type="password" placeholder="مفتاح الإدارة" autocomplete="off"><button class="cta" type="submit">عرض</button></form>
     <p class="err" id="err" role="alert"></p>
     <div id="out"></div>
@@ -156,8 +165,21 @@ async function load(key){
   const data=await r.json();
   const ex=data.exposed||[];
   if(ex.length){const b=$('exposed');b.hidden=false;b.textContent='تنبيه أمني: '+ex.join('، ')+' لسا بقيمة انكشفت بدردشة. بدّلها قبل الإطلاق للناس (الأسرار بإعدادات Cloudflare).'}
+  $('vapidBox').hidden=!ex.includes('VAPID_PRIVATE');
   render(data);
 }
+const b64u=a=>btoa(String.fromCharCode(...a)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64u=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+let vk=null;
+$('vGen').onclick=async()=>{
+  const kp=await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']);
+  const j=await crypto.subtle.exportKey('jwk',kp.privateKey);
+  const pub=new Uint8Array(65);pub[0]=4;pub.set(unb64u(j.x),1);pub.set(unb64u(j.y),33);
+  vk={pub:b64u(pub),priv:j.d};
+  $('vGen').textContent='ولّد مفاتيح ثانية';$('vPub').hidden=false;$('vPriv').hidden=false;
+  $('vMsg').textContent='انسخ كل واحد وحطه بكلاودفلير باسمه بالضبط (Secret)، وبعدها Retry deployment.';
+};
+for(const [id,k] of [['vPub','pub'],['vPriv','priv']])$(id).onclick=async()=>{try{await navigator.clipboard.writeText(vk[k]);$(id).textContent='انتسخ ✓'}catch(_){$('vMsg').textContent='ما قدرنا ننسخ. جرّب متصفح ثاني.'}};
 $('kf').addEventListener('submit',e=>{e.preventDefault();load($('k').value)});
 try{const k=sessionStorage.getItem('yn_admin');if(k){$('k').value=k;load(k)}}catch(_){}
 </script>
