@@ -3,7 +3,7 @@
 import { json, rid, deviceHash, MSG_TEXT, readJson } from './_shared.js';
 import { ensureChat, ensureBlocks } from './_extra.js';
 import { checkNote } from './_notefilter.js';
-import { ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
+import { ensurePhotoTable, parsePhoto, checkPhoto, takePhotoCheck, PHOTO_KEEP_SECONDS } from './_photo.js';
 import { notifyOwner } from './_push.js';
 
 export const CHAT_MAX_TEXT = 140, CHAT_MAX_MESSAGES = 30, CHAT_OPEN_SECONDS = 6 * 3600, CHAT_GAP_SECONDS = 3;
@@ -32,12 +32,17 @@ export async function postChat({ request, env, waitUntil }, side, msgId, car) {
   const pic = b.photo ? parsePhoto(b.photo) : null;           // a picture must come straight from the camera (the page/app never offers the gallery)
   if (b.photo && !pic.ok) return json({ error: 'bad_photo' }, 400);
   if (!c.ok || (!c.note && !pic)) return json({ error: 'text_rejected' }, 422);
-  if (pic && (await checkPhoto(env, pic.bytes)) === 'unrelated') return json({ error: 'photo_unrelated' }, 422);
+  const dev = await deviceHash(request, env);
   if (side === 's') {
     await ensureBlocks(env);
-    const dev = await deviceHash(request, env);
     const blocked = await env.DB.prepare('SELECT 1 AS x FROM blocks WHERE car_id = ? AND device_hash = ?').bind(t.m.car_id, dev).first();
     if (blocked) return json({ ok: true });   // silent
+  }
+  if (pic) {
+    if (!(await takePhotoCheck(env, dev))) return json({ error: 'slow' }, 429);
+    const verdict = await checkPhoto(env, pic.b64);
+    if (verdict === 'rejected') return json({ error: 'photo_unrelated' }, 422);
+    if (verdict !== 'ok') return json({ error: 'photo_check_down' }, 503);
   }
   const cid = rid(14);
   await env.DB.prepare('INSERT INTO chat (id, msg_id, side, text, photo) VALUES (?,?,?,?,?)').bind(cid, t.m.id, side, c.note || '', pic ? 1 : 0).run();

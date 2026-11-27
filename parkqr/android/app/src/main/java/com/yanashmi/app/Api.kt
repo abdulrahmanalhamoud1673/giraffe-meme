@@ -16,6 +16,8 @@ data class Inbox(val name: String, val nickname: String, val paused: Boolean, va
 data class ChatMsg(val id: String, val mine: Boolean, val text: String, val photo: Boolean, val t: Long)
 data class Thread(val open: Boolean, val messages: List<ChatMsg>)
 data class Registered(val token: String, val key: String)
+/** Either signed in (account set) or a new Google user who still has to give a phone number. */
+data class GoogleResult(val account: Registered?, val name: String)
 
 val KINDS = mapOf(
     "block" to "سيارتك مسكّرة عليّ، ممكن تحرّكها؟",
@@ -59,6 +61,16 @@ object Api {
         val r = call("POST", "/api/register", body = JSONObject().put("name", name).put("nickname", nickname).put("phone", phone).put("consent", true).put("src", "app"))
         return Registered(r.getString("token"), r.getString("owner_key"))
     }
+
+    suspend fun google(idToken: String, name: String = "", nickname: String = "", phone: String = "", consent: Boolean = false): GoogleResult {
+        val b = JSONObject().put("idToken", idToken).put("src", "app")
+        if (phone.isNotEmpty()) b.put("name", name).put("nickname", nickname).put("phone", phone).put("consent", consent)
+        return parseGoogle(call("POST", "/api/auth/google", body = b))
+    }
+
+    internal fun parseGoogle(r: JSONObject): GoogleResult =
+        if (r.optBoolean("needs_signup")) GoogleResult(null, r.optString("name"))
+        else GoogleResult(Registered(r.getString("token"), r.getString("owner_key")), "")
 
     suspend fun inbox(key: String): Inbox {
         val r = call("GET", "/api/inbox", key)

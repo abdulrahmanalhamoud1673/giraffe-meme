@@ -1,10 +1,10 @@
 // "I want a ready-made sticker": owner-only, validated, one answer per car, table created on first use.
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 const { db, DB } = makeDb(); const env = { DB, SALT: 's', ADMIN_KEY: 'interest-test-admin-key-0001' };
-const R = await import(SITE + 'functions/api/register.js');
-const I = await import(SITE + 'functions/api/interest.js?fresh=' + Date.now());   // fresh module: "table ensured" flag starts false
-const RES = await import(SITE + 'functions/api/results.js');
+const R = await import(SITE_URL + 'functions/api/register.js');
+const I = await import(SITE_URL + 'functions/api/interest.js?fresh=' + Date.now());   // fresh module: "table ensured" flag starts false
+const RES = await import(SITE_URL + 'functions/api/results.js');
 let ip = 0;
 const req = (method, body, h = {}) => new Request('http://x/', { method, body: body && JSON.stringify(body), headers: { 'cf-connecting-ip': '8.8.8.' + (ip++ % 250), 'user-agent': 'u' + ip, ...h } });
 const mk = async (phone) => (await (await R.onRequestPost({ request: req('POST', { name: 'أحمد الخطيب', phone, consent: true }), env })).json());

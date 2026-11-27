@@ -3,7 +3,7 @@ import { notifyOwner } from './_push.js';
 import { ensureBlocks, ensureNotes } from './_extra.js';
 import { whatsappConfigured, ownerContact, sendWhatsApp } from './_channels.js';
 import { checkNote } from './_notefilter.js';
-import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, PHOTO_KEEP_SECONDS } from './_photo.js';
+import { PHOTO_KINDS, ensurePhotoTable, parsePhoto, checkPhoto, takePhotoCheck, PHOTO_KEEP_SECONDS } from './_photo.js';
 
 export async function onRequestPost(ctx) {
   try { return await handle({ request: ctx.request, env: ctx.env, waitUntil: ctx.waitUntil ? ctx.waitUntil.bind(ctx) : null }); }
@@ -38,10 +38,13 @@ async function handle({ request, env, waitUntil }) {
   const today = await env.DB.prepare('SELECT COUNT(*) AS n FROM messages WHERE car_id = ? AND created_at > unixepoch() - 86400 AND kind NOT LIKE \'nudge:%\'').bind(car.id).first();
   if (today.n >= 20) return json({ error: 'daily_limit' }, 429);
 
-  let verdict = null;
+  let verdict = null, dropped = false;
   if (photo) {
-    verdict = await checkPhoto(env, photo.bytes);
-    if (verdict === 'unrelated') return json({ error: 'photo_unrelated' }, 422);
+    if (!(await takePhotoCheck(env, dev))) return json({ error: 'wait' }, 429);
+    verdict = await checkPhoto(env, photo.b64);
+    if (verdict === 'rejected') return json({ error: 'photo_unrelated' }, 422);
+    // The checker is down: the alert still goes out (the car may need help), the unchecked photo does not.
+    if (verdict !== 'ok') { photo = null; dropped = true; }
   }
   const id = rid(14);
   await env.DB.prepare('INSERT INTO messages (id, car_id, kind, device_hash) VALUES (?,?,?,?)').bind(id, car.id, b.kind, dev).run();
@@ -58,5 +61,5 @@ async function handle({ request, env, waitUntil }) {
     ? ownerContact(env, car.id).then((c) => sendWhatsApp(env, c, MSG_TEXT[b.kind] + (photo ? ' (مع صورة)' : ''))).catch(() => {})
     : Promise.resolve();
   if (waitUntil) { waitUntil(tell); waitUntil(wa); } else { await tell; await wa; }
-  return json({ ok: true, id });
+  return json(dropped ? { ok: true, id, photo_dropped: true } : { ok: true, id });
 }

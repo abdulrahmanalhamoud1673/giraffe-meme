@@ -1,12 +1,12 @@
 // Reminder ("nudge"), urgent notifications, and the owner's typical reply time.
 import http from 'node:http'; import crypto from 'node:crypto';
 import { createRequire } from 'node:module';
-import { SITE, makeKeys, makeDb, fakeJpeg } from '../helpers.mjs';
+import { SITE_URL, SITE, makeKeys, makeDb, fakeJpeg, fakeAI } from '../helpers.mjs';
 const require = createRequire(import.meta.url); const ece = require('http_ece');
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 const { db, DB } = makeDb(); const keys = makeKeys();
-const env = { DB, SALT: 's', ...keys };
-const m = (p) => import(SITE + 'functions/' + p);
+const env = { DB, SALT: 's', AI: fakeAI(), ...keys };
+const m = (p) => import(SITE_URL + 'functions/' + p);
 const R = await m('api/register.js'), SEND = await m('api/send.js'), NUDGE = await m('api/nudge.js'), CAR = await m('api/car.js'), INBOX = await m('api/inbox.js'), RES = await m('api/results.js'), REPLY = await m('api/inbox/reply.js'), PAUSE = await m('api/inbox/pause.js');
 let ip = 0;
 const req = (u, method = 'GET', body, h = {}) => new Request('http://x' + u, { method, body: body && JSON.stringify(body), headers: { 'cf-connecting-ip': '7.7.7.' + (ip++ % 250), 'user-agent': 'ua' + ip, ...h } });

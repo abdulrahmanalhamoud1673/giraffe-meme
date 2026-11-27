@@ -1,8 +1,8 @@
 // Short chat between the person who scanned and the owner.
-import { SITE, makeDb, fakeJpeg } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb, fakeJpeg, fakeAI } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), CHAT = await import(SITE + 'functions/api/chat.js'), OCHAT = await import(SITE + 'functions/api/inbox/chat.js'), INBOX = await import(SITE + 'functions/api/inbox.js'), BLOCK = await import(SITE + 'functions/api/inbox/block.js');
-const { DB, db } = makeDb(); const env = { DB, SALT: 's' };
+const REG = await import(SITE_URL + 'functions/api/register.js'), SEND = await import(SITE_URL + 'functions/api/send.js'), CHAT = await import(SITE_URL + 'functions/api/chat.js'), OCHAT = await import(SITE_URL + 'functions/api/inbox/chat.js'), INBOX = await import(SITE_URL + 'functions/api/inbox.js'), BLOCK = await import(SITE_URL + 'functions/api/inbox/block.js');
+const { DB, db } = makeDb(); const env = { DB, SALT: 's', AI: fakeAI() };
 const req = (url, method, body, ip, h = {}) => new Request('http://x' + url, { method, headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip || '1.1.1.1', 'user-agent': 'ua', ...h }, body: body ? JSON.stringify(body) : undefined });
 const a = await (await REG.onRequestPost({ request: req('/', 'POST', { name: 'أحمد الخطيب', phone: '0795551234', consent: true }), env })).json();
 const b = await (await REG.onRequestPost({ request: req('/', 'POST', { name: 'سامي الحسن', phone: '0788403917', consent: true }, '2.2.2.2'), env })).json();
@@ -11,7 +11,7 @@ const sGet = async (i = id) => { const r = await CHAT.onRequestGet({ request: re
 const sPost = async (text, ip = '7.7.7.7', i = id) => { const r = await CHAT.onRequestPost({ request: req('/api/chat?id=' + i, 'POST', { text }, ip), env }); return [r.status, await r.json()]; };
 const oPost = async (text, key = a.owner_key, i = id) => { const r = await OCHAT.onRequestPost({ request: req('/api/inbox/chat?id=' + i, 'POST', { text }, '9.9.9.9', key ? { authorization: 'Bearer ' + key } : {}), env }); return [r.status, await r.json()]; };
 const oGet = async (key = a.owner_key, i = id) => { const r = await OCHAT.onRequestGet({ request: req('/api/inbox/chat?id=' + i, 'GET', null, '9.9.9.9', key ? { authorization: 'Bearer ' + key } : {}), env }); return [r.status, await r.json()]; };
-const CP = await import(SITE + 'functions/api/chat-photo.js'), PH = await import(SITE + 'functions/api/photo.js');
+const CP = await import(SITE_URL + 'functions/api/chat-photo.js'), PH = await import(SITE_URL + 'functions/api/photo.js');
 const gap = () => db.prepare('UPDATE chat SET created_at = created_at - 10').run();
 
 let [s, j] = await sGet(); check('empty thread, open', s === 200 && j.open === true && j.messages.length === 0);

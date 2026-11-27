@@ -1,9 +1,9 @@
 // Admin protection: strong keys work; wrong, missing, weak or exposed keys do not.
 import crypto from 'node:crypto';
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const S = await import(SITE + 'functions/api/_security.js');
-const R = await import(SITE + 'functions/api/results.js');
+const S = await import(SITE_URL + 'functions/api/_security.js');
+const R = await import(SITE_URL + 'functions/api/results.js');
 const { DB } = makeDb();
 // fake "exposed" values (the real leaked ones are never stored in plaintext anywhere)
 const fake = { ADMIN_KEY: 'fake-leaked-admin-key-for-tests-1', SALT: 'fake-leaked-salt-for-tests', VAPID_PRIVATE: 'fake-leaked-vapid-for-tests' };

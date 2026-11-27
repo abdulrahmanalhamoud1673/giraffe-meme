@@ -21,7 +21,7 @@
 
 ## شو معلّق (بالترتيب المقترح)
 1. **الدخول بجوجل:** المالك فتح Google Cloud (مشروع `orb-scanner-c06b7`، Google Auth Platform). لازم: Branding (اسم "يا نشمي") ← Clients ← Create client (Web) ← ينسخ **Client ID** (مش سرّي). بعدها: يحطه بكلاودفلير باسم `GOOGLE_CLIENT_ID`، وأنت تضيف الدخول بجوجل بالتطبيق (Credential Manager + googleid) وبتحتاج OAuth client من نوع Android (package `com.yanashmi.app` + SHA-1 للمفتاح) إذا لزم. ثم وقت الحذف/الدخول الجديد يتحدّث `privacy.html` (موجود فيه سطر إيميل جوجل).
-2. **Cloudflare:** `VAPID_PUBLIC/VAPID_PRIVATE` لسا قديمين (مولّد بالصفحة `/results` بيعطي زوج جديد بدون ما يظهر السر). إيميل `info@yanashmi.com` (Email Routing) لسا ما اتعمل. Bot Fight Mode + Rate limiting rule على `/api/*`. ربط Workers AI باسم `AI` (فحص الصور اختياري).
+2. **Cloudflare:** `VAPID_PUBLIC/VAPID_PRIVATE` لسا قديمين (مولّد بالصفحة `/results` بيعطي زوج جديد بدون ما يظهر السر). إيميل `info@yanashmi.com` (Email Routing) لسا ما اتعمل. Bot Fight Mode + Rate limiting rule على `/api/*`. Workers AI مربوط باسم `AI` (2026-11-27).
 3. **واتساب (Meta):** حساب أعمال Yanashmi وتطبيق `yanashmi` اتعملوا، ورقم تجريبي (+1 555 190 0834) جرّب يبعت. المفاتيح الحقيقية بدها: Business Verification (أوراق: سجل تجاري/رخصة مهن)، رقم خدمة حقيقي، قالب عربي موافق عليه. الكود جاهز (`_channels.js`)، يتفعّل بـ WA_TOKEN/WA_PHONE_ID/WA_TEMPLATE. الرنّة عبر Twilio + `cron-worker/` (CRON_KEY).
 4. **جوجل بلاي:** حساب مطوّر شخصي موجود، التطبيق ما اتنشأ. بيحتاج غالباً اختبار مغلق (تأكد من العدد/المدة بلوحته). الملفات جاهزة بـ `parkqr/play/`. AAB موقّع: المالك لازم يحتفظ بمفتاح الرفع (ما تولّده وتضيّعه).
 5. **FCM:** إشعارات فورية بالتطبيق بتحتاج مشروع Firebase (الآن فحص كل 15 دقيقة).

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Color as AColor
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -41,6 +42,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.credentials.exceptions.GetCredentialCancellationException
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.delay
@@ -98,6 +102,8 @@ fun AuthScreen(onDone: (String, String) -> Unit) {
     var phone by remember { mutableStateOf("") }; var car by remember { mutableStateOf("") }
     var consent by remember { mutableStateOf(false) }; var link by remember { mutableStateOf("") }
     var busy by remember { mutableStateOf(false) }; var err by remember { mutableStateOf("") }
+    var idToken by remember { mutableStateOf("") }   // set while a new Google user still has to give a phone number
+    val ctx = LocalContext.current
     Column(Modifier.fillMaxSize().background(Night)) {
         Column(Modifier.fillMaxWidth().background(HeaderBrush).statusBarsPadding().padding(horizontal = 24.dp, vertical = 26.dp), horizontalAlignment = Alignment.Start) {
             StarMark(46)
@@ -117,6 +123,30 @@ fun AuthScreen(onDone: (String, String) -> Unit) {
                     }
                 }
             }
+            OutlinedButton(
+                onClick = {
+                    err = ""; busy = true
+                    scope.launch {
+                        try {
+                            val t = googleIdToken(ctx)
+                            val r = Api.google(t)
+                            val a = r.account
+                            if (a != null) onDone(a.token, a.key) else {
+                                idToken = t; tab = 0
+                                val parts = r.name.trim().split(Regex("\\s+"), limit = 2)
+                                if (first.isBlank()) first = parts.getOrElse(0) { "" }
+                                if (last.isBlank()) last = parts.getOrElse(1) { "" }
+                            }
+                        } catch (_: GetCredentialCancellationException) {
+                        } catch (_: NoCredentialException) { err = "ما لقينا حساب جوجل على الموبايل. ضيف حساب من الإعدادات وجرّب."
+                        } catch (_: GetCredentialException) { err = "ما زبط الدخول بجوجل. جرّب كمان مرة."
+                        } catch (e: Exception) { err = errText(e) } finally { busy = false }
+                    }
+                },
+                enabled = !busy, modifier = Modifier.fillMaxWidth().height(52.dp), shape = RoundedCornerShape(18.dp),
+                border = BorderStroke(1.dp, Line), colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White, contentColor = Green),
+            ) { Text("المتابعة بحساب جوجل", fontSize = 16.sp, fontWeight = FontWeight.Bold) }
+            if (idToken.isNotEmpty() && tab == 0) Text("ضل خطوة: اكتب رقمك ووافق، وبعدين اضغط «سجّل».", color = GreenDark, fontWeight = FontWeight.SemiBold)
             if (tab == 0) {
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     YnField(first, { first = it }, "الاسم الأول", Modifier.weight(1f))
@@ -143,7 +173,12 @@ fun AuthScreen(onDone: (String, String) -> Unit) {
                     try {
                         if (tab == 0) {
                             if (!consent) { err = "لازم توافق على حفظ اسمك ورقمك."; return@launch }
-                            val r = Api.register("${first.trim()} ${last.trim()}", car.trim(), phone.trim()); onDone(r.token, r.key)
+                            val name = "${first.trim()} ${last.trim()}"
+                            val r = if (idToken.isEmpty()) Api.register(name, car.trim(), phone.trim()) else {
+                                if (phone.isBlank()) { err = errText(ApiError(400, "bad_phone")); return@launch }
+                                Api.google(idToken, name, car.trim(), phone.trim(), true).account ?: throw ApiError(401, "bad_token")
+                            }
+                            onDone(r.token, r.key)
                         } else {
                             val m = Regex("([a-zA-Z0-9]{16,40})\\s*$").find(link.trim())
                             if (m == null) { err = "الرابط مش صحيح. انسخه كامل."; return@launch }

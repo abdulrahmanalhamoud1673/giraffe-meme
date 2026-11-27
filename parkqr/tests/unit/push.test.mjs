@@ -1,10 +1,10 @@
 import crypto from 'node:crypto';
 import http from 'node:http';
-import { SITE, makeKeys } from '../helpers.mjs';
+import { SITE_URL, SITE, makeKeys } from '../helpers.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const ece = require('http_ece');
-const { encryptPayload, vapidJwt, sendPush, validEndpoint, pushConfigured } = await import(SITE + 'functions/api/_push.js');
+const { encryptPayload, vapidJwt, sendPush, validEndpoint, pushConfigured } = await import(SITE_URL + 'functions/api/_push.js');
 const keys = makeKeys();
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; console.log(c ? 'PASS' : 'FAIL', name); };
 

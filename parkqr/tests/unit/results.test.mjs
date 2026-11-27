@@ -1,8 +1,8 @@
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 const { db, DB } = makeDb();
 const env = { DB, ADMIN_KEY: 'admin-secret-key-123' };
-const R = await import(SITE + 'functions/api/results.js');
+const R = await import(SITE_URL + 'functions/api/results.js');
 const get = (key) => R.onRequestGet({ request: new Request('http://x/api/results', { headers: key ? { authorization: 'Bearer ' + key } : {} }), env });
 
 check('needs the admin key', (await get()).status === 401 && (await get('wrong')).status === 401);

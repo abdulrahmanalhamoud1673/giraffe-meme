@@ -1,11 +1,11 @@
 import http from 'node:http'; import crypto from 'node:crypto';
-import { SITE, makeKeys, makeDb, fakeJpeg } from '../helpers.mjs';
+import { SITE_URL, SITE, makeKeys, makeDb, fakeJpeg, fakeAI } from '../helpers.mjs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url); const ece = require('http_ece');
-const B = SITE + 'functions/';
+const B = SITE_URL + 'functions/';
 const { db, DB } = makeDb();
 const keys = makeKeys();
-const env = { DB, SALT: 's', VAPID_PUBLIC: keys.VAPID_PUBLIC, VAPID_PRIVATE: keys.VAPID_PRIVATE };
+const env = { DB, SALT: 's', AI: fakeAI(), VAPID_PUBLIC: keys.VAPID_PUBLIC, VAPID_PRIVATE: keys.VAPID_PRIVATE };
 const m = async (p) => import(B + p);
 const R = await m('api/register.js'), SUB = await m('api/push-subscribe.js'), UNS = await m('api/push-unsubscribe.js'), PK = await m('api/push-key.js'), PT = await m('api/push-test.js'), SEND = await m('api/send.js'), MAN = await m('manifest.webmanifest.js');
 const req = (u, method = 'GET', body, h = {}) => new Request('http://x' + u, { method, body: body && JSON.stringify(body), headers: { 'cf-connecting-ip': '1.1.1.' + (Math.random() * 250 | 0), 'user-agent': 'ua' + Math.random(), ...h } });

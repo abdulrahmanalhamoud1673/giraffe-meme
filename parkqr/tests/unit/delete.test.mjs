@@ -1,8 +1,8 @@
 // Account deletion, request size caps, registration flood cap.
-import { SITE, makeDb, fakeJpeg } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb, fakeJpeg, fakeAI } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), DEL = await import(SITE + 'functions/api/inbox/delete.js'), BLOCK = await import(SITE + 'functions/api/inbox/block.js'), SURVEY = await import(SITE + 'functions/api/survey.js');
-const { DB, db } = makeDb(); const env = { DB, SALT: 's' };
+const REG = await import(SITE_URL + 'functions/api/register.js'), SEND = await import(SITE_URL + 'functions/api/send.js'), DEL = await import(SITE_URL + 'functions/api/inbox/delete.js'), BLOCK = await import(SITE_URL + 'functions/api/inbox/block.js'), SURVEY = await import(SITE_URL + 'functions/api/survey.js');
+const { DB, db } = makeDb(); const env = { DB, SALT: 's', AI: fakeAI() };
 const req = (body, ip, h = {}) => new Request('http://x/', { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, ...h }, body: typeof body === 'string' ? body : JSON.stringify(body) });
 const reg = async (name, phone, ip) => (await (await REG.onRequestPost({ request: req({ name, phone, consent: true }, ip), env })).json());
 const a = await reg('أحمد الخطيب', '0795551234', '1.1.1.1'); const b = await reg('سامي الحسن', '0788403917', '2.2.2.2');

@@ -1,8 +1,8 @@
 // WhatsApp message + phone ring (mocked network), and the minute-by-minute escalation endpoint.
-import { SITE, makeDb, fakeJpeg } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb, fakeJpeg, fakeAI } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const C = await import(SITE + 'functions/api/_channels.js');
-const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), NUDGE = await import(SITE + 'functions/api/nudge.js'), ESC = await import(SITE + 'functions/api/escalate.js');
+const C = await import(SITE_URL + 'functions/api/_channels.js');
+const REG = await import(SITE_URL + 'functions/api/register.js'), SEND = await import(SITE_URL + 'functions/api/send.js'), NUDGE = await import(SITE_URL + 'functions/api/nudge.js'), ESC = await import(SITE_URL + 'functions/api/escalate.js');
 check('waNumber: 07.. -> 962..', C.waNumber('0795551234') === '962795551234');
 check('waNumber: +962 kept', C.waNumber('+962 79 555 1234') === '962795551234');
 check('waNumber: junk -> empty', C.waNumber('12') === '');
@@ -10,7 +10,7 @@ check('waNumber: junk -> empty', C.waNumber('12') === '');
 const calls = []; const realFetch = globalThis.fetch;
 globalThis.fetch = async (url, init) => { calls.push({ url: String(url), init }); return new Response('{}', { status: 200 }); };
 const { DB, db } = makeDb();
-const base = { DB, SALT: 's' };
+const base = { DB, SALT: 's', AI: fakeAI() };
 const wa = { WA_TOKEN: 'tok', WA_PHONE_ID: '123', WA_TEMPLATE: 'new_alert', SITE_URL: 'https://yanashmi.com' };
 const tw = { TWILIO_SID: 'ACabc', TWILIO_TOKEN: 'secret', TWILIO_FROM: '+15005550006' };
 const req = (body, ip, h = {}) => new Request('http://x/', { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, ...h }, body: JSON.stringify(body) });

@@ -1,6 +1,6 @@
 import fs from 'node:fs'; import vm from 'node:vm';
-import { SITE, makeDb } from '../helpers.mjs';
-const V = await import(SITE + 'functions/api/_validate.js');
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
+const V = await import(SITE_URL + 'functions/api/_validate.js');
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 
 // ---- names that must be accepted
@@ -41,7 +41,7 @@ check('every error code has a message', ['name_required','name_two_words','name_
 // ---- API: register endpoint enforces it, with a real SQL database
 const { db, DB } = makeDb();
 const env = { DB, SALT: 's' };
-const R = await import(SITE + 'functions/api/register.js');
+const R = await import(SITE_URL + 'functions/api/register.js');
 let ipc = 0;
 const reg = async (b) => { const r = await R.onRequestPost({ request: new Request('http://x/', { method: 'POST', body: JSON.stringify(b), headers: { 'cf-connecting-ip': '5.5.5.' + (ipc++ % 250), 'user-agent': 'u' + ipc } }), env }); return [r.status, await r.json()]; };
 const base = { name: 'أحمد الخطيب', phone: '0795551234', consent: true };

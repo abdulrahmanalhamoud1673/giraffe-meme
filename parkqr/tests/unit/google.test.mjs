@@ -1,8 +1,8 @@
 // Sign in with Google: token checks (real RSA signatures, mocked Google keys) and account creation / recovery.
 import crypto from 'node:crypto';
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const G = await import(SITE + 'functions/api/_google.js'), AUTH = await import(SITE + 'functions/api/auth/google.js'), DEL = await import(SITE + 'functions/api/inbox/delete.js'), SEND = await import(SITE + 'functions/api/send.js');
+const G = await import(SITE_URL + 'functions/api/_google.js'), AUTH = await import(SITE_URL + 'functions/api/auth/google.js'), DEL = await import(SITE_URL + 'functions/api/inbox/delete.js'), SEND = await import(SITE_URL + 'functions/api/send.js');
 const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', { modulusLength: 2048 });
 const jwk = { ...publicKey.export({ format: 'jwk' }), kid: 'k1', alg: 'RS256', use: 'sig' };
 globalThis.fetch = async (u) => new Response(JSON.stringify({ keys: [jwk] }), { status: 200 });

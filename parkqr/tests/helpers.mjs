@@ -1,8 +1,13 @@
+import { fileURLToPath } from 'node:url';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import { DatabaseSync } from 'node:sqlite';
 
-export const SITE = new URL('../site/', import.meta.url).pathname;
+// A pretend Workers AI binding: answers every photo with the given verdict (a good car photo unless told otherwise).
+export const fakeAI = (v = {}) => ({ run: async () => ({ choices: [{ message: { content: JSON.stringify({ vehicle: true, screen: false, indecent: false, abusive_text: false, ...v }) } }] }) });
+
+export const SITE = fileURLToPath(new URL('../site/', import.meta.url));
+export const SITE_URL = new URL('../site/', import.meta.url).href;   // for import(); SITE is for fs (Windows needs both)
 
 // A throw-away VAPID key pair (public key = 65-byte uncompressed point, private = 32-byte d), both base64url.
 export function makeKeys() {

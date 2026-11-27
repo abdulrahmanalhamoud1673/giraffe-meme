@@ -1,4 +1,6 @@
 -keep class com.yanashmi.app.** { *; }
+-if class androidx.credentials.CredentialManager
+-keep class androidx.credentials.playservices.** { *; }
 -dontwarn com.google.errorprone.annotations.**
 -dontwarn javax.annotation.**
 -dontwarn javax.annotation.concurrent.**

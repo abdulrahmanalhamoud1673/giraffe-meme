@@ -1,7 +1,7 @@
 // Blocking a sender, and recording where a registration came from.
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE_URL, SITE, makeDb } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
-const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), BLOCK = await import(SITE + 'functions/api/inbox/block.js'), RES = await import(SITE + 'functions/api/results.js');
+const REG = await import(SITE_URL + 'functions/api/register.js'), SEND = await import(SITE_URL + 'functions/api/send.js'), BLOCK = await import(SITE_URL + 'functions/api/inbox/block.js'), RES = await import(SITE_URL + 'functions/api/results.js');
 const { DB, db } = makeDb();
 const env = { DB, SALT: 'test-salt', ADMIN_KEY: 'block-test-admin-key-000001' };
 const req = (body, ip, h = {}) => new Request('http://x/', { method: 'POST', headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, 'user-agent': 'ua', ...h }, body: JSON.stringify(body) });
