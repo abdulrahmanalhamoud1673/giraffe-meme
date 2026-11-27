@@ -285,3 +285,8 @@ input[aria-invalid="true"]{border-color:var(--red)!important;box-shadow:0 0 0 3p
 .opt .camTag{margin-inline-start:auto;flex:none;display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:600;color:var(--muted);background:var(--bubble);border-radius:99px;padding:4px 10px}
 .opt .camTag svg{width:14px;height:14px}
 .opt.primary .camTag{background:#ffffff26;color:inherit}
+.noKey{display:grid;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;margin:24px 0}
+.noKey b{font-family:var(--display);font-size:1.25rem}
+.noKey input{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:12px 14px;min-width:0}
+.noKey button{font:inherit;font-weight:600;background:var(--green);color:var(--on-green);border:0;border-radius:12px;padding:12px;cursor:pointer}
+.noKey a{color:var(--green);font-weight:600}

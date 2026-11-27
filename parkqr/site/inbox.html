@@ -248,7 +248,10 @@ async function renderNotif(){
   };
   if($('nOff'))$('nOff').onclick=async()=>{if(Push.demo){return}await Push.disable(H);renderNotif()};
 }
-if(key.length>=16){load();setInterval(load,8000);renderNotif();Push.resync(H)}else $('msgs').innerHTML='<div class="warn">ما في مفتاح بالرابط. افتح الرابط اللي حفظته عند التسجيل.</div>';
+if(key.length>=16){load();setInterval(load,8000);renderNotif();Push.resync(H)}else{
+  $('msgs').innerHTML='<div class="noKey"><b>افتح صندوقك</b><p>الصق رابط صندوقك اللي حفظته عند التسجيل.</p><input id="keyIn" dir="ltr" placeholder="https://yanashmi.com/inbox.html#..." autocomplete="off"><button id="keyGo" type="button">فتح</button><p class="note" id="keyErr"></p><a href="register.html">ما عندي حساب؟ سجّل سيارتك</a></div>';
+  $('keyGo').onclick=()=>{const m=($('keyIn').value||'').trim().match(/([a-z0-9]{16,40})\s*$/i);if(!m){$('keyErr').textContent='الرابط مش صحيح. انسخه كامل.';return}try{localStorage.setItem('yn_key',m[1].toLowerCase())}catch(_){}location.hash=m[1].toLowerCase();location.reload()};
+}
 </script>
 </body>
 </html>
