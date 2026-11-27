@@ -14,6 +14,7 @@ export async function onRequestPost({ request, env }) {
   await run('DELETE FROM blocks WHERE car_id = ?');
   await run('DELETE FROM interests WHERE car_id = ?');
   await run('DELETE FROM sources WHERE car_id = ?');
+  await run('DELETE FROM accounts WHERE car_id = ?');
   await env.DB.prepare('DELETE FROM cars WHERE id = ?').bind(id).run();
   return json({ ok: true });
 }

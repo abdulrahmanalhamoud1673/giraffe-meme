@@ -11,7 +11,7 @@ import java.net.URLEncoder
 
 class ApiError(val status: Int, val code: String) : Exception("$status $code")
 
-data class Msg(val id: String, val kind: String, val reply: String?, val createdAt: Long, val photo: Boolean, val note: String?, val chat: Int)
+data class Msg(val id: String, val kind: String, val reply: String?, val createdAt: Long, val photo: Boolean, val note: String?, val chat: Int, val repliedAt: Long? = null)
 data class Inbox(val name: String, val nickname: String, val paused: Boolean, val messages: List<Msg>)
 data class ChatMsg(val id: String, val mine: Boolean, val text: String, val photo: Boolean, val t: Long)
 data class Thread(val open: Boolean, val messages: List<ChatMsg>)
@@ -65,7 +65,7 @@ object Api {
         val car = r.getJSONObject("car"); val arr = r.getJSONArray("messages")
         val list = (0 until arr.length()).map { arr.getJSONObject(it) }.filter { !it.optString("kind").startsWith("nudge:") }.map {
             Msg(it.getString("id"), it.optString("kind"), if (it.isNull("reply")) null else it.optString("reply"), it.optLong("created_at"), it.optInt("photo") == 1,
-                if (it.isNull("note")) null else it.optString("note"), it.optInt("chat"))
+                if (it.isNull("note")) null else it.optString("note"), it.optInt("chat"), if (it.isNull("replied_at")) null else it.optLong("replied_at"))
         }
         return Inbox(car.optString("name"), car.optString("nickname"), car.optBoolean("paused"), list)
     }

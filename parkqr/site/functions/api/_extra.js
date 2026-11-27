@@ -24,3 +24,9 @@ export async function ensureChat(env) {
   try { await env.DB.prepare('ALTER TABLE chat ADD COLUMN photo INTEGER NOT NULL DEFAULT 0').run(); } catch (_) { /* column already there */ }
   ch = true;
 }
+let ac = false;
+export async function ensureAccounts(env) {
+  if (ac) return;
+  await env.DB.prepare('CREATE TABLE IF NOT EXISTS accounts (sub TEXT PRIMARY KEY, email TEXT NOT NULL, car_id TEXT NOT NULL UNIQUE, created_at INTEGER NOT NULL DEFAULT (unixepoch()))').run();
+  ac = true;
+}

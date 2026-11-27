@@ -289,6 +289,7 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
             item {
                 Bubble(false, KINDS[m.kind] ?: m.kind, clock(m.createdAt), first, note = m.note)
             }
+            if (m.reply != null) item { Bubble(true, REPLIES[m.reply] ?: m.reply, clock(m.repliedAt ?: m.createdAt), null) }
             items(items, key = { it.id }) { c ->
                 val pic by rememberPhoto(key, c.id, c.photo)
                 Bubble(c.mine, c.text, clock(c.t), pic)
@@ -314,10 +315,10 @@ fun ChatScreen(key: String, m: Msg, onBack: () -> Unit, onChanged: () -> Unit) {
 fun Bubble(mine: Boolean, text: String, time: String, pic: Bitmap?, note: String? = null) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = if (mine) Arrangement.Start else Arrangement.End) {
         Column(
-            Modifier.widthIn(max = 290.dp).clip(RoundedCornerShape(topStart = if (mine) 4.dp else 16.dp, topEnd = if (mine) 16.dp else 4.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
+            Modifier.widthIn(max = 270.dp).clip(RoundedCornerShape(topStart = if (mine) 4.dp else 16.dp, topEnd = if (mine) 16.dp else 4.dp, bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(if (mine) Green else Color.White).padding(horizontal = 10.dp, vertical = 7.dp),
         ) {
-            pic?.let { Image(it.asImageBitmap(), null, Modifier.padding(bottom = 6.dp).widthIn(max = 260.dp).heightIn(max = 240.dp).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Crop) }
+            pic?.let { Image(it.asImageBitmap(), null, Modifier.padding(bottom = 6.dp).widthIn(max = 230.dp).heightIn(max = 260.dp).clip(RoundedCornerShape(10.dp)), contentScale = ContentScale.Crop) }
             if (text.isNotEmpty()) Text(text, color = if (mine) Color.White else Ink, fontSize = 15.sp)
             if (!note.isNullOrBlank()) Text(note, color = Muted, fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
             Text(time, color = if (mine) Color(0xCCFFFFFF) else Muted, fontSize = 10.sp, modifier = Modifier.align(Alignment.End).padding(top = 2.dp))
