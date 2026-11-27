@@ -1,4 +1,4 @@
-import { json, carByKey } from './_shared.js';
+import { json, carByKey, readJson } from './_shared.js';
 
 const AREAS = ['amman', 'irbid', 'zarqa', 'other'];
 const PRICES = ['2', '3', '5', 'more'];
@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
   const car = await carByKey(env, request);
   if (!car) return json({ error: 'unauthorized' }, 401);
   let b;
-  try { b = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  try { b = await readJson(request, 4096); } catch { return json({ error: 'bad_json' }, 400); }
   if (!AREAS.includes(b.area)) return json({ error: 'bad_area' }, 400);
   if (!PRICES.includes(String(b.price))) return json({ error: 'bad_price' }, 400);
   const qty = Number(b.qty || 1);

@@ -1,4 +1,4 @@
-import { json, NUDGE_PREFIX, NUDGE_AFTER_SECONDS } from './_shared.js';
+import { json, NUDGE_PREFIX, NUDGE_AFTER_SECONDS, readJson } from './_shared.js';
 import { escalate } from './_escalate.js';
 
 // The sender (who holds the secret message id) can remind the owner once, after 3 minutes without a reply.
@@ -9,7 +9,7 @@ export async function onRequestPost(ctx) {
 
 async function handle({ request, env, waitUntil }) {
   let b;
-  try { b = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  try { b = await readJson(request, 4096); } catch { return json({ error: 'bad_json' }, 400); }
   const id = String(b.id || '');
   const m = await env.DB.prepare("SELECT m.id, m.car_id, m.kind, m.reply, unixepoch() - m.created_at AS age, c.paused FROM messages m JOIN cars c ON c.id = m.car_id WHERE m.id = ? AND m.kind NOT LIKE 'nudge:%'").bind(id).first();
   if (!m) return json({ error: 'not_found' }, 404);

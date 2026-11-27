@@ -1,11 +1,11 @@
-import { json, rid, carByKey } from './_shared.js';
+import { json, rid, carByKey, readJson } from './_shared.js';
 import { validEndpoint } from './_push.js';
 
 export async function onRequestPost({ request, env }) {
   const car = await carByKey(env, request);
   if (!car) return json({ error: 'unauthorized' }, 401);
   let b;
-  try { b = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  try { b = await readJson(request, 4096); } catch { return json({ error: 'bad_json' }, 400); }
   const endpoint = String(b?.endpoint || '');
   const p256dh = String(b?.keys?.p256dh || '');
   const auth = String(b?.keys?.auth || '');

@@ -1,11 +1,11 @@
-import { OPTIONS } from './_shared.js';
+import { OPTIONS, readJson } from './_shared.js';
 
 const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json; charset=utf-8' } });
 
 export async function onRequestPost({ request, env }) {
   let body;
-  try { body = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  try { body = await readJson(request, 4096); } catch { return json({ error: 'bad_json' }, 400); }
   if (body.website) return json({ ok: true }); // honeypot: silently drop bots
   const row = {};
   for (const [key, allowed] of Object.entries(OPTIONS)) {

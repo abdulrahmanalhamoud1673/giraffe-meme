@@ -1,4 +1,4 @@
-import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS } from './_shared.js';
+import { json, rid, deviceHash, MSG_KINDS, MSG_TEXT, URGENT_KINDS, readJson } from './_shared.js';
 import { notifyOwner } from './_push.js';
 import { ensureBlocks, ensureNotes } from './_extra.js';
 import { whatsappConfigured, ownerContact, sendWhatsApp } from './_channels.js';
@@ -12,7 +12,7 @@ export async function onRequestPost(ctx) {
 
 async function handle({ request, env, waitUntil }) {
   let b;
-  try { b = await request.json(); } catch { return json({ error: 'bad_json' }, 400); }
+  try { b = await readJson(request, 420000); } catch { return json({ error: 'bad_json' }, 400); }
   if (!MSG_KINDS.includes(b.kind)) return json({ error: 'bad_kind' }, 400);
   const car = await env.DB.prepare('SELECT id, paused FROM cars WHERE id = ?').bind(String(b.token || '')).first();
   if (!car) return json({ error: 'not_found' }, 404);

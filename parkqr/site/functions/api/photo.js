@@ -10,5 +10,5 @@ export async function onRequestGet({ request, env }) {
   const row = await env.DB.prepare('SELECT data FROM photos WHERE msg_id = ? AND car_id = ?').bind(id, car.id).first();
   if (!row) return json({ error: 'not_found' }, 404);
   const bin = Uint8Array.from(atob(row.data), (c) => c.charCodeAt(0));
-  return new Response(bin, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff' } });
+  return new Response(bin, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'private, no-store', 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; sandbox" } });
 }

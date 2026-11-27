@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/app.css?v=20261119c">
+<link rel="icon" type="image/png" href="/icon-192.png">
+<title>حذف الحساب — يا نشمي</title>
+<meta name="robots" content="noindex">
+</head>
+<body>
+<div class="band" aria-hidden="true"></div>
+<div class="wrap">
+  <header class="top"><a class="logo" href="/">يا نشمي</a><a class="back" href="/">الرئيسية</a></header>
+  <main>
+    <h1>حذف حسابي</h1>
+    <p class="lead">بنحذف حسابك وكل رسائلك وصورك وأجهزة الإشعارات نهائياً. ما في رجعة.</p>
+    <div class="noKey" style="margin-top:6px">
+      <b>الصق رابط صندوقك</b>
+      <p>هو الرابط اللي حفظته عند التسجيل (فيه # وبعده حروف).</p>
+      <input id="keyIn" dir="ltr" placeholder="https://yanashmi.com/inbox.html#..." autocomplete="off">
+      <button id="go" type="button">احذف حسابي</button>
+      <p class="note" id="msg" role="status"></p>
+    </div>
+    <p class="note">ما عندك الرابط؟ ابعت إيميل لـ <a href="mailto:info@yanashmi.com">info@yanashmi.com</a> وبنحذف الحساب.</p>
+  </main>
+</div>
+<script src="/shared.js?v=20261119c"></script>
+<script>
+const $=id=>document.getElementById(id);
+$('go').onclick=async()=>{
+  const m=($('keyIn').value||'').trim().match(/([a-z0-9]{16,40})\s*$/i);
+  if(!m){$('msg').textContent='الرابط مش صحيح. انسخه كامل.';return}
+  if(!confirm('متأكد؟ رح ينحذف حسابك وكل رسائلك نهائياً.'))return;
+  $('go').disabled=true;
+  try{await api('/inbox/delete',{method:'POST',headers:{authorization:'Bearer '+m[1].toLowerCase(),'content-type':'application/json'},body:'{}'});
+    try{localStorage.removeItem('yn_key');localStorage.removeItem('yn_reg')}catch(_){}
+    $('msg').textContent='انحذف حسابك.';
+  }catch(e){$('go').disabled=false;$('msg').textContent=e.status===401?'الرابط مش صحيح أو الحساب محذوف أصلاً.':'صار خطأ، جرب كمان مرة.'}
+};
+</script>
+</body>
+</html>

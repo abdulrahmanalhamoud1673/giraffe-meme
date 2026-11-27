@@ -13,6 +13,15 @@ export const OPTIONS = {
 export const MSG_KINDS = ['block', 'urgent', 'lights', 'open', 'fault', 'hit', 'thanks'];
 export const REPLY_KINDS = ['2', '5', '10', 'cant'];
 
+// Reads a JSON body but refuses anything bigger than `max` characters (no one can push huge bodies at the API).
+export async function readJson(request, max = 4096) {
+  const len = Number(request.headers.get('content-length') || 0);
+  if (len > max) throw new Error('too_big');
+  const text = await request.text();
+  if (text.length > max) throw new Error('too_big');
+  return JSON.parse(text);
+}
+
 export const json = (obj, status = 200) =>
   new Response(JSON.stringify(obj), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
 
