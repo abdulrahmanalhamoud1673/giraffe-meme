@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/app.css?v=20261127b">
+<link rel="stylesheet" href="/app.css?v=20261127c">
 <link rel="icon" type="image/png" href="/icon-192.png">
 <title>رسالة لصاحب السيارة — يا نشمي</title>
 <meta name="robots" content="noindex">
@@ -56,7 +56,7 @@
       </div>
       <div class="chatBox" id="chatBox" hidden>
         <div class="chatList" id="chatList"></div>
-        <form class="chatForm" id="chatForm"><input id="chatIn" maxlength="140" placeholder="اكتب رسالة قصيرة…" autocomplete="off"><button type="submit" aria-label="إرسال"></button></form>
+        <form class="chatForm" id="chatForm"><button type="button" class="camBtn" id="chatCam" aria-label="صوّر"></button><input id="chatIn" maxlength="140" placeholder="اكتب رسالة قصيرة…" autocomplete="off"><button type="submit" aria-label="إرسال"></button></form>
         <p class="note" id="chatErr"></p>
       </div>
       <div class="reply" id="replyCard" hidden><span class="note">ردّ صاحب السيارة</span><b id="replyText"></b></div>
@@ -69,7 +69,8 @@
     </section>
   </main>
 </div>
-<script src="/shared.js?v=20261127b"></script>
+<script src="/shared.js?v=20261127c"></script>
+<script src="/camera.js?v=20261127c"></script>
 <script>
 const token=new URLSearchParams(location.search).get('t')||(location.pathname.match(/\/c\/([a-z0-9]+)/i)||[])[1]||'';
 const $=id=>document.getElementById(id);
@@ -143,19 +144,22 @@ $('camBack').onclick=()=>{stopCam();view('pick')};
 
 // ---- short chat with the owner (same id as the status page)
 let chatId='',chatTimer=null,chatSig='';
-const CHAT_ERR={text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.'};
+const CHAT_ERR={photo_unrelated:'الصورة ما بتبيّن السيارة. صوّر المشكلة بوضوح.',bad_photo:'الصورة مش صالحة. صوّر من جديد.',text_rejected:'الرسالة ما انقبلت. اكتب شي بسيط بدون أرقام أو روابط.',slow:'استنى ثواني قبل الرسالة الجاية.',closed:'انتهت المحادثة.',limit:'وصلت الحد الأقصى للمحادثة.'};
 async function pullChat(){
   try{
     const r=await api('/chat?id='+encodeURIComponent(chatId));const sig=JSON.stringify(r.messages);
-    if(sig!==chatSig){chatSig=sig;const l=$('chatList');l.textContent='';for(const m of r.messages){const d=document.createElement('div');d.className='cm '+(m.side==='s'?'me':'him');d.textContent=m.text;l.appendChild(d)}l.scrollTop=l.scrollHeight}
+    if(sig!==chatSig){chatSig=sig;const l=$('chatList');l.textContent='';for(const m of r.messages)l.appendChild(chatBubble(m,m.side==='s',x=>'/api/chat-photo?id='+encodeURIComponent(chatId)+'&c='+encodeURIComponent(x.id)));l.scrollTop=l.scrollHeight}
     $('chatForm').hidden=!r.open;
   }catch(_){}
 }
 function startChat(id){
   chatId=id;$('chatBox').hidden=false;chatSig='';pullChat();clearInterval(chatTimer);chatTimer=setInterval(pullChat,4000);
-  $('chatForm').onsubmit=async e=>{e.preventDefault();const t=$('chatIn').value.trim();if(!t)return;$('chatErr').textContent='';
-    try{await api('/chat?id='+encodeURIComponent(chatId),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text:t})});$('chatIn').value='';pullChat()}
+  $('chatCam').innerHTML=ICON.camera;
+  const post=async(body)=>{$('chatErr').textContent='';
+    try{await api('/chat?id='+encodeURIComponent(chatId),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});$('chatIn').value='';pullChat()}
     catch(err){$('chatErr').textContent=CHAT_ERR[err.code]||'ما قدرنا نرسل. جرب كمان مرة.'}};
+  $('chatForm').onsubmit=e=>{e.preventDefault();const t=$('chatIn').value.trim();if(t)post({text:t})};
+  $('chatCam').onclick=async()=>{const p=await liveCapture();if(p)post({photo:p,text:$('chatIn').value.trim()})};
 }
 // Automatic second alert: if there is no reply 2 minutes after sending, we alert him again (once). The button stays as a manual fallback.
 const NUDGE_AFTER=120;let nudgeTimer=null,sentAt=0,auto=false;

@@ -151,3 +151,16 @@ function qrSvg(text) {
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += 'M' + (c + m) + ' ' + (r + m) + 'h1v1h-1z';
   return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + 2 * m) + ' ' + (n + 2 * m) + '" shape-rendering="crispEdges"><rect width="100%" height="100%" fill="#fff"/><path d="' + d + '" fill="#15120f"/></svg>';
 }
+
+// One chat bubble (WhatsApp style): optional picture, text, time. getSrc(m) -> url (or a promise of one) for the picture.
+function chatBubble(m, mine, getSrc) {
+  const d = document.createElement('div'); d.className = 'cm ' + (mine ? 'me' : 'him');
+  if (m.photo && getSrc) {
+    const im = document.createElement('img'); im.className = 'cmImg'; im.alt = 'صورة'; d.appendChild(im);
+    Promise.resolve(getSrc(m)).then((u) => { if (u) { im.src = u; im.onclick = () => window.open(u, '_blank'); } }).catch(() => {});
+  }
+  if (m.text) { const t = document.createElement('span'); t.textContent = m.text; d.appendChild(t); }
+  const tm = document.createElement('span'); tm.className = 'tm'; const dt = new Date(m.t * 1000);
+  tm.textContent = String(dt.getHours()).padStart(2, '0') + ':' + String(dt.getMinutes()).padStart(2, '0'); d.appendChild(tm);
+  return d;
+}

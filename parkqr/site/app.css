@@ -292,13 +292,27 @@ input[aria-invalid="true"]{border-color:var(--red)!important;box-shadow:0 0 0 3p
 .noKey a{color:var(--green);font-weight:600}
 .delLink{text-align:center;font-size:.8rem;color:var(--muted);padding:6px 0 26px}.delLink a{color:var(--muted)}
 
-.chatBox{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px}
-.chatList{display:flex;flex-direction:column;gap:6px;max-height:240px;overflow:auto;padding:4px 2px 8px}
-.cm{max-width:82%;padding:8px 12px;border-radius:14px;font-size:.95rem;line-height:1.5;word-break:break-word}
-.cm.me{align-self:flex-start;background:var(--green);color:var(--on-green);border-bottom-right-radius:4px}
-.cm.him{align-self:flex-end;background:var(--bubble);border-bottom-left-radius:4px}
-.chatForm{display:flex;gap:8px}
+.chatBox{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.chatList{display:flex;flex-direction:column;gap:5px;max-height:320px;min-height:90px;overflow:auto;padding:14px 12px;background:var(--bubble) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cpath d='M22 6l7 7-7 7-7-7z' fill='none' stroke='%23a47a2e' stroke-opacity='.13' stroke-width='1.4'/%3E%3C/svg%3E")}
+.cm{position:relative;max-width:82%;padding:7px 11px 18px;border-radius:14px;font-size:.96rem;line-height:1.5;word-break:break-word;box-shadow:0 1px 1px #0001}
+.cm.me{align-self:flex-start;background:var(--green);color:var(--on-green);border-top-right-radius:4px}
+.cm.him{align-self:flex-end;background:var(--surface);color:var(--ink);border-top-left-radius:4px}
+.cm .tm{position:absolute;bottom:3px;inset-inline-end:9px;font-size:.66rem;opacity:.7}
+.cmImg{display:block;width:100%;max-width:230px;max-height:190px;border-radius:10px;margin:2px 0 6px;cursor:zoom-in;background:#0002;min-height:110px;object-fit:cover}
+.chatForm{display:flex;gap:8px;align-items:center;padding:10px;background:var(--surface)}
 .chatForm input{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:10px 16px}
-.chatForm button{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--green);color:var(--on-green);cursor:pointer;position:relative}
-.chatForm button:after{content:'';position:absolute;inset:0;margin:auto;width:10px;height:10px;border-top:2.5px solid currentColor;border-left:2.5px solid currentColor;transform:rotate(-45deg) translate(1px,1px)}
+.chatForm button{flex:none;width:44px;height:44px;border-radius:50%;border:0;background:var(--green);color:var(--on-green);cursor:pointer;position:relative;display:grid;place-items:center;padding:0}
+.chatForm .camBtn{background:var(--bubble);color:var(--ink)}
+.chatForm .camBtn svg{width:22px;height:22px}
+.chatForm button[type=submit]:after{content:'';position:absolute;inset:0;margin:auto;width:10px;height:10px;border-top:2.5px solid currentColor;border-left:2.5px solid currentColor;transform:rotate(-45deg) translate(1px,1px)}
+.chatBox .note{padding:0 14px 10px}
+.liveCam{position:fixed;inset:0;z-index:99;background:#000;display:flex;flex-direction:column}
+.liveCam video,.liveCam img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.lcX{position:absolute;top:16px;inset-inline-start:16px;width:44px;height:44px;border-radius:50%;border:0;background:#0008;color:#fff;font-size:28px;line-height:1;cursor:pointer;z-index:2}
+.lcMsg{position:absolute;inset:auto 18px 150px;color:#fff;background:#000a;border-radius:12px;padding:10px 14px;text-align:center;z-index:2}.lcMsg:empty{display:none}
+.lcBar{position:absolute;left:0;right:0;bottom:0;padding:22px 20px calc(26px + env(safe-area-inset-bottom,0px));display:flex;gap:14px;justify-content:center;align-items:center;z-index:2;background:linear-gradient(transparent,#000a)}
+.lcShot{width:78px;height:78px;border-radius:50%;border:4px solid #fff;background:transparent;padding:5px;cursor:pointer}
+.lcShot i{display:block;width:100%;height:100%;border-radius:50%;background:#fff}
+.lcAgain,.lcOk{flex:1;max-width:170px;font:inherit;font-weight:700;border-radius:99px;border:0;padding:14px;cursor:pointer}
+.lcAgain{background:#fff3;color:#fff}.lcOk{background:var(--green);color:var(--on-green)}
 .chatToggle{margin:8px 0 0;background:none;border:1px solid var(--line);border-radius:99px;color:var(--green);font:inherit;font-size:.9rem;font-weight:600;padding:6px 16px;cursor:pointer}

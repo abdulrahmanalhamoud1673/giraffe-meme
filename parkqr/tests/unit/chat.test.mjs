@@ -1,5 +1,5 @@
 // Short chat between the person who scanned and the owner.
-import { SITE, makeDb } from '../helpers.mjs';
+import { SITE, makeDb, fakeJpeg } from '../helpers.mjs';
 let ok = 0, n = 0; const check = (name, c) => { n++; if (c) ok++; else console.log('FAIL', name); };
 const REG = await import(SITE + 'functions/api/register.js'), SEND = await import(SITE + 'functions/api/send.js'), CHAT = await import(SITE + 'functions/api/chat.js'), OCHAT = await import(SITE + 'functions/api/inbox/chat.js'), INBOX = await import(SITE + 'functions/api/inbox.js'), BLOCK = await import(SITE + 'functions/api/inbox/block.js');
 const { DB, db } = makeDb(); const env = { DB, SALT: 's' };
@@ -11,6 +11,7 @@ const sGet = async (i = id) => { const r = await CHAT.onRequestGet({ request: re
 const sPost = async (text, ip = '7.7.7.7', i = id) => { const r = await CHAT.onRequestPost({ request: req('/api/chat?id=' + i, 'POST', { text }, ip), env }); return [r.status, await r.json()]; };
 const oPost = async (text, key = a.owner_key, i = id) => { const r = await OCHAT.onRequestPost({ request: req('/api/inbox/chat?id=' + i, 'POST', { text }, '9.9.9.9', key ? { authorization: 'Bearer ' + key } : {}), env }); return [r.status, await r.json()]; };
 const oGet = async (key = a.owner_key, i = id) => { const r = await OCHAT.onRequestGet({ request: req('/api/inbox/chat?id=' + i, 'GET', null, '9.9.9.9', key ? { authorization: 'Bearer ' + key } : {}), env }); return [r.status, await r.json()]; };
+const CP = await import(SITE + 'functions/api/chat-photo.js'), PH = await import(SITE + 'functions/api/photo.js');
 const gap = () => db.prepare('UPDATE chat SET created_at = created_at - 10').run();
 
 let [s, j] = await sGet(); check('empty thread, open', s === 200 && j.open === true && j.messages.length === 0);
@@ -39,6 +40,21 @@ db.prepare("DELETE FROM chat WHERE id LIKE 'c%'").run();
 const hit = await BLOCK.onRequestPost({ request: req('/', 'POST', { id }, '9.9.9.9', { authorization: 'Bearer ' + a.owner_key }), env });
 gap(); [s, j] = await sPost('رسالة من محظور'); check('blocked sender: looks fine', s === 200);
 [, j] = await oGet(); check('...but nothing is stored', !j.messages.some((m) => m.text === 'رسالة من محظور'));
+// pictures in the chat (live camera only)
+const pPost = async (photo, text = '', ip = '7.7.7.7') => { const r = await CHAT.onRequestPost({ request: req('/api/chat?id=' + id, 'POST', { text, photo }, ip), env }); return [r.status, await r.json()]; };
+db.prepare("DELETE FROM blocks").run(); gap();
+[s, j] = await pPost(fakeJpeg()); check('picture alone is accepted', s === 200);
+gap(); [s, j] = await pPost('data:image/png;base64,AAAA'); check('not a JPEG: bad_photo', s === 400 && j.error === 'bad_photo');
+gap(); [s, j] = await pPost(fakeJpeg(), 'شوف الصورة'); check('picture with text', s === 200);
+[, j] = await oGet(); const withPic = j.messages.filter((m) => m.photo === 1);
+check('the thread lists pictures with an id', withPic.length === 2 && withPic[0].id);
+const getPic = async (cid, key) => (await PH.onRequestGet({ request: req('/api/photo?id=' + cid, 'GET', null, '1.1.1.1', key ? { authorization: 'Bearer ' + key } : {}), env })).status;
+check('owner can fetch a chat picture', await getPic(withPic[0].id, a.owner_key) === 200);
+check('another owner cannot', await getPic(withPic[0].id, b.owner_key) === 404);
+const sp = async (cid, mid = id) => (await CP.onRequestGet({ request: req('/api/chat-photo?id=' + mid + '&c=' + cid, 'GET'), env })).status;
+check('sender can fetch it with the thread id', await sp(withPic[0].id) === 200);
+check('a wrong thread id cannot', await sp(withPic[0].id, 'nope') === 404);
+[s, j] = await oPost('   '); check('owner empty text still refused', s === 422);
 // closes after 6 hours
 db.prepare('UPDATE messages SET created_at = unixepoch() - 7*3600 WHERE id = ?').run(id);
 [s, j] = await sPost('متأخر', '8.8.8.8'); check('after 6 hours: 410 closed', s === 410);

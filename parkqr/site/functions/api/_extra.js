@@ -21,5 +21,6 @@ export async function ensureChat(env) {
   if (ch) return;
   await env.DB.prepare('CREATE TABLE IF NOT EXISTS chat (id TEXT PRIMARY KEY, msg_id TEXT NOT NULL, side TEXT NOT NULL, text TEXT NOT NULL, created_at INTEGER NOT NULL DEFAULT (unixepoch()))').run();
   await env.DB.prepare('CREATE INDEX IF NOT EXISTS idx_chat_msg ON chat(msg_id, created_at)').run();
+  try { await env.DB.prepare('ALTER TABLE chat ADD COLUMN photo INTEGER NOT NULL DEFAULT 0').run(); } catch (_) { /* column already there */ }
   ch = true;
 }
